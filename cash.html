@@ -6,25 +6,13 @@
   <title>Cashout - Chicken Eggz</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&family=Fredoka+One&display=swap');
-
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      height: 100%; width: 100%; overflow: hidden;
-      font-family: 'Poppins', system-ui, sans-serif;
-      background-color: transparent; color: #fff;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-
+    html, body { height: 100%; width: 100%; overflow: hidden; font-family: 'Poppins', system-ui, sans-serif; background-color: transparent; color: #fff; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .bg-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
     .bg-layer img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     .bg-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: transparent; z-index: 1; }
-
     .cloud-container { position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-    .cloud { position: absolute; background: #ffffff; border-radius: 100px;
-      box-shadow: 0 0 12px rgba(255,255,255,0.95), inset -10px -10px 22px rgba(219,234,254,0.95);
-      animation: floatClouds linear infinite; }
+    .cloud { position: absolute; background: #ffffff; border-radius: 100px; box-shadow: 0 0 12px rgba(255,255,255,0.95), inset -10px -10px 22px rgba(219,234,254,0.95); animation: floatClouds linear infinite; }
     .cloud::before, .cloud::after { content: ''; position: absolute; background: #ffffff; border-radius: 50%; box-shadow: inset -6px -6px 16px rgba(219,234,254,0.95); }
     .cloud.size-l { width: 100px; height: 35px; }
     .cloud.size-l::before { width: 50px; height: 50px; top: -28px; left: 15px; }
@@ -35,394 +23,146 @@
     .cloud.size-m { width: 70px; height: 25px; }
     .cloud.size-m::before { width: 35px; height: 35px; top: -20px; left: 10px; }
     .cloud.size-m::after { width: 28px; height: 28px; top: -14px; right: 10px; }
-
     @keyframes floatClouds { 0% { transform: translateX(-120%); } 100% { transform: translateX(100vw); } }
-
-    header {
-      justify-content: center; align-items: center;
-      background: rgba(135, 206, 235, 0.85);
-      margin-top: 15px; margin-bottom: 2px;
-      margin-left: 15px; margin-right: 15px;
-      border-radius: 12px;
-      backdrop-filter: blur(30px); border: 3px solid #ffffff;
-      box-shadow: 0 0 12px #FFFFFF, inset 0 0 12px #00aaff;
-      position: relative; z-index: 12; padding: 7px 15px;
-      display: flex;
-    }
-    .logo {
-      font-family: 'Fredoka One', cursive; color: #ffffff;
-      text-shadow: 0 0 20px #00aaff; font-size: 24px;
-      white-space: nowrap; text-align: center;
-    }
-
-    .balance-bar {
-      position: relative; z-index: 10;
-      background: rgba(20, 30, 60, 0.9);
-      border: 2px solid #FFD700;
-      border-radius: 12px;
-      padding: 12px 20px;
-      margin: 10px 15px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .balance-label {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px; color: #a0b0d0;
-      text-transform: uppercase; letter-spacing: 1px;
-    }
-    .balance-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 22px; color: #FFD700;
-      font-weight: 900; text-shadow: 0 0 10px rgba(255,215,0,0.3);
-    }
-
-    .container {
-      position: relative; z-index: 10;
-      height: calc(100vh - 200px);
-      padding: 10px 15px;
-      overflow-y: auto;
-      margin-top: 8px;
-    }
-
-    .card {
-      background: rgba(10, 20, 50, 0.95);
-      border: 2px solid #FFD700;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 12px;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
-    }
-    .card-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 14px; color: #FFD700;
-      margin-bottom: 12px; text-align: center;
-      text-transform: uppercase; letter-spacing: 1px;
-    }
-
-    .tab-nav {
-      display: flex; gap: 8px; margin-bottom: 16px;
-    }
-    .tab-btn {
-      flex: 1; padding: 10px;
-      border: 2px solid rgba(255, 215, 0, 0.3);
-      border-radius: 10px;
-      background: rgba(20, 30, 60, 0.8);
-      color: #a0b0d0;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px; font-weight: 700;
-      cursor: pointer; text-transform: uppercase;
-      letter-spacing: 1px; transition: all 0.3s ease;
-    }
-    .tab-btn.active {
-      border-color: #FFD700; color: #FFD700;
-      background: rgba(255, 215, 0, 0.1);
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-    }
+    header { justify-content: center; align-items: center; background: rgba(135, 206, 235, 0.85); margin-top: 15px; margin-bottom: 2px; margin-left: 15px; margin-right: 15px; border-radius: 12px; backdrop-filter: blur(30px); border: 3px solid #ffffff; box-shadow: 0 0 12px #FFFFFF, inset 0 0 12px #00aaff; position: relative; z-index: 12; padding: 7px 15px; display: flex; }
+    .logo { font-family: 'Fredoka One', cursive; color: #ffffff; text-shadow: 0 0 20px #00aaff; font-size: 24px; white-space: nowrap; text-align: center; }
+    .balance-bar { position: relative; z-index: 10; background: rgba(20, 30, 60, 0.9); border: 2px solid #FFD700; border-radius: 12px; padding: 12px 20px; margin: 10px 15px 0; display: flex; justify-content: space-between; align-items: center; }
+    .balance-label { font-family: 'Orbitron', sans-serif; font-size: 11px; color: #a0b0d0; text-transform: uppercase; letter-spacing: 1px; }
+    .balance-value { font-family: 'Orbitron', sans-serif; font-size: 22px; color: #FFD700; font-weight: 900; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+    .container { position: relative; z-index: 10; height: calc(100vh - 200px); padding: 10px 15px; overflow-y: auto; margin-top: 8px; }
+    .card { background: rgba(10, 20, 50, 0.95); border: 2px solid #FFD700; border-radius: 16px; padding: 20px; margin-bottom: 12px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); }
+    .card-title { font-family: 'Orbitron', sans-serif; font-size: 14px; color: #FFD700; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+    .tab-nav { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 10px; border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 10px; background: rgba(20, 30, 60, 0.8); color: #a0b0d0; font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+    .tab-btn.active { border-color: #FFD700; color: #FFD700; background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
     .tab-btn:hover { border-color: rgba(255, 215, 0, 0.6); color: #fff; }
     .panel { display: none; }
     .panel.active { display: block; }
-
     .form-group { margin-bottom: 12px; }
-    .form-label {
-      display: block; font-family: 'Poppins', sans-serif;
-      font-size: 11px; font-weight: 600;
-      color: #a0b0d0; margin-bottom: 4px;
-      text-transform: uppercase; letter-spacing: 1px;
-    }
-    .form-input, .form-select {
-      width: 100%; padding: 10px 12px;
-      background: rgba(10, 15, 30, 0.8);
-      border: 2px solid rgba(255, 215, 0, 0.2);
-      border-radius: 10px; color: #fff;
-      font-family: 'Poppins', sans-serif;
-      font-size: 13px; outline: none;
-      transition: all 0.3s ease;
-    }
+    .form-label { display: block; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; color: #a0b0d0; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+    .form-input, .form-select { width: 100%; padding: 10px 12px; background: rgba(10, 15, 30, 0.8); border: 2px solid rgba(255, 215, 0, 0.2); border-radius: 10px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; transition: all 0.3s ease; }
     .form-input:focus, .form-select:focus { border-color: #FFD700; }
     .form-input::placeholder { color: #5a6a8a; }
     .form-select { cursor: pointer; }
     .form-select option { background: #0a0f1e; color: #fff; }
-
-    .info-text {
-      font-size: 11px; color: #a0b0d0;
-      line-height: 1.5; margin-bottom: 12px;
-      padding: 8px; background: rgba(255, 215, 0, 0.05);
-      border-radius: 8px; border-left: 3px solid #FFD700;
-    }
-
-    .action-btn {
-      width: 100%; padding: 12px;
-      border: none; border-radius: 10px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 13px; font-weight: 900;
-      cursor: pointer; text-transform: uppercase;
-      letter-spacing: 1px; transition: all 0.3s ease;
-    }
-    .btn-deposit {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #fff; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
-    }
+    .info-text { font-size: 11px; color: #a0b0d0; line-height: 1.5; margin-bottom: 12px; padding: 8px; background: rgba(255, 215, 0, 0.05); border-radius: 8px; border-left: 3px solid #FFD700; }
+    .action-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+    .btn-deposit { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
     .btn-deposit:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(34, 197, 94, 0.5); }
-    .btn-withdraw {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    }
+    .btn-withdraw { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
     .btn-withdraw:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); }
     .action-btn:active { transform: translateY(0); }
     .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .tx-list {
-      max-height: 200px; overflow-y: auto;
-      margin-top: 10px;
-    }
-    .tx-item {
-      background: rgba(20, 30, 60, 0.8);
-      border: 1px solid rgba(255, 215, 0, 0.1);
-      border-radius: 8px; padding: 10px;
-      margin-bottom: 6px; font-size: 12px;
-    }
-    .tx-header {
-      display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 4px;
-    }
-    .tx-type {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase;
-    }
+    .tx-list { max-height: 200px; overflow-y: auto; margin-top: 10px; }
+    .tx-item { background: rgba(20, 30, 60, 0.8); border: 1px solid rgba(255, 215, 0, 0.1); border-radius: 8px; padding: 10px; margin-bottom: 6px; font-size: 12px; }
+    .tx-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .tx-type { font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; }
     .tx-type.deposit { color: #22c55e; }
     .tx-type.withdraw { color: #ef4444; }
-    .tx-status {
-      padding: 2px 8px; border-radius: 20px;
-      font-size: 9px; font-weight: 600;
-    }
-    .status-pending {
-      background: rgba(245, 158, 11, 0.2); color: #f59e0b;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-    .status-approved {
-      background: rgba(34, 197, 94, 0.2); color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-    .status-rejected {
-      background: rgba(239, 68, 68, 0.2); color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
+    .tx-status { padding: 2px 8px; border-radius: 20px; font-size: 9px; font-weight: 600; }
+    .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-approved { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .status-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
     .tx-details { color: #a0b0d0; font-size: 11px; }
     .tx-amount { color: #FFD700; font-weight: 700; }
-
-    .notification {
-      position: fixed; bottom: 80px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(239, 68, 68, 0.95);
-      padding: 14px 28px; border-radius: 12px;
-      opacity: 0; transition: all 0.3s ease;
-      pointer-events: none; z-index: 10000;
-      font-size: 14px; max-width: 90vw;
-      text-align: center; font-family: 'Poppins', sans-serif;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-    }
+    .notification { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(239, 68, 68, 0.95); padding: 14px 28px; border-radius: 12px; opacity: 0; transition: all 0.3s ease; pointer-events: none; z-index: 10000; font-size: 14px; max-width: 90vw; text-align: center; font-family: 'Poppins', sans-serif; border: 2px solid rgba(255, 255, 255, 0.3); }
     .notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .notification.success { background: rgba(34, 197, 94, 0.95); }
     .notification.info { background: rgba(59, 130, 246, 0.95); }
-
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; width: 100%;
-      display: flex; justify-content: space-around; align-items: center;
-      background: transparent; padding: 4px 0 6px;
-      z-index: 500; pointer-events: auto; height: 32px;
-    }
-    .bottom-nav-btn {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 2px; text-decoration: none; color: #fff;
-      padding: 2px 12px; border-radius: 8px;
-      transition: all 0.2s ease; min-width: 60px; min-height: 36px;
-      border: 1px solid transparent;
-    }
-    .bottom-nav-btn:hover, .bottom-nav-btn:focus {
-      background: rgba(255, 255, 255, 0.08); border-color: #A1887F; color: #ffffff; outline: none;
-    }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; align-items: center; background: transparent; padding: 4px 0 6px; z-index: 500; pointer-events: auto; height: 32px; }
+    .bottom-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #fff; padding: 2px 12px; border-radius: 8px; transition: all 0.2s ease; min-width: 60px; min-height: 36px; border: 1px solid transparent; }
+    .bottom-nav-btn:hover, .bottom-nav-btn:focus { background: rgba(255, 255, 255, 0.08); border-color: #A1887F; color: #ffffff; outline: none; }
     .bottom-nav-btn:active { transform: scale(0.95); }
     .bottom-nav-icon { font-size: 18px; line-height: 1; filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3)); }
-    .bottom-nav-label {
-      font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 1000;
-      letter-spacing: 0.5px; text-transform: uppercase; color: #ffffff; transition: color 0.2s ease;
-    }
-    .bottom-nav-btn:hover .bottom-nav-label, .bottom-nav-btn:focus .bottom-nav-label {
-      color: #FFD700; text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 40px #00aaff, 0 0 80px #00aaff;
-    }
-
-    .loading-spinner {
-      display: inline-block; width: 16px; height: 16px;
-      border: 2px solid #fff; border-top-color: transparent;
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-      margin-left: 8px; vertical-align: middle;
-    }
+    .bottom-nav-label { font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 1000; letter-spacing: 0.5px; text-transform: uppercase; color: #ffffff; transition: color 0.2s ease; }
+    .bottom-nav-btn:hover .bottom-nav-label, .bottom-nav-btn:focus .bottom-nav-label { color: #FFD700; text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 40px #00aaff, 0 0 80px #00aaff; }
+    .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .empty-state {
-      text-align: center; padding: 20px; color: #a0b0d0; font-size: 12px;
-    }
+    .empty-state { text-align: center; padding: 20px; color: #a0b0d0; font-size: 12px; }
   </style>
 </head>
 <body>
-
   <div class="bg-layer"><img src="Green.png" alt="Green Background"></div>
   <div class="bg-overlay"></div>
-
   <div class="cloud-container" aria-hidden="true">
     <div class="cloud size-s" style="top: 14%; animation-duration: 80s; animation-delay: -5s;"></div>
     <div class="cloud size-m" style="top: 16%; animation-duration: 85s; animation-delay: -18s;"></div>
     <div class="cloud size-l" style="top: 18%; animation-duration: 130s; animation-delay: -10s;"></div>
     <div class="cloud size-m" style="top: 20%; animation-duration: 75s; animation-delay: -25s;"></div>
   </div>
-
   <header><div class="logo">💰 Cashout</div></header>
-
-  <!-- Balance Bar -->
   <div class="balance-bar">
-    <div>
-      <div class="balance-label">Your Eggz Balance</div>
-    </div>
+    <div><div class="balance-label">Your Eggz Balance</div></div>
     <div class="balance-value" id="balanceDisplay">0</div>
   </div>
-
   <div class="container">
-
-    <!-- Deposit / Withdraw Tabs -->
     <div class="tab-nav">
       <button class="tab-btn active" id="depositTab" onclick="showTab('deposit')">💰 Deposit</button>
       <button class="tab-btn" id="withdrawTab" onclick="showTab('withdraw')">🏦 Withdraw</button>
       <button class="tab-btn" id="historyTab" onclick="showTab('history')">📋 History</button>
     </div>
-
-    <!-- Deposit Panel -->
     <div id="depositPanel" class="panel active">
       <div class="card">
         <div class="card-title">💰 Buy Eggz</div>
-        <div class="info-text">
-          💡 Rate: 1 Eggz = R0.10 (10 cents)<br>
-          R10 = 100 Eggz | R100 = 1,000 Eggz<br>
-          Deposit money to get Eggz. Admin must approve before eggs are added.
-        </div>
-        <div class="form-group">
-          <label class="form-label">Amount to Deposit (Rands)</label>
-          <input type="number" class="form-input" id="depositAmount" placeholder="Enter amount in Rands" min="1" value="100">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Transfer Method</label>
-          <select class="form-select" id="depositMethod">
-            <option value="bank">Bank Transfer</option>
-            <option value="ewallet">E-Wallet</option>
-            <option value="cash">Cash Deposit</option>
-          </select>
-        </div>
-        <div class="form-group" id="bankField">
-          <label class="form-label">Bank Account Number</label>
-          <input type="text" class="form-input" id="depositBankAccount" placeholder="Enter account number used for transfer">
-        </div>
-        <div class="form-group" id="cellField" style="display:none;">
-          <label class="form-label">Cellphone Number</label>
-          <input type="tel" class="form-input" id="depositCellphone" placeholder="0712345678">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Reference / Note</label>
-          <input type="text" class="form-input" id="depositReference" placeholder="Optional reference">
-        </div>
-        <div class="info-text" id="depositSummary">
-          You will receive: <span class="tx-amount" id="depositEggs">1000</span> Eggz for R<span id="depositCost">100</span>
-          <br><small style="color:#888">(Rate: R1 = 10 Eggz)</small>
-        </div>
-        <button class="action-btn btn-deposit" id="depositBtn" onclick="submitDeposit()">
-          SUBMIT DEPOSIT REQUEST
-        </button>
+        <div class="info-text">💡 Rate: 1 Eggz = R0.10 (10 cents)<br>R10 = 100 Eggz | R100 = 1,000 Eggz<br>Deposit money to get Eggz. Admin must approve before eggs are added.</div>
+        <div class="form-group"><label class="form-label">Amount to Deposit (Rands)</label><input type="number" class="form-input" id="depositAmount" placeholder="Enter amount in Rands" min="1" value="100"></div>
+        <div class="form-group"><label class="form-label">Transfer Method</label><select class="form-select" id="depositMethod"><option value="bank">Bank Transfer</option><option value="ewallet">E-Wallet</option><option value="cash">Cash Deposit</option></select></div>
+        <div class="form-group" id="bankField"><label class="form-label">Bank Account Number</label><input type="text" class="form-input" id="depositBankAccount" placeholder="Enter account number used for transfer"></div>
+        <div class="form-group" id="cellField" style="display:none;"><label class="form-label">Cellphone Number</label><input type="tel" class="form-input" id="depositCellphone" placeholder="0712345678"></div>
+        <div class="form-group"><label class="form-label">Reference / Note</label><input type="text" class="form-input" id="depositReference" placeholder="Optional reference"></div>
+        <div class="info-text" id="depositSummary">You will receive: <span class="tx-amount" id="depositEggs">1000</span> Eggz for R<span id="depositCost">100</span><br><small style="color:#888">(Rate: R1 = 10 Eggz)</small></div>
+        <button class="action-btn btn-deposit" id="depositBtn" onclick="submitDeposit()">SUBMIT DEPOSIT REQUEST</button>
       </div>
     </div>
-
-    <!-- Withdraw Panel -->
     <div id="withdrawPanel" class="panel">
       <div class="card">
         <div class="card-title">🏦 Cash Out</div>
-        <div class="info-text">
-          💡 Rate: 1 Eggz = R0.10 (10 cents)<br>
-          Minimum: 1,000 Eggz (R100) | Maximum: your balance<br>
-          Admin must approve. Eggz deducted immediately.
-        </div>
-        <div class="form-group">
-          <label class="form-label">Eggz to Withdraw</label>
-          <input type="number" class="form-input" id="withdrawAmount" placeholder="Enter eggz amount" min="100">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Transfer Method</label>
-          <select class="form-select" id="withdrawMethod">
-            <option value="bank">Bank Transfer</option>
-            <option value="ewallet">E-Wallet</option>
-          </select>
-        </div>
-        <div class="form-group" id="withdrawBankField">
-          <label class="form-label">Bank Account Number</label>
-          <input type="text" class="form-input" id="withdrawBankAccount" placeholder="Your bank account number">
-        </div>
-        <div class="form-group" id="withdrawCellField" style="display:none;">
-          <label class="form-label">Cellphone Number (for E-Wallet)</label>
-          <input type="tel" class="form-input" id="withdrawCellphone" placeholder="0712345678">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Account Holder Name</label>
-          <input type="text" class="form-input" id="withdrawHolder" placeholder="Name on the account">
-        </div>
-        <div class="info-text" id="withdrawSummary">
-          You will receive: R<span class="tx-amount" id="withdrawRands">0</span> 
-          | Available: <span class="tx-amount" id="withdrawAvailable">0</span> Eggz
-          <br><small style="color:#888">(Rate: 1 Eggz = R0.10)</small>
-        </div>
-        <button class="action-btn btn-withdraw" id="withdrawBtn" onclick="submitWithdraw()">
-          SUBMIT WITHDRAW REQUEST
-        </button>
+        <div class="info-text">💡 Rate: 1 Eggz = R0.10 (10 cents)<br>Minimum: 1,000 Eggz (R100) | Maximum: your balance<br>Admin must approve. Eggz deducted immediately.</div>
+        <div class="form-group"><label class="form-label">Eggz to Withdraw</label><input type="number" class="form-input" id="withdrawAmount" placeholder="Enter eggz amount" min="100"></div>
+        <div class="form-group"><label class="form-label">Transfer Method</label><select class="form-select" id="withdrawMethod"><option value="bank">Bank Transfer</option><option value="ewallet">E-Wallet</option></select></div>
+        <div class="form-group" id="withdrawBankField"><label class="form-label">Bank Account Number</label><input type="text" class="form-input" id="withdrawBankAccount" placeholder="Your bank account number"></div>
+        <div class="form-group" id="withdrawCellField" style="display:none;"><label class="form-label">Cellphone Number (for E-Wallet)</label><input type="tel" class="form-input" id="withdrawCellphone" placeholder="0712345678"></div>
+        <div class="form-group"><label class="form-label">Account Holder Name</label><input type="text" class="form-input" id="withdrawHolder" placeholder="Name on the account"></div>
+        <div class="info-text" id="withdrawSummary">You will receive: R<span class="tx-amount" id="withdrawRands">0</span> | Available: <span class="tx-amount" id="withdrawAvailable">0</span> Eggz<br><small style="color:#888">(Rate: 1 Eggz = R0.10)</small></div>
+        <button class="action-btn btn-withdraw" id="withdrawBtn" onclick="submitWithdraw()">SUBMIT WITHDRAW REQUEST</button>
       </div>
     </div>
-
-    <!-- History Panel -->
     <div id="historyPanel" class="panel">
       <div class="card">
         <div class="card-title">📋 Your Transactions</div>
-        <div id="txList" class="tx-list">
-          <div class="empty-state">No transactions yet</div>
-        </div>
+        <div id="txList" class="tx-list"><div class="empty-state">No transactions yet</div></div>
       </div>
     </div>
-
   </div>
-
   <nav class="bottom-nav" aria-label="Main navigation">
-    <a href="game.html" class="bottom-nav-btn">
-      <span class="bottom-nav-icon">🎮</span>
-      <span class="bottom-nav-label">Game</span>
-    </a>
-    <a href="info.html" class="bottom-nav-btn">
-      <span class="bottom-nav-icon">ℹ️</span>
-      <span class="bottom-nav-label">Info</span>
-    </a>
-    <a href="index.html" class="bottom-nav-btn">
-      <span class="bottom-nav-icon">❌</span>
-      <span class="bottom-nav-label">Exit</span>
-    </a>
+    <a href="game.html" class="bottom-nav-btn"><span class="bottom-nav-icon">🎮</span><span class="bottom-nav-label">Game</span></a>
+    <a href="info.html" class="bottom-nav-btn"><span class="bottom-nav-icon">ℹ️</span><span class="bottom-nav-label">Info</span></a>
+    <a href="index.html" class="bottom-nav-btn"><span class="bottom-nav-icon">❌</span><span class="bottom-nav-label">Exit</span></a>
   </nav>
-
   <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
-  <script>
-    // ===== LOCAL STORAGE KEYS (must match admin panel) =====
-    const DB_KEYS = {
-      USERS: 'chickenAdmin_users',
-      TRANSACTIONS: 'chickenAdmin_transactions',
-      SESSION: 'chickenEmpire_v1.session',
-      GAME_EGGS: 'chickenEmpire_v1.eggs'
-    };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+  authDomain: "chickeneggz.firebaseapp.com",
+  projectId: "chickeneggz",
+  storageBucket: "chickeneggz.firebasestorage.app",
+  messagingSenderId: "378281633320",
+  appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     let currentUser = null;
+    let userDocRef = null;
     let currentEggs = 0;
+    let unsubscribeTx = null;
 
     function showNotification(msg, type = 'error') {
       const notif = document.getElementById('notification');
@@ -433,280 +173,139 @@
       setTimeout(() => notif.classList.remove('show'), 5000);
     }
 
-    function getStore(key) {
-      try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; }
-      catch (e) { return null; }
-    }
-
-    function setStore(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function now() {
-      return new Date().toISOString();
-    }
-
-    // ===== AUTH CHECK =====
-    function checkAuth() {
-      const session = getStore(DB_KEYS.SESSION);
-      if (!session || !session.email) {
-        showNotification('Please login first');
-        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
-        return false;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      userDocRef = doc(db, 'users', user.uid);
+      const snap = await getDoc(userDocRef);
+      if (snap.exists()) { currentEggs = snap.data().eggs || 0; }
+      else {
+        await setDoc(userDocRef, { uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0], eggs: 0, level: 1, totalEarned: 0, isAdmin: user.email === 'admin@chicken.com', isBlocked: false, createdAt: serverTimestamp() });
+        currentEggs = 0;
       }
-      currentUser = session;
-      return true;
-    }
+      updateBalanceDisplay();
+      listenTransactions();
+    });
 
-    // ===== LOAD BALANCE =====
-    function loadBalance() {
-      if (!checkAuth()) return;
-      currentEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
+    function updateBalanceDisplay() {
       document.getElementById('balanceDisplay').textContent = currentEggs.toLocaleString();
       document.getElementById('withdrawAvailable').textContent = currentEggs;
     }
 
-    // ===== SYNC EGGS TO ADMIN =====
-    function syncEggsToAdmin() {
+    function listenTransactions() {
       if (!currentUser) return;
-      const users = getStore(DB_KEYS.USERS) || {};
-      const entry = Object.entries(users).find(([uid, u]) => u.email === currentUser.email);
-      if (entry) {
-        const [uid, user] = entry;
-        users[uid].eggs = currentEggs;
-        users[uid].updatedAt = now();
-        setStore(DB_KEYS.USERS, users);
-      }
+      if (unsubscribeTx) unsubscribeTx();
+      const q = query(collection(db, 'transactions'), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+      unsubscribeTx = onSnapshot(q, (snapshot) => {
+        const txs = [];
+        snapshot.forEach(doc => txs.push({ id: doc.id, ...doc.data() }));
+        renderHistory(txs);
+      });
     }
 
-    // ===== TAB NAVIGATION =====
-    function showTab(tabName) {
+    window.showTab = function(tabName) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+      if (tabName === 'deposit') { document.getElementById('depositTab').classList.add('active'); document.getElementById('depositPanel').classList.add('active'); }
+      else if (tabName === 'withdraw') { document.getElementById('withdrawTab').classList.add('active'); document.getElementById('withdrawPanel').classList.add('active'); }
+      else { document.getElementById('historyTab').classList.add('active'); document.getElementById('historyPanel').classList.add('active'); }
+    };
 
-      if (tabName === 'deposit') {
-        document.getElementById('depositTab').classList.add('active');
-        document.getElementById('depositPanel').classList.add('active');
-      } else if (tabName === 'withdraw') {
-        document.getElementById('withdrawTab').classList.add('active');
-        document.getElementById('withdrawPanel').classList.add('active');
-      } else {
-        document.getElementById('historyTab').classList.add('active');
-        document.getElementById('historyPanel').classList.add('active');
-        loadHistory();
-      }
-    }
-
-    // ===== DEPOSIT METHOD TOGGLE =====
     document.getElementById('depositMethod').addEventListener('change', function() {
       const method = this.value;
       document.getElementById('bankField').style.display = method === 'bank' || method === 'cash' ? 'block' : 'none';
       document.getElementById('cellField').style.display = method === 'ewallet' ? 'block' : 'none';
     });
-
-    // ===== WITHDRAW METHOD TOGGLE =====
     document.getElementById('withdrawMethod').addEventListener('change', function() {
       const method = this.value;
       document.getElementById('withdrawBankField').style.display = method === 'bank' ? 'block' : 'none';
       document.getElementById('withdrawCellField').style.display = method === 'ewallet' ? 'block' : 'none';
     });
-
-    // ===== DEPOSIT SUMMARY UPDATE =====
     document.getElementById('depositAmount').addEventListener('input', function() {
       const rands = parseInt(this.value) || 0;
-      const eggz = rands * 10;  // R1 = 10 Eggz
-      document.getElementById('depositEggs').textContent = eggz;
+      document.getElementById('depositEggs').textContent = rands * 10;
       document.getElementById('depositCost').textContent = rands;
     });
-
-    // ===== WITHDRAW SUMMARY UPDATE =====
     document.getElementById('withdrawAmount').addEventListener('input', function() {
       const eggz = parseInt(this.value) || 0;
-      const rands = (eggz * 0.10).toFixed(2);  // 1 Eggz = R0.10
-      document.getElementById('withdrawRands').textContent = rands;
+      document.getElementById('withdrawRands').textContent = (eggz * 0.10).toFixed(2);
     });
 
-    // ===== SUBMIT DEPOSIT =====
-    function submitDeposit() {
-      if (!checkAuth()) return;
-
+    window.submitDeposit = async function() {
+      if (!currentUser) { showNotification('Please login first'); return; }
       const amount = parseInt(document.getElementById('depositAmount').value) || 0;
       const method = document.getElementById('depositMethod').value;
       const bankAccount = document.getElementById('depositBankAccount').value.trim();
       const cellphone = document.getElementById('depositCellphone').value.trim();
       const reference = document.getElementById('depositReference').value.trim();
-
-      if (amount < 1) {
-        showNotification('Please enter a valid deposit amount');
-        return;
-      }
-      if (method === 'bank' && !bankAccount) {
-        showNotification('Please enter your bank account number');
-        return;
-      }
-      if (method === 'ewallet' && !cellphone) {
-        showNotification('Please enter your cellphone number');
-        return;
-      }
+      if (amount < 1) { showNotification('Please enter a valid deposit amount'); return; }
+      if (method === 'bank' && !bankAccount) { showNotification('Please enter your bank account number'); return; }
+      if (method === 'ewallet' && !cellphone) { showNotification('Please enter your cellphone number'); return; }
 
       const btn = document.getElementById('depositBtn');
-      btn.disabled = true;
-      btn.innerHTML = 'SUBMITTING... <span class="loading-spinner"></span>';
+      btn.disabled = true; btn.innerHTML = 'SUBMITTING... <span class="loading-spinner"></span>';
+      try {
+        await addDoc(collection(db, 'transactions'), {
+          userId: currentUser.uid, userEmail: currentUser.email, userName: currentUser.displayName || currentUser.email.split('@')[0],
+          type: 'deposit', coinAmount: amount * 10, cost: amount, status: 'pending',
+          paymentDetails: { transferMethod: method, bankAccount: bankAccount || null, cellphone: cellphone || null, reference: reference || null },
+          createdAt: serverTimestamp(), notes: ''
+        });
+        showNotification('Deposit request submitted! Awaiting admin approval.', 'success');
+        btn.disabled = false; btn.innerHTML = 'SUBMIT DEPOSIT REQUEST';
+        document.getElementById('depositBankAccount').value = '';
+        document.getElementById('depositCellphone').value = '';
+        document.getElementById('depositReference').value = '';
+      } catch (e) { showNotification(e.message); btn.disabled = false; btn.innerHTML = 'SUBMIT DEPOSIT REQUEST'; }
+    };
 
-      // Get user's UID from users store
-      const users = getStore(DB_KEYS.USERS) || {};
-      const entry = Object.entries(users).find(([uid, u]) => u.email === currentUser.email);
-      const userId = entry ? entry[0] : currentUser.uid || 'unknown';
-
-      // Create transaction - Rate: R1 = 10 Eggz
-      const eggzAmount = amount * 10;  // Convert Rands to Eggz
-      const txs = getStore(DB_KEYS.TRANSACTIONS) || [];
-      txs.push({
-        id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-        userId: userId,
-        userEmail: currentUser.email,
-        type: 'deposit',
-        coinAmount: eggzAmount,  // eggs to add (Rands * 10)
-        cost: amount,            // Rands paid
-        status: 'pending',       // ADMIN MUST APPROVE
-        paymentDetails: {
-          transferMethod: method,
-          bankAccount: bankAccount || null,
-          cellphone: cellphone || null,
-          reference: reference || null
-        },
-        createdAt: now(),
-        notes: ''
-      });
-
-      setStore(DB_KEYS.TRANSACTIONS, txs);
-
-      showNotification('Deposit request submitted! Awaiting admin approval.', 'success');
-      btn.disabled = false;
-      btn.innerHTML = 'SUBMIT DEPOSIT REQUEST';
-
-      // Clear form
-      document.getElementById('depositBankAccount').value = '';
-      document.getElementById('depositCellphone').value = '';
-      document.getElementById('depositReference').value = '';
-    }
-
-    // ===== SUBMIT WITHDRAW =====
-    function submitWithdraw() {
-      if (!checkAuth()) return;
-
+    window.submitWithdraw = async function() {
+      if (!currentUser) { showNotification('Please login first'); return; }
       const amount = parseInt(document.getElementById('withdrawAmount').value) || 0;
       const method = document.getElementById('withdrawMethod').value;
       const bankAccount = document.getElementById('withdrawBankAccount').value.trim();
       const cellphone = document.getElementById('withdrawCellphone').value.trim();
       const holder = document.getElementById('withdrawHolder').value.trim();
-
-      if (amount < 1000) {
-        showNotification('Minimum withdrawal is 1,000 Eggz (R100)');
-        return;
-      }
-      if (amount > currentEggs) {
-        showNotification('Insufficient Eggz balance. You have ' + currentEggs + ' Eggz');
-        return;
-      }
-      if (method === 'bank' && !bankAccount) {
-        showNotification('Please enter your bank account number');
-        return;
-      }
-      if (method === 'ewallet' && !cellphone) {
-        showNotification('Please enter your cellphone number');
-        return;
-      }
-      if (!holder) {
-        showNotification('Please enter the account holder name');
-        return;
-      }
+      if (amount < 1000) { showNotification('Minimum withdrawal is 1,000 Eggz (R100)'); return; }
+      if (amount > currentEggs) { showNotification('Insufficient Eggz balance. You have ' + currentEggs + ' Eggz'); return; }
+      if (method === 'bank' && !bankAccount) { showNotification('Please enter your bank account number'); return; }
+      if (method === 'ewallet' && !cellphone) { showNotification('Please enter your cellphone number'); return; }
+      if (!holder) { showNotification('Please enter the account holder name'); return; }
 
       const btn = document.getElementById('withdrawBtn');
-      btn.disabled = true;
-      btn.innerHTML = 'SUBMITTING... <span class="loading-spinner"></span>';
+      btn.disabled = true; btn.innerHTML = 'SUBMITTING... <span class="loading-spinner"></span>';
+      try {
+        currentEggs = Math.max(0, currentEggs - amount);
+        await updateDoc(userDocRef, { eggs: currentEggs, updatedAt: serverTimestamp() });
+        updateBalanceDisplay();
+        await addDoc(collection(db, 'transactions'), {
+          userId: currentUser.uid, userEmail: currentUser.email, userName: currentUser.displayName || currentUser.email.split('@')[0],
+          type: 'withdraw', coinAmount: amount, cost: (amount * 0.10).toFixed(2), status: 'pending',
+          paymentDetails: { transferMethod: method, bankAccount: bankAccount || null, cellphone: cellphone || null, accountHolder: holder },
+          createdAt: serverTimestamp(), notes: ''
+        });
+        showNotification('Withdrawal request submitted! ' + amount + ' Eggz deducted. Awaiting admin approval.', 'success');
+        btn.disabled = false; btn.innerHTML = 'SUBMIT WITHDRAW REQUEST';
+        document.getElementById('withdrawAmount').value = '';
+        document.getElementById('withdrawBankAccount').value = '';
+        document.getElementById('withdrawCellphone').value = '';
+        document.getElementById('withdrawHolder').value = '';
+        document.getElementById('withdrawRands').textContent = '0';
+      } catch (e) { showNotification(e.message); btn.disabled = false; btn.innerHTML = 'SUBMIT WITHDRAW REQUEST'; }
+    };
 
-      // Get user's UID
-      const users = getStore(DB_KEYS.USERS) || {};
-      const entry = Object.entries(users).find(([uid, u]) => u.email === currentUser.email);
-      const userId = entry ? entry[0] : currentUser.uid || 'unknown';
-
-      // Deduct eggs immediately for withdrawal
-      currentEggs = Math.max(0, currentEggs - amount);
-      localStorage.setItem(DB_KEYS.GAME_EGGS, String(currentEggs));
-      loadBalance();
-      syncEggsToAdmin();
-
-      // Create transaction - Rate: 1 Eggz = R0.10
-      const randsAmount = (amount * 0.10).toFixed(2);  // Convert Eggz to Rands
-      const txs = getStore(DB_KEYS.TRANSACTIONS) || [];
-      txs.push({
-        id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-        userId: userId,
-        userEmail: currentUser.email,
-        type: 'withdraw',
-        coinAmount: amount,      // eggs withdrawn
-        cost: randsAmount,       // Rands to pay out (Eggz * 0.10)
-        status: 'pending',       // ADMIN MUST APPROVE
-        paymentDetails: {
-          transferMethod: method,
-          bankAccount: bankAccount || null,
-          cellphone: cellphone || null,
-          accountHolder: holder
-        },
-        createdAt: now(),
-        notes: ''
-      });
-
-      setStore(DB_KEYS.TRANSACTIONS, txs);
-
-      showNotification('Withdrawal request submitted! ' + amount + ' Eggz (R' + randsAmount + ') deducted. Awaiting admin approval.', 'success');
-      btn.disabled = false;
-      btn.innerHTML = 'SUBMIT WITHDRAW REQUEST';
-
-      // Clear form
-      document.getElementById('withdrawAmount').value = '';
-      document.getElementById('withdrawBankAccount').value = '';
-      document.getElementById('withdrawCellphone').value = '';
-      document.getElementById('withdrawHolder').value = '';
-      document.getElementById('withdrawRands').textContent = '0';
-    }
-
-    // ===== LOAD TRANSACTION HISTORY =====
-    function loadHistory() {
-      if (!currentUser) return;
-      const txs = getStore(DB_KEYS.TRANSACTIONS) || [];
-      const myTxs = txs.filter(t => t.userEmail === currentUser.email).reverse();
+    function renderHistory(txs) {
       const list = document.getElementById('txList');
-
-      if (myTxs.length === 0) {
-        list.innerHTML = '<div class="empty-state">No transactions yet</div>';
-        return;
-      }
-
-      list.innerHTML = myTxs.map(tx => {
-        const date = tx.createdAt ? new Date(tx.createdAt).toLocaleDateString() : 'N/A';
+      if (txs.length === 0) { list.innerHTML = '<div class="empty-state">No transactions yet</div>'; return; }
+      list.innerHTML = txs.map(tx => {
+        const date = tx.createdAt && tx.createdAt.toDate ? tx.createdAt.toDate().toLocaleDateString() : 'N/A';
         const typeClass = tx.type === 'deposit' ? 'deposit' : 'withdraw';
         const typeLabel = tx.type === 'deposit' ? 'DEPOSIT' : 'WITHDRAW';
         const statusClass = 'status-' + (tx.status || 'pending');
         const statusLabel = (tx.status || 'pending').toUpperCase();
-        return `
-          <div class="tx-item">
-            <div class="tx-header">
-              <span class="tx-type ${typeClass}">${typeLabel}</span>
-              <span class="tx-status ${statusClass}">${statusLabel}</span>
-            </div>
-            <div class="tx-details">
-              <span class="tx-amount">${tx.coinAmount || 0} Eggz</span> | R${tx.cost || 0} | ${date}
-            </div>
-          </div>
-        `;
+        return `<div class="tx-item"><div class="tx-header"><span class="tx-type ${typeClass}">${typeLabel}</span><span class="tx-status ${statusClass}">${statusLabel}</span></div><div class="tx-details"><span class="tx-amount">${tx.coinAmount || 0} Eggz</span> | R${tx.cost || 0} | ${date}</div></div>`;
       }).join('');
     }
-
-    // ===== INIT =====
-    checkAuth();
-    loadBalance();
   </script>
 </body>
 </html>
