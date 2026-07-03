@@ -1,744 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Admin Dashboard - Chicken Eggz</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Admin - Chicken Eggz</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&family=Fredoka+One&display=swap');
-
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&display=swap');
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      font-family: 'Poppins', system-ui, sans-serif;
-      background-color: #0a0f1e;
-      color: #fff;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: none;
-      user-select: none;
-    }
-
-    .bg-layer {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      z-index: 0;
-    }
-    .bg-layer img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-    }
-    .bg-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(10, 15, 30, 0.85);
-      z-index: 1;
-    }
-
-    /* ===== HEADER ===== */
-    header {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      background: rgba(135, 206, 235, 0.85);
-      padding: 7px 15px;
-      margin: 15px auto 0;
-      max-width: calc(100vw - 30px);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      border: 3px solid #ffffff;
-      box-shadow: 0 0 12px #FFFFFF, inset 0 0 8px rgba(255, 215, 0, 0.3);
-      position: relative;
-      z-index: 10;
-    }
-    .logo {
-      font-family: 'Fredoka One', cursive;
-      color: #ffffff;
-      text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-      font-size: clamp(18px, 5vw, 24px);
-      white-space: nowrap;
-      text-align: center;
-    }
-
-    /* ===== ADMIN CONTAINER ===== */
-    .admin-container {
-      position: relative;
-      z-index: 10;
-      height: calc(100vh - 130px);
-      padding: 10px 12px;
-      overflow-y: auto;
-      margin-top: 8px;
-    }
-
-    /* ===== ADMIN HEADER ===== */
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 0 4px;
-    }
-
-    .admin-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(14px, 4vw, 18px);
-      color: #FFD700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-    }
-
-    .admin-stats {
-      display: flex;
-      gap: 8px;
-      font-size: 11px;
-      color: #a0b0d0;
-      flex-wrap: wrap;
-    }
-
-    .stat-box {
-      background: rgba(20, 30, 60, 0.8);
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 215, 0, 0.2);
-      white-space: nowrap;
-    }
-
-    .stat-box span {
-      color: #FFD700;
-      font-weight: 700;
-    }
-
-    /* ===== ACTION BUTTONS ===== */
-    .action-btns {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      padding: 0 4px;
-    }
-
-    .action-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 10px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-    }
-
-    .btn-refresh {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: #fff;
-    }
-    .btn-logout {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #fff;
-    }
-
-    /* ===== TABLE ===== */
-    .users-table-container {
-      background: rgba(20, 30, 60, 0.9);
-      border: 1px solid rgba(255, 215, 0, 0.2);
-      border-radius: 12px;
-      overflow: hidden;
-      max-height: calc(100vh - 280px);
-      overflow-y: auto;
-      overflow-x: auto;
-      margin: 0 4px;
-    }
-
-    .users-table {
-      width: 100%;
-      min-width: 600px;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    .users-table th {
-      background: rgba(255, 215, 0, 0.15);
-      padding: 10px 8px;
-      text-align: left;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #FFD700;
-      position: sticky;
-      top: 0;
-      white-space: nowrap;
-    }
-
-    .users-table td {
-      padding: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      color: #c0d0f0;
-      max-width: 150px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .users-table tr:hover {
-      background: rgba(255, 215, 0, 0.05);
-    }
-
-    .status-badge {
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 600;
-      display: inline-block;
-      white-space: nowrap;
-    }
-
-    .status-approved {
-      background: rgba(34, 197, 94, 0.2);
-      color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-
-    .status-pending {
-      background: rgba(245, 158, 11, 0.2);
-      color: #f59e0b;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .status-rejected {
-      background: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .user-actions {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
-    .user-action-btn {
-      padding: 4px 8px;
-      border: none;
-      border-radius: 5px;
-      font-size: 9px;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .btn-approve { background: #22c55e; color: #fff; }
-    .btn-reject { background: #ef4444; color: #fff; }
-    .btn-block { background: #f97316; color: #fff; }
-    .btn-unblock { background: #22c55e; color: #fff; }
-
-    /* ===== BOTTOM NAV ===== */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0; left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      background: #FFD700;
-      backdrop-filter: blur(15px);
-      padding: 4px 0 6px;
-      z-index: 500;
-      pointer-events: auto;
-      height: 32px;
-    }
-
-    .bottom-nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      text-decoration: none;
-      color: #fff;
-      padding: 2px 12px;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      min-width: 60px;
-      min-height: 36px;
-      border: 1px solid transparent;
-    }
-
-    .bottom-nav-btn:hover, .bottom-nav-btn:focus {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: #A1887F;
-      outline: none;
-    }
-
-    .bottom-nav-icon {
-      font-size: 18px;
-      line-height: 1;
-      filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
-    }
-
-    .bottom-nav-label {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 8px;
-      font-weight: 1000;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: #ffffff;
-    }
-
-    /* ===== NOTIFICATION ===== */
-    .notification {
-      position: fixed;
-      bottom: 45px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(239, 68, 68, 0.95);
-      padding: 12px 24px;
-      border-radius: 10px;
-      opacity: 0;
-      transition: all 0.3s ease;
-      pointer-events: none;
-      z-index: 10000;
-      font-size: 13px;
-      max-width: 90vw;
-      text-align: center;
-      font-family: 'Poppins', sans-serif;
-    }
-    .notification.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    html, body { height: 100%; font-family: 'Poppins', sans-serif; background: #0a0f1e; color: #fff; overflow: hidden; }
+    body { display: flex; flex-direction: column; padding-bottom: 60px; }
+    header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 0, 125, 0.85); padding: 10px 15px; margin: 10px; border-radius: 12px; backdrop-filter: blur(10px); border: 3px solid #ffffff; box-shadow: 0 0 12px #FFFFFF; }
+    header h1 { font-family: 'Orbitron', sans-serif; font-size: 18px; color: #fff; }
+    .admin-badge { background: #ff007d; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-family: 'Orbitron'; }
+    .hud-container { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; padding: 0 10px 10px 10px; }
+    .ice-textbox { flex: 1; min-height: 0; border: 3px solid #ffd700; border-radius: 16px; background: #000; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+    .tab-nav { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tab-btn { padding: 8px 14px; border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 8px; background: rgba(20, 30, 60, 0.8); color: #a0b0d0; font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+    .tab-btn.active { border-color: #FFD700; color: #FFD700; background: rgba(255, 215, 0, 0.1); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .stat-card { background: rgba(20, 30, 60, 0.8); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .stat-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #a0b0d0; text-transform: uppercase; }
+    .stat-value { font-family: 'Orbitron', sans-serif; font-size: 20px; color: #FFD700; font-weight: 900; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .data-table th { background: rgba(255, 215, 0, 0.1); color: #FFD700; padding: 8px; text-align: left; font-family: 'Orbitron', sans-serif; font-size: 9px; text-transform: uppercase; border-bottom: 1px solid rgba(255, 215, 0, 0.3); }
+    .data-table td { padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #c0d0f0; }
+    .data-table tr:hover { background: rgba(255, 255, 255, 0.02); }
+    .action-btn { padding: 4px 10px; border: none; border-radius: 4px; font-family: 'Orbitron', sans-serif; font-size: 9px; cursor: pointer; text-transform: uppercase; color: #fff; margin-right: 4px; }
+    .btn-approve { background: #22c55e; }
+    .btn-reject { background: #ef4444; }
+    .btn-block { background: #f97316; }
+    .btn-unblock { background: #3b82f6; }
+    .status-pending { color: #f59e0b; }
+    .status-approved { color: #22c55e; }
+    .status-rejected { color: #ef4444; }
+    .notification { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(239, 68, 68, 0.95); padding: 10px 20px; border-radius: 10px; opacity: 0; transition: all 0.3s ease; pointer-events: none; z-index: 10000; font-size: 12px; max-width: 90vw; text-align: center; font-family: 'Poppins', sans-serif; }
+    .notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .notification.success { background: rgba(34, 197, 94, 0.95); }
-    .notification.info { background: rgba(59, 130, 246, 0.95); }
-
-    /* ===== LOGIN SCREEN ===== */
-    .login-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(10, 15, 30, 0.98);
-      z-index: 30000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-    }
-
-    .login-card {
-      background: rgba(20, 30, 60, 0.95);
-      border: 2px solid #FFD700;
-      border-radius: 16px;
-      padding: 30px 24px;
-      max-width: 360px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .login-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 20px;
-      color: #FFD700;
-      margin-bottom: 8px;
-    }
-
-    .login-subtitle {
-      color: #a0b0d0;
-      font-size: 12px;
-      margin-bottom: 24px;
-    }
-
-    .login-error {
-      color: #ef4444;
-      font-size: 12px;
-      margin-top: 8px;
-      min-height: 18px;
-    }
-
-    .modal-form-group {
-      margin-bottom: 12px;
-      text-align: left;
-    }
-
-    .modal-label {
-      display: block;
-      font-size: 10px;
-      color: #a0b0d0;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .modal-input {
-      width: 100%;
-      padding: 10px 12px;
-      background: rgba(10, 15, 30, 0.8);
-      border: 2px solid rgba(255, 215, 0, 0.2);
-      border-radius: 8px;
-      color: #fff;
-      font-family: 'Poppins', sans-serif;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .modal-input:focus {
-      border-color: #FFD700;
-    }
-
-    .modal-btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #FFD700, #FFA500);
-      color: #0a0f1e;
-      margin-top: 8px;
-    }
-
-    .loading-text {
-      text-align: center;
-      padding: 16px;
-      color: #FFD700;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #a0b0d0;
-    }
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-      opacity: 0.5;
-    }
-    .empty-state-text {
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-    .empty-state-hint {
-      font-size: 11px;
-      color: #666;
-    }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; display: flex; justify-content: space-around; align-items: center; background: rgba(0,0,0,0.95); border-top: 1px solid #ffd700; z-index: 1000; }
+    .bottom-nav-btn { color: #fff; text-decoration: none; text-align: center; font-size: 10px; font-family: 'Orbitron'; padding: 5px 15px; border-radius: 8px; }
+    .bottom-nav-btn:hover { background: rgba(255, 215, 0, 0.1); }
+    .empty-state { text-align: center; padding: 40px; color: #555; font-size: 13px; }
+    .loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-
-  <div class="bg-layer">
-    <img src="Green.png" alt="Green Background">
-  </div>
-  <div class="bg-overlay"></div>
-
-  <!-- Login Screen -->
-  <div class="login-screen" id="adminLoginScreen">
-    <div class="login-card">
-      <div class="login-title">🔐 ADMIN LOGIN</div>
-      <div class="login-subtitle">Chicken Eggz Administrator Panel</div>
-
-      <div class="modal-form-group">
-        <label class="modal-label">Email</label>
-        <input type="email" class="modal-input" id="adminEmail" value="admin@chicken.com">
-      </div>
-
-      <div class="modal-form-group">
-        <label class="modal-label">Password</label>
-        <input type="password" class="modal-input" id="adminPassword" value="admin2026">
-      </div>
-
-      <button class="modal-btn" onclick="adminLogin()">
-        LOGIN AS ADMIN
-      </button>
-      <div class="login-error" id="loginError"></div>
+<header>
+  <h1>🛡️ ADMIN PANEL</h1>
+  <span class="admin-badge">ADMIN</span>
+</header>
+<div class="hud-container">
+  <div class="ice-textbox">
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
+      <button class="tab-btn" onclick="showTab('transactions')">💰 Transactions</button>
+      <button class="tab-btn" onclick="showTab('users')">👥 Users</button>
+      <button class="tab-btn" onclick="showTab('chat')">💬 Chat</button>
     </div>
-  </div>
 
-  <!-- Admin Panel -->
-  <div id="adminPanel" style="display: none;">
-
-    <header>
-      <div class="logo">🛡️ Admin Dashboard</div>
-    </header>
-
-    <div class="admin-container">
-      <div class="admin-header">
-        <div class="admin-title">USER MANAGEMENT</div>
-        <div class="admin-stats">
-          <div class="stat-box">Users: <span id="totalUsers">0</span></div>
-          <div class="stat-box">Pending: <span id="pendingUsers">0</span></div>
-          <div class="stat-box">Approved: <span id="approvedUsers">0</span></div>
-          <div class="stat-box">Blocked: <span id="blockedUsers">0</span></div>
-        </div>
-      </div>
-
-      <div class="action-btns">
-        <button class="action-btn btn-refresh" onclick="loadUsers()">🔄 Refresh</button>
-        <button class="action-btn btn-logout" onclick="adminLogout()">🚪 Logout</button>
-      </div>
-
-      <div class="users-table-container">
-        <table class="users-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Cell</th>
-              <th>Status</th>
-              <th>Eggz</th>
-              <th>Admin</th>
-              <th>Blocked</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="usersTableBody">
-            <tr><td colspan="8" class="loading-text">Loading users...</td></tr>
-          </tbody>
-        </table>
+    <div id="dashboardPanel" class="panel active">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="totalUsers">0</div></div>
+        <div class="stat-card"><div class="stat-label">Total Eggz</div><div class="stat-value" id="totalEggs">0</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Tx</div><div class="stat-value" id="pendingTx">0</div></div>
+        <div class="stat-card"><div class="stat-label">Total Messages</div><div class="stat-value" id="totalMessages">0</div></div>
       </div>
     </div>
+
+    <div id="transactionsPanel" class="panel">
+      <table class="data-table">
+        <thead><tr><th>User</th><th>Type</th><th>Eggz</th><th>Rands</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="txTableBody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="usersPanel" class="panel">
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Eggz</th><th>Level</th><th>Admin</th><th>Blocked</th><th>Actions</th></tr></thead>
+        <tbody id="usersTableBody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="chatPanel" class="panel">
+      <table class="data-table">
+        <thead><tr><th>User</th><th>Message</th><th>Channel</th><th>Time</th><th>Actions</th></tr></thead>
+        <tbody id="chatTableBody"><tr><td colspan="5" class="empty-state">Loading...</td></tr></tbody>
+      </table>
+    </div>
   </div>
+</div>
+<nav class="bottom-nav">
+  <a href="game.html" class="bottom-nav-btn">🎮<br>GAME</a>
+  <a href="chat.html" class="bottom-nav-btn">💬<br>CHAT</a>
+  <a href="index.html" class="bottom-nav-btn">❌<br>EXIT</a>
+</nav>
+<div id="notification" class="notification" role="alert"></div>
 
-  <nav class="bottom-nav" aria-label="Main navigation">
-    <a href="info.html" class="bottom-nav-btn">
-      <span class="bottom-nav-icon">ℹ️</span>
-      <span class="bottom-nav-label">info</span>
-    </a>
-    <a href="chat.html" class="bottom-nav-btn">
-      <span class="bottom-nav-icon">💬</span>
-      <span class="bottom-nav-label">Chat</span>
-    </a>
-    <a href="index.html" class="bottom-nav-btn">
-      <span class="bottom-nav-icon">❌</span>
-      <span class="bottom-nav-label">Exit</span>
-    </a>
-  </nav>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  <div id="notification" class="notification" role="alert"></div>
+  const firebaseConfig = {
+  apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+  authDomain: "chickeneggz.firebaseapp.com",
+  projectId: "chickeneggz",
+  storageBucket: "chickeneggz.firebasestorage.app",
+  messagingSenderId: "378281633320",
+  appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
+};
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
-      authDomain: "chickeneggz.firebaseapp.com",
-      projectId: "chickeneggz",
-      storageBucket: "chickeneggz.firebasestorage.app",
-      messagingSenderId: "378281633320",
-      appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
-    };
+  let isAdmin = false;
+  let usersData = [];
+  let txsData = [];
+  let msgsData = [];
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  function showNotification(msg, type = 'error') {
+    const notif = document.getElementById('notification');
+    notif.textContent = msg;
+    notif.className = 'notification ' + type;
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 4000);
+  }
 
-    let currentAdmin = null;
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) { isAdmin = userDoc.data().isAdmin === true; }
+    if (user.email === 'admin@chicken.com') isAdmin = true;
+    if (!isAdmin) { showNotification('Access denied. Admins only.'); setTimeout(() => window.location.href = 'game.html', 2000); return; }
+    loadDashboard();
+    listenUsers();
+    listenTransactions();
+    listenMessages();
+  });
 
-    function showNotification(msg, type = 'error') {
-      const notif = document.getElementById('notification');
-      notif.textContent = msg;
-      notif.className = 'notification ' + type;
-      notif.classList.add('show');
-      setTimeout(() => notif.classList.remove('show'), 4000);
-    }
+  window.showTab = function(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(tab + 'Panel').classList.add('active');
+  };
 
-    // ===== LOGIN =====
-    function adminLogin() {
-      const email = document.getElementById('adminEmail').value.trim().toLowerCase();
-      const password = document.getElementById('adminPassword').value;
-      const errorEl = document.getElementById('loginError');
+  function listenUsers() {
+    onSnapshot(collection(db, 'users'), (snap) => {
+      usersData = [];
+      snap.forEach(d => usersData.push({ id: d.id, ...d.data() }));
+      renderUsers();
+      updateDashboard();
+    });
+  }
 
-      errorEl.textContent = '';
+  function listenTransactions() {
+    onSnapshot(query(collection(db, 'transactions'), orderBy('createdAt', 'desc')), (snap) => {
+      txsData = [];
+      snap.forEach(d => txsData.push({ id: d.id, ...d.data() }));
+      renderTransactions();
+      updateDashboard();
+    });
+  }
 
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
+  function listenMessages() {
+    onSnapshot(query(collection(db, 'messages'), orderBy('timestamp', 'desc')), (snap) => {
+      msgsData = [];
+      snap.forEach(d => msgsData.push({ id: d.id, ...d.data() }));
+      renderMessages();
+      updateDashboard();
+    });
+  }
 
-          // Verify this user is actually an admin in Firestore
-          return db.collection('users').doc(user.uid).get().then((doc) => {
-            if (!doc.exists) {
-              throw new Error('Admin data not found');
-            }
-            const userData = doc.data();
-            if (!userData.isAdmin) {
-              auth.signOut();
-              throw new Error('Not authorized as admin');
-            }
-            currentAdmin = user;
-            document.getElementById('adminLoginScreen').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadUsers();
-            showNotification('Welcome, Administrator!', 'success');
-          });
-        })
-        .catch((error) => {
-          console.error('Admin login error:', error);
-          let msg = 'Login failed. Please try again.';
-          if (error.message === 'Not authorized as admin') msg = 'This account is not an administrator.';
-          if (error.message === 'Admin data not found') msg = 'Admin account not found. Please register first.';
-          if (error.code === 'auth/user-not-found') msg = 'Account not found.';
-          if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
-          errorEl.textContent = msg;
-        });
-    }
+  function updateDashboard() {
+    document.getElementById('totalUsers').textContent = usersData.length;
+    document.getElementById('totalEggs').textContent = usersData.reduce((sum, u) => sum + (u.eggs || 0), 0).toLocaleString();
+    document.getElementById('pendingTx').textContent = txsData.filter(t => t.status === 'pending').length;
+    document.getElementById('totalMessages').textContent = msgsData.length;
+  }
 
-    function adminLogout() {
-      auth.signOut().then(() => {
-        currentAdmin = null;
-        location.reload();
-      });
-    }
+  function renderUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    if (usersData.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No users</td></tr>'; return; }
+    tbody.innerHTML = usersData.map(u => {
+      const blockBtn = u.isBlocked 
+        ? `<button class="action-btn btn-unblock" onclick="unblockUser('${u.id}')">Unblock</button>`
+        : `<button class="action-btn btn-block" onclick="blockUser('${u.id}')">Block</button>`;
+      return `<tr><td>${u.name || 'N/A'}</td><td>${u.email || 'N/A'}</td><td>${u.eggs || 0}</td><td>${u.level || 1}</td><td>${u.isAdmin ? 'Yes' : 'No'}</td><td>${u.isBlocked ? 'Yes' : 'No'}</td><td>${blockBtn}</td></tr>`;
+    }).join('');
+  }
 
-    // Check if already logged in
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        db.collection('users').doc(user.uid).get().then((doc) => {
-          if (doc.exists && doc.data().isAdmin) {
-            currentAdmin = user;
-            document.getElementById('adminLoginScreen').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadUsers();
-          }
-        });
+  function renderTransactions() {
+    const tbody = document.getElementById('txTableBody');
+    if (txsData.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No transactions</td></tr>'; return; }
+    tbody.innerHTML = txsData.map(tx => {
+      const date = tx.createdAt && tx.createdAt.toDate ? tx.createdAt.toDate().toLocaleDateString() : 'N/A';
+      const statusClass = 'status-' + (tx.status || 'pending');
+      let actions = '';
+      if (tx.status === 'pending') {
+        actions = `<button class="action-btn btn-approve" onclick="approveTx('${tx.id}', '${tx.userId}', ${tx.coinAmount || 0}, '${tx.type}')">Approve</button><button class="action-btn btn-reject" onclick="rejectTx('${tx.id}')">Reject</button>`;
       }
-    });
+      return `<tr><td>${tx.userName || tx.userEmail || 'N/A'}</td><td>${tx.type}</td><td>${tx.coinAmount || 0}</td><td>R${tx.cost || 0}</td><td class="${statusClass}">${tx.status || 'pending'}</td><td>${date}</td><td>${actions}</td></tr>`;
+    }).join('');
+  }
 
-    // ===== LOAD USERS FROM FIRESTORE =====
-    function loadUsers() {
-      const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Loading users from Firestore...</td></tr>';
+  function renderMessages() {
+    const tbody = document.getElementById('chatTableBody');
+    if (msgsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No messages</td></tr>'; return; }
+    tbody.innerHTML = msgsData.slice(0, 50).map(msg => {
+      const time = msg.timestamp && msg.timestamp.toDate ? msg.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + ' ' + msg.timestamp.toDate().toLocaleDateString() : 'N/A';
+      return `<tr><td>${msg.senderName || 'N/A'}</td><td>${escapeHtml(msg.body || '')}</td><td>${msg.channel || 'global'}</td><td>${time}</td><td><button class="action-btn btn-reject" onclick="deleteMsg('${msg.id}')">Delete</button></td></tr>`;
+    }).join('');
+  }
 
-      db.collection('users').get()
-        .then((snapshot) => {
-          let total = 0, pending = 0, approved = 0, blocked = 0;
-          tbody.innerHTML = '';
+  window.approveTx = async function(txId, userId, amount, type) {
+    try {
+      await updateDoc(doc(db, 'transactions', txId), { status: 'approved', approvedAt: serverTimestamp() });
+      if (type === 'deposit') {
+        const userRef = doc(db, 'users', userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const currentEggs = userSnap.data().eggs || 0;
+          await updateDoc(userRef, { eggs: currentEggs + amount, updatedAt: serverTimestamp() });
+        }
+      }
+      showNotification('Transaction approved!', 'success');
+    } catch (e) { showNotification(e.message); }
+  };
 
-          if (snapshot.empty) {
-            tbody.innerHTML = `
-              <tr>
-                <td colspan="8">
-                  <div class="empty-state">
-                    <div class="empty-state-icon">👤</div>
-                    <div class="empty-state-text">No registered users yet</div>
-                    <div class="empty-state-hint">Users will appear here when they register</div>
-                  </div>
-                </td>
-              </tr>`;
-            return;
-          }
+  window.rejectTx = async function(txId) {
+    try {
+      await updateDoc(doc(db, 'transactions', txId), { status: 'rejected', rejectedAt: serverTimestamp() });
+      showNotification('Transaction rejected', 'success');
+    } catch (e) { showNotification(e.message); }
+  };
 
-          snapshot.forEach((doc) => {
-            const user = doc.data();
-            total++;
-            if (user.status === 'pending') pending++;
-            if (user.status === 'approved') approved++;
-            if (user.isBlocked) blocked++;
+  window.blockUser = async function(userId) {
+    try { await updateDoc(doc(db, 'users', userId), { isBlocked: true, updatedAt: serverTimestamp() }); showNotification('User blocked', 'success'); }
+    catch (e) { showNotification(e.message); }
+  };
 
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${escapeHtml(user.name || 'N/A')}</td>
-              <td>${escapeHtml(user.email)}</td>
-              <td>${escapeHtml(user.cellNumber || 'N/A')}</td>
-              <td><span class="status-badge status-${user.status || 'pending'}">${(user.status || 'pending').toUpperCase()}</span></td>
-              <td>${user.eggs || 0}</td>
-              <td>${user.isAdmin ? '<span style="color:#22c55e">YES</span>' : '<span style="color:#666">No</span>'}</td>
-              <td>${user.isBlocked ? '<span style="color:#ef4444">YES</span>' : '<span style="color:#666">No</span>'}</td>
-              <td>
-                <div class="user-actions">
-                  ${user.status === 'pending' ? `<button class="user-action-btn btn-approve" onclick="approveUser('${doc.id}')">Approve</button>` : ''}
-                  ${user.status === 'pending' ? `<button class="user-action-btn btn-reject" onclick="rejectUser('${doc.id}')">Reject</button>` : ''}
-                  ${!user.isBlocked ? `<button class="user-action-btn btn-block" onclick="toggleBlockUser('${doc.id}', true)">Block</button>` : `<button class="user-action-btn btn-unblock" onclick="toggleBlockUser('${doc.id}', false)">Unblock</button>`}
-                </div>
-              </td>
-            `;
-            tbody.appendChild(tr);
-          });
+  window.unblockUser = async function(userId) {
+    try { await updateDoc(doc(db, 'users', userId), { isBlocked: false, updatedAt: serverTimestamp() }); showNotification('User unblocked', 'success'); }
+    catch (e) { showNotification(e.message); }
+  };
 
-          document.getElementById('totalUsers').textContent = total;
-          document.getElementById('pendingUsers').textContent = pending;
-          document.getElementById('approvedUsers').textContent = approved;
-          document.getElementById('blockedUsers').textContent = blocked;
-        })
-        .catch((error) => {
-          console.error('Error loading users:', error);
-          tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Error loading users. Check Firestore rules.</td></tr>';
-          showNotification('Error loading users: ' + error.message);
-        });
-    }
+  window.deleteMsg = async function(msgId) {
+    try { await deleteDoc(doc(db, 'messages', msgId)); showNotification('Message deleted', 'success'); }
+    catch (e) { showNotification(e.message); }
+  };
 
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    // ===== APPROVE USER =====
-    function approveUser(uid) {
-      db.collection('users').doc(uid).update({
-        status: 'approved',
-        approvedAt: new Date().toISOString()
-      })
-      .then(() => {
-        showNotification('User approved!', 'success');
-        loadUsers();
-      })
-      .catch((error) => {
-        showNotification('Error: ' + error.message);
-      });
-    }
-
-    // ===== REJECT USER =====
-    function rejectUser(uid) {
-      db.collection('users').doc(uid).update({
-        status: 'rejected',
-        rejectedAt: new Date().toISOString()
-      })
-      .then(() => {
-        showNotification('User rejected', 'success');
-        loadUsers();
-      })
-      .catch((error) => {
-        showNotification('Error: ' + error.message);
-      });
-    }
-
-    // ===== BLOCK/UNBLOCK USER =====
-    function toggleBlockUser(uid, block) {
-      db.collection('users').doc(uid).update({
-        isBlocked: block
-      })
-      .then(() => {
-        showNotification(block ? 'User blocked' : 'User unblocked', 'success');
-        loadUsers();
-      })
-      .catch((error) => {
-        showNotification('Error: ' + error.message);
-      });
-    }
-
-    // Enter key on password
-    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') adminLogin();
-    });
-  </script>
+  function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+</script>
 </body>
-</html>
+  </html>
