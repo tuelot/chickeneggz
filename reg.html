@@ -206,13 +206,24 @@
 
   <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <script>
-    // ===== LOCAL STORAGE KEYS (must match admin panel) =====
-    const DB_KEYS = {
-      USERS: 'chickenAdmin_users',
-      SESSION: 'chickenEmpire_v1.session',
-      GAME_EGGS: 'chickenEmpire_v1.eggs'
+    const firebaseConfig = {
+      apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+      authDomain: "chickeneggz.firebaseapp.com",
+      projectId: "chickeneggz",
+      storageBucket: "chickeneggz.firebasestorage.app",
+      messagingSenderId: "378281633320",
+      appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
     };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
     function showNotification(msg, type = 'error') {
       const notif = document.getElementById('notification');
@@ -221,19 +232,6 @@
       notif.className = 'notification ' + type;
       notif.classList.add('show');
       setTimeout(() => notif.classList.remove('show'), 5000);
-    }
-
-    function getStore(key) {
-      try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; }
-      catch (e) { return null; }
-    }
-
-    function setStore(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function generateId() {
-      return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     function now() {
@@ -245,7 +243,7 @@
     }
 
     // ============================================
-    // USER REGISTRATION
+    // USER REGISTRATION - FIREBASE AUTH + FIRESTORE
     // ============================================
     const registerForm = document.getElementById('registerForm');
     const registerBtn = document.getElementById('registerBtn');
@@ -286,57 +284,55 @@
       registerBtn.disabled = true;
       registerBtn.innerHTML = 'CREATING ACCOUNT... <span class="loading-spinner"></span>';
 
-      // Get existing users from chickenAdmin_users
-      const users = getStore(DB_KEYS.USERS) || {};
-
-      // Check if email already exists
-      const exists = Object.values(users).some(u => u.email === email);
-      if (exists) {
-        showNotification('This email is already registered. Please login instead.');
-        registerBtn.disabled = false;
-        registerBtn.innerHTML = 'REGISTER';
-        return;
-      }
-
       // Check if this is the admin email
       const isAdminEmail = email === 'admin@chicken.com';
 
-      // Create new user
-      const uid = generateId();
-      users[uid] = {
-        uid: uid,
-        name: name,
-        email: email,
-        cellNumber: cell,
-        password: password,        // stored for local login
-        isAdmin: isAdminEmail,     // Auto-admin if admin email
-        isBlocked: false,
-        status: isAdminEmail ? 'approved' : 'pending',  // Auto-approve admin
-        eggs: isAdminEmail ? 999999 : 0,
-        isSystemAdmin: isAdminEmail || false,  // Protect admin account
-        createdAt: now(),
-        updatedAt: now()
-      };
+      // Create Firebase Auth account
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
 
-      // Save to chickenAdmin_users (admin panel reads this)
-      setStore(DB_KEYS.USERS, users);
+          // Save user data to Firestore
+          const userData = {
+            uid: user.uid,
+            name: name,
+            email: email,
+            cellNumber: cell,
+            isAdmin: isAdminEmail,
+            isBlocked: false,
+            status: isAdminEmail ? 'approved' : 'pending',
+            eggs: isAdminEmail ? 999999 : 0,
+            isSystemAdmin: isAdminEmail,
+            createdAt: now(),
+            updatedAt: now()
+          };
 
-      // Also create a game session so user is logged in
-      setStore(DB_KEYS.SESSION, {
-        uid: uid,
-        email: email,
-        name: name,
-        loggedInAt: now()
-      });
+          return db.collection('users').doc(user.uid).set(userData).then(() => {
+            // Also save to localStorage as fallback
+            localStorage.setItem('chickenEmpire_v1.session', JSON.stringify({
+              uid: user.uid,
+              email: email,
+              name: name,
+              loggedInAt: now()
+            }));
+            localStorage.setItem('chickenEmpire_v1.eggs', String(userData.eggs));
+            localStorage.setItem('chickenEmpire_v1.uid', user.uid);
+            localStorage.setItem('chickenEmpire_v1.email', email);
 
-      // Initialize game eggs to 0
-      localStorage.setItem(DB_KEYS.GAME_EGGS, '0');
-
-      console.log('User registered. UID:', uid);
-      console.log('Saved to chickenAdmin_users:', users[uid]);
-
-      // Show approval modal
-      document.getElementById('approvalModal').classList.add('show');
+            // Show approval modal
+            document.getElementById('approvalModal').classList.add('show');
+          });
+        })
+        .catch((error) => {
+          console.error('Registration error:', error);
+          let msg = 'Registration failed. Please try again.';
+          if (error.code === 'auth/email-already-in-use') msg = 'This email is already registered. Please login instead.';
+          if (error.code === 'auth/invalid-email') msg = 'Invalid email address.';
+          if (error.code === 'auth/weak-password') msg = 'Password is too weak. Use at least 6 characters.';
+          showNotification(msg);
+          registerBtn.disabled = false;
+          registerBtn.innerHTML = 'REGISTER';
+        });
     });
   </script>
 </body>
