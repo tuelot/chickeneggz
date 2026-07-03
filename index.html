@@ -18,7 +18,7 @@
     .bg-layer {
       position: absolute;
       inset: 0;
-      background: url('Green.jpg') no-repeat center center;
+      background: url('Greenland.jpg') no-repeat center center;
       background-size: cover;
       z-index: 0;
     }
@@ -192,6 +192,36 @@
       transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .star-bird-container:active .eggz-coin { transform: scale(0.95); }
+
+    /* Login prompt overlay */
+    .login-prompt {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 15, 30, 0.95);
+      border: 2px solid #00f2fe;
+      border-radius: 16px;
+      padding: 20px 30px;
+      z-index: 10001;
+      text-align: center;
+      display: none;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      box-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+    }
+    .login-prompt.show { display: block; }
+    .login-prompt p { margin-bottom: 15px; font-size: 0.95rem; }
+    .login-prompt a {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #00f2fe;
+      color: #000;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -219,6 +249,11 @@
     <div class="page-footer">Chicken Empire 2026</div>
   </div>
 
+  <div class="login-prompt" id="loginPrompt">
+    <p>Please login to collect Eggz!</p>
+    <a href="login.html">Go to Login</a>
+  </div>
+
   <!-- NAV MOVED OUTSIDE game-container TO FIX CLICK BLOCKING -->
   <nav class="bottom-nav">
     <a href="reg.html" class="nav-btn">
@@ -235,63 +270,77 @@
     </a>
   </nav>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <script>
-    (function() {
-      'use strict';
+    const firebaseConfig = {
+      apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+      authDomain: "chickeneggz.firebaseapp.com",
+      projectId: "chickeneggz",
+      storageBucket: "chickeneggz.firebasestorage.app",
+      messagingSenderId: "378281633320",
+      appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
+    };
 
-      const SAVE_KEY = 'chicken_city_economic_ledger_v26';
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-      let gameState = null;
+    let currentUser = null;
+    let currentEggs = 0;
+    let isAdmin = false;
 
-      function loadState() {
-        try {
-          const saved = localStorage.getItem(SAVE_KEY);
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed && parsed.users) {
-              return parsed;
-            }
+    const loginPrompt = document.getElementById('loginPrompt');
+
+    // Auth state listener
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        currentUser = user;
+        db.collection('users').doc(user.uid).get().then(function(doc) {
+          if (doc.exists) {
+            const data = doc.data();
+            currentEggs = data.eggs || 0;
+            isAdmin = data.isAdmin || false;
+            localStorage.setItem('chickenEmpire_v1.eggs', currentEggs);
+            localStorage.setItem('chickenEmpire_v1.uid', user.uid);
+            localStorage.setItem('chickenEmpire_v1.email', user.email);
           }
-        } catch (e) {
-          console.warn('Load fallback:', e);
-        }
-        return {
-          users: {},
-          transactions: [],
-          activeUserSession: null
-        };
-      }
-
-      function init() {
-        gameState = loadState();
-
-        document.getElementById('birdTapTarget').addEventListener('click', () => {
-          gameState = loadState();
-          if (!gameState.activeUserSession) {
-            return;
-          }
-
-          const user = gameState.users[gameState.activeUserSession];
-          if (!user) {
-            return;
-          }
-
-          if (user.status !== 'APPROVED') {
-            return;
-          }
-
-          user.eggs = (user.eggs || 0) + 1;
-          localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+        }).catch(function(err) {
+          console.error('Firestore error:', err);
         });
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
       } else {
-        init();
+        currentUser = null;
+        currentEggs = 0;
+        isAdmin = false;
       }
-    })();
+    });
 
+    // Bird click handler - saves to Firestore
+    document.getElementById('birdTapTarget').addEventListener('click', function() {
+      if (!currentUser) {
+        loginPrompt.classList.add('show');
+        setTimeout(function() {
+          loginPrompt.classList.remove('show');
+        }, 2000);
+        return;
+      }
+
+      currentEggs += 1;
+
+      db.collection('users').doc(currentUser.uid).update({
+        eggs: currentEggs
+      }).then(function() {
+        localStorage.setItem('chickenEmpire_v1.eggs', currentEggs);
+      }).catch(function(err) {
+        console.error('Failed to update eggs:', err);
+      });
+    });
+  </script>
+
+  <script>
     // ===== BIRD CANVAS VISUAL SYSTEM =====
     const BIRD_COUNT = 8;
     const birds = [];
@@ -426,6 +475,6 @@
     } else {
       initBirds();
     }
-</script>
+  </script>
 </body>
 </html>
