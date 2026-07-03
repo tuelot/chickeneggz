@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'self';">
+  <title>info</title>
+  <meta name="description" content="Chicken City Official Player's Guide - Gameplay rules, scoring, and support.">
+  <link rel="icon" href="favicon.ico">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&family=Fredoka+One&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'Poppins', system-ui, sans-serif;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .bg-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+
+    .bg-layer img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      background-color: transparent;
+    }
+
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      z-index: 1;
+    }
+
+    .cloud-container {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .cloud {
+      position: absolute;
+      will-change: transform;
+      background: #ffffff;
+      border-radius: 100px;
+      box-shadow: 
+        0 0 12px rgba(255,255,255,0.95),
+        inset -10px -10px 22px rgba(219, 234, 254, 0.95);
+      animation: floatClouds linear infinite;
+    }
+
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: inset -6px -6px 16px rgba(219, 234, 254, 0.95);
+    }
+
+    .cloud.size-l { width: 100px; height: 35px; }
+    .cloud.size-l::before { width: 50px; height: 50px; top: -28px; left: 15px; }
+    .cloud.size-l::after { width: 38px; height: 38px; top: -18px; right: 15px; }
+
+    .cloud.size-s { width: 45px; height: 16px; }
+    .cloud.size-s::before { width: 22px; height: 22px; top: -12px; left: 7px; }
+    .cloud.size-s::after { width: 17px; height: 17px; top: -8px; right: 7px; }
+
+    .cloud.size-m { width: 70px; height: 25px; }
+    .cloud.size-m::before { width: 35px; height: 35px; top: -20px; left: 10px; }
+    .cloud.size-m::after { width: 28px; height: 28px; top: -14px; right: 10px; }
+
+    @keyframes floatClouds {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(100vw); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cloud { animation: none; }
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    header {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      background: rgba(135, 206, 235, 0.85);
+      padding: 4px 12px;
+      margin: 6px 6px 0 6px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 12px #FFFFFF, inset 0 0 12px #00aaff;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .notification {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(239, 68, 68, 0.9);
+      padding: 12px 24px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 10000;
+      font-size: 14px;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 6px 0 10px;
+      z-index: 999;
+      pointer-events: auto;
+      min-height: 56px;
+      height: auto;
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .bottom-nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      text-decoration: none;
+      color: #fff;
+      padding: 2px 12px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      min-width: 60px;
+      min-height: 36px;
+      border: 2px solid transparent;
+    }
+
+    .bottom-nav-btn:hover,
+    .bottom-nav-btn:focus {
+      background: transparent; 
+      color: #ffffff;
+      outline: none;
+    }
+
+    .bottom-nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .bottom-nav-icon {
+      font-size: 15px;
+      line-height: 1;
+      filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
+    }
+
+    .bottom-nav-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 5px;
+      font-weight: 1000;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #ffffff;
+      transition: color 0.2s ease;
+    }
+
+    .bottom-nav-btn:hover .bottom-nav-label,
+    .bottom-nav-btn:focus .bottom-nav-label {
+      color: #FFD700;
+      text-shadow: 
+        0 0 5px #ffd700,
+        0 0 15px #00aaff;
+    }
+
+    /* ===== ICE GLASS TEXT BOX ===== */
+    .ice-container {
+        position: relative;
+        width: auto;
+        margin: 8px 8px 0 8px;
+        z-index: 10;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+    .ice-textbox {
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        padding: 16px 14px;
+        border: 3px solid #ffd700;
+        border-radius: 16px;
+        background:  #000000 ;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        color: #ffffff;
+        font-size: 16px;
+        line-height: 1.6;
+        outline: none;
+        box-shadow: 
+            0 0 20px rgba(0, 80, 255, 0.15),
+            0 0 60px rgba(0, 80, 255, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+
+        /* Scrollable content */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .ice-textbox::placeholder {
+        color: rgba(200, 230, 255, 0.4);
+    }
+    .ice-textbox:focus {
+        border-color: rgba(0, 100, 255, 0.6);
+        box-shadow: 
+            0 0 30px rgba(0, 100, 255, 0.3),
+            0 0 80px rgba(0, 100, 255, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    .neon-border-top, .neon-border-bottom, .neon-border-left, .neon-border-right {
+        position: absolute;
+        pointer-events: none;
+    }
+    .neon-border-top {
+        top: -2px;
+        left: 20px;
+        right: 20px;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent, 
+                        rgba(255, 0, 125, 0.9), 
+            rgba(255, 0, 125, 0.9), 
+            rgba(255, 0, 125, 0.9), 
+            transparent);
+        box-shadow: 0 0 15px rgba(255, 0, 125, 0.9), 0 0 30px rgba(255, 0, 125, 0.9);
+        border-radius: 10px;
+    }
+    .neon-border-bottom {
+        bottom: -2px;
+        left: 20px;
+        right: 20px;
+        height: 5px;
+        background: linear-gradient(90deg, 
+            transparent, 
+                        rgba(255, 0, 125, 0.9), 
+            rgba(255, 0, 125, 0.9), 
+            rgba(255, 0, 125, 0.9), 
+            transparent);
+        box-shadow: 0 0 15px rgba(255, 0, 125, 0.9), 0 0 30px rgba(255, 0, 125, 0.9);
+        border-radius: 10px;
+    }
+    .neon-border-left {
+        left: -2px;
+        top: 30px;
+        bottom: 30px;
+        width: 2px;
+        background: linear-gradient(180deg, 
+            transparent, 
+       rgba(255, 0, 125, 0.9), 
+       rgba(255, 0, 125, 0.9), 
+       rgba(255, 0, 125, 0.9), 
+            transparent);
+        box-shadow: 0 0 15px rgba(255, 0, 125, 0.9), 0 0 30px rgba(255, 0, 125, 0.9);
+        border-radius: 10px;
+    }
+    .neon-border-right {
+        right: -2px;
+        top: 30px;
+        bottom: 30px;
+        width: 2px;
+        background: linear-gradient(180deg, 
+            transparent, 
+            rgba(255, 0, 125, 0.9), 
+            rgba(255, 0, 125, 0.9), 
+            rgba(255, 0, 125, 0.9), 
+            transparent);
+        box-shadow: 0 0 15px rgba(255, 0, 125, 0.9), 0 0 30px rgba(255, 0, 125, 0.9);
+        border-radius: 10px;
+    }
+    .corner {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        pointer-events: none;
+    }
+    .corner-tl { top: -4px; left: -4px; border-top: 3px solid rgba(255, 0, 125, 0.9); border-left: 3px solid rgba(255, 0, 125, 0.9); box-shadow: -2px -2px 15px rgba(255, 0, 125, 0.9); border-radius: 4px 0 0 0; }
+    .corner-tr { top: -4px; right: -4px; border-top: 3px solid rgba(255, 0, 125, 0.9); border-right: 3px solid rgba(255, 0, 125, 0.9); box-shadow: 2px -2px 15px rgba(255, 0, 125, 0.9); border-radius: 0 4px 0 0; }
+    .corner-bl { bottom: -4px; left: -4px; border-bottom: 3px solid rgba(255, 0, 125, 0.9); border-left: 3px solid rgba(255, 0, 125, 0.9); box-shadow: -2px 2px 15px rgba(255, 0, 125, 0.9); border-radius: 0 0 0 4px; }
+    .corner-br { bottom: -4px; right: -4px; border-bottom: 3px solid rgba(255, 0, 125, 0.9); border-right: 3px solid rgba(255, 0, 125, 0.9); box-shadow: 2px 2px 15px rgba(255, 0, 125, 0.9); border-radius: 0 0 4px 0; }
+/* Guide content styles */
+    .guide-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(135, 206, 235, 0.85);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .guide-subtitle {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFD700;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .guide-text {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 10px;
+    }
+
+    .disclaimer-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 3px solid rgba(255, 0, 125, 0.9);
+      border-radius: 8px;
+      padding: 12px;
+      margin: 12px 0;
+    }
+
+    .disclaimer-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255, 0, 125, 0.9);
+      margin-bottom: 6px;
+    }
+
+    .disclaimer-text {
+      font-size: 12px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .section-block {
+      margin: 12px 0;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      border-left: 3px solid #FFD700;
+    }
+
+    .rule-item {
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .rule-item strong {
+      color: #FFD700;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .link-style {
+      color: #FFD700;
+      text-decoration: none;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .link-style:hover {
+      text-decoration: underline;
+    }
+  
+    .hud-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0 0 70px 0;
+      box-sizing: border-box;
+    }
+
+    .level-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+    .level-table th, .level-table td {
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      padding: 6px 8px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.95);
+    }
+    .level-table th {
+      background: rgba(255, 215, 0, 0.15);
+      color: #FFD700;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+    }
+    .level-table tr:nth-child(even) {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-layer">
+    <img src="Green.png" alt="Green Background">
+  </div>
+  <div class="bg-overlay"></div>
+
+  <div class="cloud-container" aria-hidden="true">
+    <div class="cloud size-s" style="top: 14%; animation-duration: 80s; animation-delay: -5s;"></div>
+    <div class="cloud size-m" style="top: 16%; animation-duration: 85s; animation-delay: -18s;"></div>
+    <div class="cloud size-l" style="top: 18%; animation-duration: 130s; animation-delay: -10s;"></div>
+    <div class="cloud size-m" style="top: 20%; animation-duration: 75s; animation-delay: -25s;"></div>
+  </div>
+
+  <div class="hud-container">
+
+    <!-- Ice glass text box wrapping the game content -->
+    <div class="ice-container" role="region" aria-label="Game Guide">
+        <div class="neon-border-top"></div>
+        <div class="neon-border-bottom"></div>
+        <div class="neon-border-left"></div>
+        <div class="neon-border-right"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        <div class="ice-textbox">
+
+      <h3 class="guide-title">🎮 Terms and conditions</h3>
+      <p class="guide-text">Welcome to Chicken Eggz (2026)!A game where you shoot flying birds and earn eggz coins,1 Eggz = R0.10, This will break down the core mechanics, timing windows, economic rules, level progression, and penalty structures so you can maximize your eggz collection and rule the leaderboard.</p>
+
+      <div class="disclaimer-box">
+        <h3 class="disclaimer-title">⚠️ IMPORTANT DISCLAIMER</h3>
+        <p class="disclaimer-text">We are not rendering financial advice. Prices and value of Eggz may fluctuate due to currency volatility. In this game you can buy or sell Eggz. It is for saving purposes — you can choose to play the game or just keep your Eggz growing, then sell them later for cash. Speak to the creators and other players before you play as you may lose your Eggz or your money by registering on this game you agree and bind yourself with terms and conditions of the game, We presume they are read on info page.<br><br><strong style="color:#FFD700">💰 Current Rate: 1 Eggz = R0.10 (10 cents)</strong></p>
+      </div>
+
+
+      <div class="section-block">
+        <p class="rule-item"><strong>1. Level Progression System (1 — 10)</strong><br>
+        Your rank is determined by total lifetime Eggz collected. Every <strong>1,000 Eggz</strong> advances you to the next level.<br>
+        There are <strong>10 levels total</strong>. Higher levels unlock bragging rights and leaderboard prestige.<br>
+        <strong style="color:#FFD700">💰 Eggz Value: 1 Eggz = R0.10 (10 cents) | R1 = 10 Eggz | R100 = 1,000 Eggz</strong><br>
+        The level cap is <strong>Level 10 (10,000+ Eggz = R1,000+)</strong>. Once you hit the cap, you continue earning Eggz but remain at max level.</p>
+
+        <table class="level-table">
+          <tr><th>Level</th><th>Eggz Required</th><th>Title</th></tr>
+          <tr><td>1</td><td>0 — 999</td><td>Eggz Rookie</td></tr>
+          <tr><td>2</td><td>1,000 — 1,999</td><td>Nest Builder</td></tr>
+          <tr><td>3</td><td>2,000 — 2,999</td><td>Chick Keeper</td></tr>
+          <tr><td>4</td><td>3,000 — 3,999</td><td>Coop Commander</td></tr>
+          <tr><td>5</td><td>4,000 — 4,999</td><td>Eggz Hunter</td></tr>
+          <tr><td>6</td><td>5,000 — 5,999</td><td>Feather Elite</td></tr>
+          <tr><td>7</td><td>6,000 — 6,999</td><td>Brood Master</td></tr>
+          <tr><td>8</td><td>7,000 — 7,999</td><td>Golden Farmer</td></tr>
+          <tr><td>9</td><td>8,000 — 8,999</td><td>Chicken Lord</td></tr>
+          <tr><td>10</td><td>9,000 — 10,000+</td><td>Empire Emperor</td></tr>
+        </table>
+      </div>
+
+      <div class="section-block">
+        <p class="rule-item"><strong>2. Scoring & Penalties (The Economy)</strong><br>
+        <strong style="color:#FFD700">💰 Rate: 1 Eggz = R0.10 (10 cents)</strong><br><br>
+        • <strong>Hit a Baby Chick (🎯 +1 Eggz = R0.10):</strong> Successfully hitting a small flying purple cyber-chick awards you +1 Eggz.<br>
+        • <strong>Miss a Shot (❌ -1 Eggz = -R0.10):</strong> Firing a stone that completely misses all targets and exits the screen penalizes your balance by -1 Eggz.<br>
+        • <strong>Golden Bird (🌟 +5 Eggz = R0.50):</strong> Rare golden birds drop +5 Eggz per hit, multiplied by your current combo.<br>
+        • <strong>Rainbow Bird (🌈 +3 Eggz = R0.30):</strong> Rainbow birds grant +3 Eggz per hit, multiplied by your current combo.<br>
+        • <strong>Bomb Bird (💣 -10 Eggz = -R1.00):</strong> Hitting a bomb bird instantly wipes 10 Eggz from your balance and resets your combo to zero.<br>
+        • <strong>The Mother Shield (🛡️ -10 Eggz = -R1.00):</strong> The large green patrolling Mother Bird acts as a shield for her chicks. Hitting her cracks the shield and costs you 10 Eggz. The on-screen tracking pop-up will show your progress (e.g., MOTHER HIT: 3/10).</p>
+      </div>
+
+      <div class="section-block">
+        <p class="rule-item"><strong>3. Buying & Selling Eggz (Cashout)</strong><br>
+        • <strong>Deposit (Buy Eggz):</strong> Send money via Bank Transfer, E-Wallet, or Cash Deposit. Rate is <strong>R1 = 10 Eggz</strong>. Admin must approve before Eggz are added to your balance.<br>
+        • <strong>Withdraw (Sell Eggz):</strong> Cash out your Eggz to your bank account or E-Wallet. Rate is <strong>1 Eggz = R0.10</strong>. Minimum withdrawal is <strong>1,000 Eggz (R100)</strong>. Eggz are deducted immediately; admin must approve the payout.<br>
+        • <strong>Processing:</strong> All deposits and withdrawals require admin approval. Please allow up to 24 hours for processing.<br>
+        • <strong>Fees:</strong> N.B! Player must have 1000 eggz to play the game or We will deduct 1000eggz or R100 once off fee for joining fee.No fees for deposits. Withdrawals may incur a small processing fee deducted from the payout amount minimum of 10% if more that R1000.both once-0ff fee and withdrawal fee can be charged same time</p>
+      </div>
+
+      <div class="section-block">
+        <p class="rule-item"><strong>4. Chatroom Rules</strong><br>
+        • <strong>Group Chat:</strong> Public chat for all players. Be respectful — no spam, abuse, or inappropriate content.<br>
+        • <strong>🔒Inbox Admin:</strong> Private channel to message admin directly. Use this for support, disputes, or private inquiries.<br>
+        • <strong>Violations:</strong> Admin can delete posts, block users from posting, or permanently remove users from chat.<br>
+        • <strong>Admin Access:</strong> Only <strong>administrator</strong> has full chat moderation powers.</p>
+      </div>
+
+      <div class="section-block">
+        <p class="rule-item"><strong>5. Account & Registration</strong><br>
+        • <strong>Sign Up:</strong> Register with your name, email, cell number, and password.<br>
+        • <strong>Approval:</strong> New accounts are <strong>pending</strong> until admin approves them. You cannot play until approved.<br>
+        • <strong>Blocked Accounts:</strong> Admin can block accounts for rule violations. Blocked users cannot login.<br>
+        • <strong>Admin Account:</strong> The system administrator (<strong>admin</strong>) has full control over all users, transactions, and chat.</p>
+      </div>
+
+      <h2 class="guide-subtitle">📧 Support & Inquiries</h2>
+      <p class="guide-text">If you experience any technical glitches, balance discrepancies, or have general queries regarding your Eggz and Rands, please use the in-game <strong>Chat</strong> tab and select <strong>🔒 Admin Direct</strong> to message the Admin directly for fast, real-time assistance.</p>
+
+      <h2 class="guide-subtitle">🛠️ Credits & Official Links</h2>
+      <p class="guide-text">
+        <strong>Game Creator:</strong> Tuelo Tsheko (Web Developer)<br>
+        <strong>Official Website:</strong> <a href="https://www.chickeneggz.com" target="_blank" class="link-style">www.chickeneggz.com</a><br>
+        <strong>Direct Email Support:</strong> <a href="mailto:chickeneggz2026@gmail.com" class="link-style">Chickeneggz2026@gmail.com</a>
+      </p>
+
+      <p class="guide-text" style="color: #FFD700; font-weight: 600; margin-top: 1.5rem; text-align: center;">Good luck out there, and protect your eggs!</p>
+    
+        </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <a href="game.html" class="bottom-nav-btn">
+      <span class="bottom-nav-icon">🎮</span>
+      <span class="bottom-nav-label">Game</span>
+    </a>
+    <a href="chatroom.html" class="bottom-nav-btn" aria-current="page">
+      <span class="bottom-nav-icon">💬</span>
+      <span class="bottom-nav-label">Chat</span>
+    </a>
+    <a href="index.html" class="bottom-nav-btn">
+      <span class="bottom-nav-icon">❌</span>
+      <span class="bottom-nav-label">Exit</span>
+    </a>
+  </nav>
+
+  <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+  <script>
+    const Storage = {
+      get(key, defaultVal = null) {
+        try {
+          const val = localStorage.getItem(key);
+          return val !== null ? val : defaultVal;
+        } catch (e) {
+          return defaultVal;
+        }
+      },
+      set(key, value) {
+        try {
+          localStorage.setItem(key, value);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      },
+      getInt(key, defaultVal = 0) {
+        const val = this.get(key);
+        return val !== null ? parseInt(val, 10) || defaultVal : defaultVal;
+      },
+      getJSON(key, defaultVal = null) {
+        const val = this.get(key);
+        if (val === null) return defaultVal;
+        try {
+          return JSON.parse(val);
+        } catch (e) {
+          return defaultVal;
+        }
+      }
+    };
+
+    const CONFIG = {
+      NOTIF_DURATION: 4000
+    };
+
+    function showNotification(msg) {
+      const notif = document.getElementById('notification');
+      if (!notif) return;
+      notif.textContent = msg;
+      notif.classList.add('show');
+      setTimeout(() => notif.classList.remove('show'), CONFIG.NOTIF_DURATION);
+    }
+
+    // Storage utilities available for game pages that need them
+    // This is a static guide page - no active game state needed here
+  </script>
+</body>
+</html>
