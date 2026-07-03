@@ -5,75 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Chicken City</title>
   <style>
-    /* ===== LOCAL FONTS — NO INTERNET NEEDED ===== */
-    @font-face {
-      font-family: 'Orbitron';
-      font-style: normal;
-      font-weight: 500;
-      font-display: swap;
-      src: url('fonts/Orbitron-500.ttf') format('truetype');
-    }
-    @font-face {
-      font-family: 'Orbitron';
-      font-style: normal;
-      font-weight: 700;
-      font-display: swap;
-      src: url('fonts/Orbitron-700.ttf') format('truetype');
-    }
-    @font-face {
-      font-family: 'Orbitron';
-      font-style: normal;
-      font-weight: 900;
-      font-display: swap;
-      src: url('fonts/Orbitron-900.ttf') format('truetype');
-    }
-    @font-face {
-      font-family: 'Poppins';
-      font-style: normal;
-      font-weight: 300;
-      font-display: swap;
-      src: url('fonts/Poppins-300.ttf') format('truetype');
-    }
-    @font-face {
-      font-family: 'Poppins';
-      font-style: normal;
-      font-weight: 400;
-      font-display: swap;
-      src: url('fonts/Poppins-400.ttf') format('truetype');
-    }
-    @font-face {
-      font-family: 'Poppins';
-      font-style: normal;
-      font-weight: 500;
-      font-display: swap;
-      src: url('fonts/Poppins-500.ttf') format('truetype');
-    }
-    @font-face {
-      font-family: 'Poppins';
-      font-style: normal;
-      font-weight: 600;
-      font-display: swap;
-      src: url('fonts/Poppins-600.ttf') format('truetype');
-    }
-    @font-face {
-      font-family: 'Poppins';
-      font-style: normal;
-      font-weight: 700;
-      font-display: swap;
-      src: url('fonts/Poppins-700.ttf') format('truetype');
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&display=swap');
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       height: 100%;
       width: 100%;
       font-family: 'Poppins', system-ui, sans-serif;
+      overflow: hidden;
     }
 
     .bg-layer {
       position: absolute;
       inset: 0;
-      background: url('Green.png') no-repeat center center;
+      background: url('Greenland.jpg') no-repeat center center;
       background-size: cover;
       z-index: 0;
     }
@@ -112,7 +57,7 @@
     .cloud-3::after { width: 150px; height: 100px; top: -40px; right: 35px; background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(238,245,255,0.75)); box-shadow: 0 0 22px rgba(255,255,255,0.22); }
     @keyframes floatCloud { 0% { transform: translateX(0); } 100% { transform: translateX(calc(100vw + 350px)); } }
 
-    .game-container { position: fixed; inset: 0; display: flex; flex-direction: column;}
+    .game-container { position: fixed; inset: 0; display: flex; flex-direction: column; z-index: 1; }
 
     .welcome-board {
       text-align: center;
@@ -141,7 +86,7 @@
       color: #00fff0;
       letter-spacing: 1px;
       text-shadow: 0 0 1000px rgba(0, 0, 0, 1);
-      opacity: 900;
+      opacity: 1;
     }
     @keyframes pulseWelcome {
       0% { transform: scale(0.98); filter: brightness(0.95); }
@@ -158,124 +103,81 @@
       justify-content: center;
       min-height: 0;
       overflow: visible;
-      perspective: 10px;
     }
 
-    .emoji-feather {
+    /* ===== FIXED BOTTOM NAV - MOVED OUTSIDE GAME CONTAINER ===== */
+    .bottom-nav {
       position: fixed;
-      font-size: 1rem;
-      pointer-events: none;
-      z-index: 15;
-      opacity: 0;
-      animation: emojiFeatherFloat linear forwards;
-    }
-    @keyframes emojiFeatherFloat {
-      0% { opacity: 0; transform: translateY(100vh) rotate(0deg) scale(0.6); }
-      8% { opacity: 0.85; }
-      25% { transform: translateY(70vh) rotate(90deg) scale(1); }
-      50% { transform: translateY(50vh) rotate(180deg) scale(0.9); }
-      75% { transform: translateY(25vh) rotate(270deg) scale(1.05); opacity: 0.7; }
-      92% { opacity: 0.4; }
-      100% { opacity: 0; transform: translateY(-80px) rotate(360deg) scale(0.7); }
-    }
-
-    .top-bar {
-      position: relative;
-      z-index: 50;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0.8rem 1rem 0.4rem;
+      bottom: 0;
+      left: 0;
       width: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 6px 0 8px;
+      z-index: 9999;
+      height: 56px;
+      background: rgba(10, 15, 30, 0.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(0, 242, 254, 0.3);
+      pointer-events: auto;
+      touch-action: manipulation;
     }
-    .top-bar-inner {
+    .nav-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.3rem;
-      background: transparent;
-      border-radius: 12px;
-      padding: 10px 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      text-align: center;
-      min-width: 290px;
-    }
-    .top-row-split {
-      display: flex;
-      align-items: center;
       justify-content: center;
-      gap: 0.8rem;
-      width: 500%;
-    }
-    .top-stat {
-      font-weight: 700;
-      font-size: 0.9rem;
-      text-shadow: 0 0 5px rgba(0,0,0,0.3);
-    }
-    .top-divider {
-      width: 1px;
-      height: 14px;
+      gap: 3px;
       background: transparent;
-    }
-
-    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; align-items: center; padding: 4px 0 6px; z-index: 500; pointer-events: auto; height: 48px; }
-    .nav-btn { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 2px; 
-      background: transparent; 
-      border: none; 
+      border: none;
       cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 8px;
+      padding: 8px 20px;
+      border-radius: 10px;
       pointer-events: auto;
       position: relative;
-      z-index: 501;
+      z-index: 10000;
       text-decoration: none;
       color: inherit;
+      min-width: 70px;
+      min-height: 44px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background 0.2s ease, transform 0.1s ease;
     }
-    .nav-btn:hover { 
-      background: rgba(255, 255, 255, 0.15); 
-      color: #000; 
+    .nav-btn:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.2);
     }
-    .nav-icon { font-size: 20px; }
-    .nav-label { font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 1000; letter-spacing: 0.5px; text-transform: uppercase; color: #ffffff; }
+    .nav-icon { font-size: 22px; line-height: 1; }
+    .nav-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
     .page-footer {
       position: relative;
       z-index: 100;
       text-align: center;
-      padding: 1rem;
-      color: transparent;
-      font-size: 1rem;
-      letter-spacing: 50px;
+      padding: 1rem 1rem 70px;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.7rem;
       flex-shrink: 0;
     }
-
-    .notification {
-      position: fixed;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 25px;
-      border-radius: 25px;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      font-size: 5rem;
-      pointer-events: none;
-    }
-    .notification.show { opacity: 1; }
-
-    @supports (height: 100dvh) { .game-container { height: 100dvh; } }
 
     .star-bird-container {
       position: relative;
       z-index: 20;
       cursor: pointer;
-      width: 250px;
-      height: 250px;
+      width: 200px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -286,22 +188,10 @@
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 40px rgba(250, 204, 21, 0.45), inset 0 -6px 15px rgba(0, 0, 0, 0.5), inset 0 6px 20px rgba(255, 255, 255, 0.65);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 40px rgba(250, 204, 21, 0.45);
       transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .star-bird-container:active .eggz-coin { transform: scale(0.95); }
-
-    .golden-egg::before {
-      content: ""; position: absolute; top: 15%; left: 20%; width: 25%; height: 15%; background: transparent; transform: rotate(-30deg);
-    }
-    .golden-egg::after {
-      content: "$"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #b8860b; font-weight: 800; font-size: 0.9rem; text-shadow: 0 1px 2px rgba(255,255,255,0.5);
-    }
-    @keyframes goldenEggFall {
-      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
-      80% { opacity: 1; transform: translateY(60vh) rotate(180deg) scale(1); }
-      100% { opacity: 0; transform: translateY(70vh) rotate(360deg) scale(0.5); }
-    }
   </style>
 </head>
 <body>
@@ -316,8 +206,8 @@
     </div>
 
     <div class="welcome-board">
-      <h2 class="welcome-title"><b>Welcome to Chicken Eggz</b></h2>
-      <p class="welcome-tag"><i>Terms & Conditions Apply!</i></p>
+      <h2 class="welcome-title"><b>Welcome to Chicken City</b></h2>
+      <p class="welcome-tag"><b>Collect Eggz Earn Cash!</b></p>
     </div>
 
     <div class="game-area">
@@ -326,39 +216,32 @@
       </div>
     </div>
 
-    <nav class="bottom-nav">
-      <a href="reg.html" class="nav-btn">
-        <span class="nav-icon">🐣</span>
-        <span class="nav-label">Register</span>
-      </a>
-      <a href="login.html" class="nav-btn nav-center">
-        <span class="nav-icon">🐥</span>
-        <span class="nav-label">Login</span>
-      </a>
-      <a href="visitor.html" class="nav-btn">
-        <span class="nav-icon">ℹ️</span>
-        <span class="nav-label">Info</span>
-      </a>
-    </nav>
-
     <div class="page-footer">Chicken Empire 2026</div>
   </div>
 
-  <div class="notification" id="notification"></div>
+  <!-- NAV MOVED OUTSIDE game-container TO FIX CLICK BLOCKING -->
+  <nav class="bottom-nav">
+    <a href="reg.html" class="nav-btn">
+      <span class="nav-icon">🐣</span>
+      <span class="nav-label">Register</span>
+    </a>
+    <a href="login.html" class="nav-btn">
+      <span class="nav-icon">🐥</span>
+      <span class="nav-label">Login</span>
+    </a>
+    <a href="info.html" class="nav-btn">
+      <span class="nav-icon">ℹ️</span>
+      <span class="nav-label">Info</span>
+    </a>
+  </nav>
 
   <script>
     (function() {
       'use strict';
 
       const SAVE_KEY = 'chicken_city_economic_ledger_v26';
-      const NOTIF_DURATION = 2500;
 
       let gameState = null;
-      let notifTimeout = null;
-      let featherInterval = null;
-      let goldenEggInterval = null;
-
-      const notification = document.getElementById('notification');
 
       function loadState() {
         try {
@@ -366,8 +249,6 @@
           if (saved) {
             const parsed = JSON.parse(saved);
             if (parsed && parsed.users) {
-              if (parsed.adminEggPrice === undefined) parsed.adminEggPrice = 1.00;
-              if (parsed.adminTotalEggs === undefined) parsed.adminTotalEggs = 100000;
               return parsed;
             }
           }
@@ -377,92 +258,29 @@
         return {
           users: {},
           transactions: [],
-          activeUserSession: null,
-          adminEggPrice: 1.00,
-          adminTotalEggs: 100000
+          activeUserSession: null
         };
-      }
-
-      // Expose to window so bird system can use it
-      window.showNotification = function(message) {
-        notification.textContent = message;
-        notification.classList.add('show');
-        clearTimeout(notifTimeout);
-        notifTimeout = setTimeout(() => notification.classList.remove('show'), NOTIF_DURATION);
-      };
-
-      function spawnGoldenEgg() {
-        if (!gameState?.activeUserSession || gameState.users[gameState.activeUserSession]?.status !== 'APPROVED') return;
-
-        const goldenEgg = document.createElement('div');
-        goldenEgg.className = 'golden-egg';
-
-        const starBird = document.getElementById('starBird');
-        if (!starBird) return;
-        const rect = starBird.getBoundingClientRect();
-        goldenEgg.style.left = (rect.left + rect.width / 2 - 22) + 'px';
-        goldenEgg.style.top = (rect.top + rect.height * 0.7) + 'px';
-
-        const duration = 3 + Math.random() * 2;
-        goldenEgg.style.animationDuration = duration + 's';
-        document.body.appendChild(goldenEgg);
-
-        setTimeout(() => {
-          gameState = loadState();
-          const user = gameState.users?.[gameState.activeUserSession];
-          if (user?.status === 'APPROVED') {
-            user.eggs = (user.eggs || 0) + 1;
-            localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
-          }
-        }, duration * 1000 * 0.8);
-
-        setTimeout(() => goldenEgg.remove(), duration * 1000 + 500);
-      }
-
-      function createEmojiFeather() {
-        const feather = document.createElement('div');
-        feather.className = 'emoji-feather';
-        feather.textContent = '.';
-
-        feather.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-        const duration = 15 + Math.random() * 20;
-        const delay = Math.random() * 3;
-        feather.style.animationDuration = duration + 's';
-        feather.style.animationDelay = delay + 's';
-        feather.style.transform = `scale(${0.8 + Math.random() * 0.7})`;
-
-        document.body.appendChild(feather);
-        setTimeout(() => feather.remove(), (duration + delay) * 1000);
-      }
-
-      function startEmojiFeatherFlow() {
-        if (featherInterval) clearInterval(featherInterval);
-        featherInterval = setInterval(() => {
-          if (document.querySelectorAll('.emoji-feather').length < 50) createEmojiFeather();
-        }, 2000);
-      }
-
-      function startGoldenEggRain() {
-        if (goldenEggInterval) clearInterval(goldenEggInterval);
-        goldenEggInterval = setInterval(spawnGoldenEgg, 4000 + Math.random() * 3000);
       }
 
       function init() {
         gameState = loadState();
-        startEmojiFeatherFlow();
-        startGoldenEggRain();
 
         document.getElementById('birdTapTarget').addEventListener('click', () => {
           gameState = loadState();
           if (!gameState.activeUserSession) {
-            window.showNotification("Please login or register to click!");
             return;
           }
-          if (gameState.users[gameState.activeUserSession]?.status !== 'APPROVED') {
-            window.showNotification("Account pending admin approval.");
+
+          const user = gameState.users[gameState.activeUserSession];
+          if (!user) {
             return;
           }
-          gameState.users[gameState.activeUserSession].eggs = (gameState.users[gameState.activeUserSession].eggs || 0) + 1;
+
+          if (user.status !== 'APPROVED') {
+            return;
+          }
+
+          user.eggs = (user.eggs || 0) + 1;
           localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
         });
       }
@@ -474,24 +292,14 @@
       }
     })();
 
-    // ===== BIRD SYSTEM (offline - birds only, no shooter) =====
-    const BIRD_COUNT = 10;
+    // ===== BIRD CANVAS VISUAL SYSTEM =====
+    const BIRD_COUNT = 8;
     const birds = [];
     let gameActive = true;
-    let comboCount = 0;
-    let lastHitTime = 0;
-    const COMBO_WINDOW = 2000;
-    const MAX_COMBO = 10;
-    let coins = 0;
 
-    function updateHUD() {
-      // Offline HUD update - coins tracked in memory
-    }
-
-    // ===== CANVAS =====
     const canvas = document.createElement('canvas');
     canvas.id = 'birdCanvas';
-    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:calc(100vh - 48px);z-index:2;pointer-events:auto;cursor:crosshair;';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2;pointer-events:none;touch-action:none;';
     document.body.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
@@ -504,7 +312,6 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // ===== CLASSES =====
     class Bird {
       constructor(isMother) {
         this.isMother = isMother;
@@ -514,9 +321,9 @@
       }
       getRandomNormalColor() {
         var rand = Math.random();
-        if (rand < 0.33) return '#FFAA00';
-        if (rand < 0.66) return '#00FFFF';
-        return '#FF00AA';
+        if (rand < 0.33) return '#FFAA00'; 
+        if (rand < 0.66) return '#00FFFF'; 
+        return '#FF00AA'; 
       }
       reset() {
         if (!this.isMother) {
@@ -536,15 +343,10 @@
         this.y = this.isMother ? (canvas.height * 0.25) + Math.random() * 80 : (canvas.height * 0.08) + Math.random() * 160;
         this.wingWave = Math.random() * Math.PI;
         this.wingSpeed = this.isMother ? 0.08 : 0.25;
-        this.blinkTimer = Math.random() * 100 + 50;
-        this.pulseTimer = 0;
       }
       update() {
         this.x += this.speed * this.direction;
         this.wingWave += this.wingSpeed;
-        this.blinkTimer--;
-        this.pulseTimer += 0.05;
-        if (this.blinkTimer <= 0) this.blinkTimer = Math.random() * 200 + 100;
         if (this.direction === 1 && this.x > canvas.width + this.radius) this.reset();
         if (this.direction === -1 && this.x < -this.radius) this.reset();
       }
@@ -602,108 +404,16 @@
       }
     }
 
-    class Particle {
-      constructor(x, y, color) {
-        this.x = x; this.y = y;
-        this.color = color === 'rainbow' ? '#ff00ff' : color;
-        var a = Math.random() * Math.PI * 2;
-        var s = Math.random() * 4 + 1;
-        this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s;
-        this.alpha = 1; this.decay = 0.02 + Math.random() * 0.015;
-        this.size = 2 + Math.random() * 2;
-      }
-      update() { this.x += this.vx; this.y += this.vy; this.alpha -= this.decay; }
-      draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-    }
-
-    class FloatingText {
-      constructor(x, y, text, color) { this.x = x; this.y = y; this.text = text; this.color = color === 'rainbow' ? '#ff00ff' : color; this.alpha = 1; this.vy = -1.2; }
-      update() { this.y += this.vy; this.alpha -= 0.012; }
-      draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.font = 'bold 18px Arial'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6; ctx.textAlign = 'center'; ctx.fillText(this.text, this.x, this.y); ctx.restore(); }
-    }
-
-    // ===== HIT HANDLER =====
-    function handleHit(bird) {
-      if (!gameActive) return;
-      if (navigator.vibrate) navigator.vibrate(50);
-
-      var now = Date.now();
-      if (now - lastHitTime < COMBO_WINDOW) { comboCount++; } else { comboCount = 1; }
-      lastHitTime = now;
-      var comboMultiplier = Math.min(comboCount, MAX_COMBO);
-
-      for (var k = 0; k < 15; k++) { particles.push(new Particle(bird.x, bird.y, bird.color)); }
-
-      var rewardAmount = 0;
-      var rewardText = '';
-      var rewardColor = '#ffd700';
-
-      if (bird.isMother) {
-        comboCount = 0;
-        var penalty = Math.min(coins, 10);
-        coins -= penalty;
-        rewardText = '-' + penalty + ' Eggz';
-        rewardColor = '#ff4b4b';
-        window.showNotification('MOTHER BIRD! Combo lost!');
-      } else {
-        if (bird.type === 'golden') { rewardAmount = 5 * comboMultiplier; rewardText = '+' + rewardAmount; rewardColor = '#FFE600'; }
-        else if (bird.type === 'rainbow') { rewardAmount = 3 * comboMultiplier; rewardText = '+' + rewardAmount; rewardColor = '#ff00ff'; }
-        else if (bird.type === 'bomb') { rewardAmount = -10; rewardText = '-10'; rewardColor = '#FF0033'; comboCount = 0; window.showNotification('BOMB BIRD! -10 Eggz!'); }
-        else { rewardAmount = comboMultiplier; rewardText = (comboCount > 1 ? 'x' + comboMultiplier + ' ' : '+') + rewardAmount; rewardColor = bird.color === 'rainbow' ? '#ff00ff' : bird.color; }
-        coins += rewardAmount;
-      }
-
-      updateHUD();
-
-      floatingTexts.push(new FloatingText(bird.x, bird.y, rewardText + ' Eggz', rewardColor));
-      if (comboCount > 1 && !bird.isMother && bird.type !== 'bomb') {
-        floatingTexts.push(new FloatingText(bird.x, bird.y - 30, 'COMBO x' + comboCount + '!', '#00f2fe'));
-      }
-      bird.reset();
-    }
-
-    // ===== CLICK/TAP TO HIT BIRDS =====
-    function getCanvasPos(e) {
-      var rect = canvas.getBoundingClientRect();
-      var cx = e.touches ? e.touches[0].clientX : e.clientX;
-      var cy = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
-    }
-
-    function onBirdClick(e) {
-      if (!gameActive) return;
-      var pos = getCanvasPos(e);
-      for (var i = 0; i < birds.length; i++) {
-        var b = birds[i];
-        if (Math.hypot(pos.x - b.x, pos.y - b.y) < b.radius + 15) {
-          if (navigator.vibrate) navigator.vibrate(50);
-          handleHit(b);
-          break;
-        }
-      }
-    }
-
-    canvas.addEventListener('mousedown', onBirdClick);
-    canvas.addEventListener('touchstart', onBirdClick, { passive: true });
-
-    // ===== GAME LOOP =====
     function birdGameLoop() {
       requestAnimationFrame(birdGameLoop);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (gameActive) {
         birds.forEach(function(b) { b.update(); });
-
-        for (var i = particles.length - 1; i >= 0; i--) { particles[i].update(); if (particles[i].alpha <= 0) particles.splice(i, 1); }
-        for (var i = floatingTexts.length - 1; i >= 0; i--) { floatingTexts[i].update(); if (floatingTexts[i].alpha <= 0) floatingTexts.splice(i, 1); }
       }
-
       birds.forEach(function(b) { b.draw(); });
-      particles.forEach(function(p) { p.draw(); });
-      floatingTexts.forEach(function(t) { t.draw(); });
     }
 
-    // ===== INIT =====
     function initBirds() {
       resizeCanvas();
       birds.push(new Bird(true));
@@ -716,6 +426,6 @@
     } else {
       initBirds();
     }
-  </script>
+</script>
 </body>
 </html>
