@@ -229,15 +229,52 @@
       auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
           const user = userCredential.user;
+          const isAdminEmail = email === 'admin@chicken.com';
 
           // Read user data from Firestore
           return db.collection('users').doc(user.uid).get().then((doc) => {
+            let userData;
+
             if (!doc.exists) {
-              throw new Error('User data not found in database.');
+              // No Firestore doc found - auto-create one (handles old accounts)
+              userData = {
+                uid: user.uid,
+                name: user.displayName || email.split('@')[0],
+                email: email,
+                cellNumber: '',
+                isAdmin: isAdminEmail,
+                isBlocked: false,
+                status: isAdminEmail ? 'approved' : 'pending',
+                eggs: isAdminEmail ? 999999 : 0,
+                isSystemAdmin: isAdminEmail,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              };
+              // Create the missing doc
+              return db.collection('users').doc(user.uid).set(userData).then(() => {
+                return userData;
+              });
+            } else {
+              userData = doc.data();
+              // FORCE admin to always be approved and isAdmin
+              if (isAdminEmail) {
+                userData.isAdmin = true;
+                userData.status = 'approved';
+                userData.isSystemAdmin = true;
+                userData.isBlocked = false;
+                // Update Firestore to fix any wrong admin status
+                return db.collection('users').doc(user.uid).update({
+                  isAdmin: true,
+                  status: 'approved',
+                  isSystemAdmin: true,
+                  isBlocked: false
+                }).then(() => {
+                  return userData;
+                });
+              }
+              return userData;
             }
-
-            const userData = doc.data();
-
+          }).then((userData) => {
             // Check if blocked
             if (userData.isBlocked) {
               auth.signOut();
