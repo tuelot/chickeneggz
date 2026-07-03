@@ -138,24 +138,12 @@
       white-space: nowrap;
     }
 
-    .btn-create {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #fff;
-    }
     .btn-refresh {
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       color: #fff;
     }
     .btn-logout {
       background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #fff;
-    }
-    .btn-export {
-      background: linear-gradient(135deg, #a855f7, #7c3aed);
-      color: #fff;
-    }
-    .btn-clear {
-      background: linear-gradient(135deg, #f97316, #ea580c);
       color: #fff;
     }
 
@@ -254,12 +242,8 @@
 
     .btn-approve { background: #22c55e; color: #fff; }
     .btn-reject { background: #ef4444; color: #fff; }
-    .btn-edit { background: #3b82f6; color: #fff; }
-    .btn-coins { background: #FFD700; color: #0a0f1e; }
-    .btn-delete { background: #dc2626; color: #fff; }
     .btn-block { background: #f97316; color: #fff; }
     .btn-unblock { background: #22c55e; color: #fff; }
-    .btn-admin { background: #a855f7; color: #fff; }
 
     /* ===== BOTTOM NAV ===== */
     .bottom-nav {
@@ -312,103 +296,6 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
       color: #ffffff;
-    }
-
-    /* ===== MODALS ===== */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 20000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-    }
-    .modal-overlay.show { display: flex; }
-
-    .modal-card {
-      background: rgba(20, 30, 60, 0.98);
-      border: 2px solid #FFD700;
-      border-radius: 16px;
-      padding: 24px;
-      max-width: 400px;
-      width: 100%;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
-    }
-
-    .modal-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
-      color: #FFD700;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .modal-form-group {
-      margin-bottom: 12px;
-    }
-
-    .modal-label {
-      display: block;
-      font-size: 10px;
-      color: #a0b0d0;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .modal-input {
-      width: 100%;
-      padding: 10px 12px;
-      background: rgba(10, 15, 30, 0.8);
-      border: 2px solid rgba(255, 215, 0, 0.2);
-      border-radius: 8px;
-      color: #fff;
-      font-family: 'Poppins', sans-serif;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .modal-input:focus {
-      border-color: #FFD700;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .modal-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
-
-    .modal-btn-primary {
-      background: linear-gradient(135deg, #FFD700, #FFA500);
-      color: #0a0f1e;
-    }
-
-    .modal-btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .modal-btn-danger {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #fff;
     }
 
     /* ===== NOTIFICATION ===== */
@@ -479,13 +366,49 @@
       min-height: 18px;
     }
 
-    /* ===== MESSAGES ===== */
-    .no-users {
-      text-align: center;
-      padding: 30px;
+    .modal-form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .modal-label {
+      display: block;
+      font-size: 10px;
       color: #a0b0d0;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(10, 15, 30, 0.8);
+      border: 2px solid rgba(255, 215, 0, 0.2);
+      border-radius: 8px;
+      color: #fff;
       font-family: 'Poppins', sans-serif;
       font-size: 13px;
+      outline: none;
+    }
+
+    .modal-input:focus {
+      border-color: #FFD700;
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #0a0f1e;
+      margin-top: 8px;
     }
 
     .loading-text {
@@ -496,71 +419,6 @@
       font-size: 11px;
     }
 
-    /* Tab Navigation */
-    .tab-nav {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      padding: 0 4px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid rgba(255, 215, 0, 0.3);
-      border-radius: 10px;
-      background: rgba(20, 30, 60, 0.8);
-      color: #a0b0d0;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-    }
-    .tab-btn.active {
-      border-color: #FFD700;
-      color: #FFD700;
-      background: rgba(255, 215, 0, 0.1);
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-    }
-    .tab-btn:hover {
-      border-color: rgba(255, 215, 0, 0.6);
-      color: #fff;
-    }
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    /* Transaction detail text */
-    .tx-detail {
-      font-size: 10px;
-      color: #a0b0d0;
-      max-width: 150px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Reward queue specific */
-    .reward-positive { color: #22c55e; font-weight: 700; }
-    .reward-negative { color: #ef4444; font-weight: 700; }
-
-    /* Search box */
-    .search-box {
-      width: 100%;
-      padding: 10px 14px;
-      background: rgba(10, 15, 30, 0.8);
-      border: 2px solid rgba(255, 215, 0, 0.2);
-      border-radius: 10px;
-      color: #fff;
-      font-family: 'Poppins', sans-serif;
-      font-size: 13px;
-      outline: none;
-      margin-bottom: 12px;
-    }
-    .search-box:focus { border-color: #FFD700; }
-    .search-box::placeholder { color: #666; }
-
-    /* Empty state with icon */
     .empty-state {
       text-align: center;
       padding: 40px 20px;
@@ -585,13 +443,7 @@
 
   <div class="bg-layer">
     <img src="Green.png" alt="Green Background">
-  
-      <button class="modal-btn modal-btn-secondary" style="width: 100%; margin-top: 12px; font-size: 10px;" onclick="resetAdmin()">
-        🔄 RESET (if login fails)
-      </button>
-      <div style="color: #666; font-size: 9px; text-align: center; margin-top: 8px;">
-        v2.0 | Admin: admin@chicken.com | Pass: admin2026
-      </div></div>
+  </div>
   <div class="bg-overlay"></div>
 
   <!-- Login Screen -->
@@ -610,7 +462,7 @@
         <input type="password" class="modal-input" id="adminPassword" value="admin2026">
       </div>
 
-      <button class="modal-btn modal-btn-primary" style="width: 100%; margin-top: 8px;" onclick="adminLogin()">
+      <button class="modal-btn" onclick="adminLogin()">
         LOGIN AS ADMIN
       </button>
       <div class="login-error" id="loginError"></div>
@@ -626,111 +478,38 @@
 
     <div class="admin-container">
       <div class="admin-header">
-        <div class="admin-title">MANAGEMENT PANEL</div>
-        <div style="color:#FFD700; font-size:10px; font-family:'Orbitron'; margin-bottom:8px;">💰 Rate: 1 Eggz = R0.10</div>
+        <div class="admin-title">USER MANAGEMENT</div>
         <div class="admin-stats">
           <div class="stat-box">Users: <span id="totalUsers">0</span></div>
-          <div class="stat-box">Pending Rewards: <span id="pendingRewards">0</span></div>
-          <div class="stat-box">Pending Tx: <span id="pendingTx">0</span></div>
-          <div class="stat-box">Total Eggs: <span id="totalEggs">0</span></div>
+          <div class="stat-box">Pending: <span id="pendingUsers">0</span></div>
+          <div class="stat-box">Approved: <span id="approvedUsers">0</span></div>
+          <div class="stat-box">Blocked: <span id="blockedUsers">0</span></div>
         </div>
       </div>
 
       <div class="action-btns">
-        <button class="action-btn btn-create" onclick="openCreateUserModal()">➕ Create User</button>
-        <button class="action-btn btn-refresh" onclick="refreshAll()">🔄 Refresh</button>
-        <button class="action-btn btn-export" onclick="exportData()">📥 Export</button>
-        <button class="action-btn btn-clear" onclick="clearAllData()">🗑️ Clear All</button>
+        <button class="action-btn btn-refresh" onclick="loadUsers()">🔄 Refresh</button>
         <button class="action-btn btn-logout" onclick="adminLogout()">🚪 Logout</button>
       </div>
 
-      <!-- Tab Navigation -->
-      <div class="tab-nav">
-        <button class="tab-btn active" id="usersTab" onclick="showTab('users')">👥 Users</button>
-        <button class="tab-btn" id="rewardsTab" onclick="showTab('rewards')">🎁 Rewards</button>
-        <button class="tab-btn" id="transactionsTab" onclick="showTab('transactions')">💰 Transactions</button>
-      </div>
-
-      <!-- Users Panel -->
-      <div id="usersPanel" class="panel active">
-        <input type="text" class="search-box" id="userSearch" placeholder="🔍 Search users by name or email..." oninput="filterUsers()">
-        <div class="users-table-container">
-          <table class="users-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Cell</th>
-                <th>Status</th>
-                <th>Eggz</th>
-                <th>Admin</th>
-                <th>Blocked</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <tr><td colspan="8" class="loading-text">Loading users...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Rewards Panel -->
-      <div id="rewardsPanel" class="panel">
-        <div class="admin-header" style="margin-top:8px;">
-          <div class="admin-stats">
-            <div class="stat-box">Pending: <span id="pendingRewardCount">0</span></div>
-            <div class="stat-box">Approved: <span id="approvedRewardCount">0</span></div>
-            <div class="stat-box">Rejected: <span id="rejectedRewardCount">0</span></div>
-          </div>
-        </div>
-        <div class="users-table-container">
-          <table class="users-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Email</th>
-                <th>Reward</th>
-                <th>Reason</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="rewardsTableBody">
-              <tr><td colspan="6" class="loading-text">Loading rewards...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Transactions Panel -->
-      <div id="transactionsPanel" class="panel">
-        <div class="admin-header" style="margin-top:8px;">
-          <div class="admin-stats">
-            <div class="stat-box">Pending: <span id="pendingTxCount">0</span></div>
-            <div class="stat-box">Deposits: <span id="depositTxCount">0</span></div>
-            <div class="stat-box">Withdrawals: <span id="withdrawTxCount">0</span></div>
-          </div>
-        </div>
-        <div class="users-table-container">
-          <table class="users-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>User</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Cost</th>
-                <th>Status</th>
-                <th>Details</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="transactionsTableBody">
-              <tr><td colspan="8" class="loading-text">Loading transactions...</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="users-table-container">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Cell</th>
+              <th>Status</th>
+              <th>Eggz</th>
+              <th>Admin</th>
+              <th>Blocked</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="8" class="loading-text">Loading users...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -750,209 +529,29 @@
     </a>
   </nav>
 
-  <!-- Edit User Modal -->
-  <div class="modal-overlay" id="editModal">
-    <div class="modal-card">
-      <div class="modal-title">✏️ EDIT USER</div>
-      <div class="modal-form-group">
-        <label class="modal-label">Name</label>
-        <input type="text" class="modal-input" id="editName">
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Email</label>
-        <input type="email" class="modal-input" id="editEmail" readonly>
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Cell Number</label>
-        <input type="tel" class="modal-input" id="editCell">
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Status</label>
-        <select class="modal-input" id="editStatus" style="cursor: pointer;">
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </select>
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Is Admin</label>
-        <select class="modal-input" id="editIsAdmin" style="cursor: pointer;">
-          <option value="false">No</option>
-          <option value="true">Yes</option>
-        </select>
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Blocked</label>
-        <select class="modal-input" id="editIsBlocked" style="cursor: pointer;">
-          <option value="false">No</option>
-          <option value="true">Yes</option>
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">Cancel</button>
-        <button class="modal-btn modal-btn-primary" onclick="saveUserEdit()">Save Changes</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Create User Modal -->
-  <div class="modal-overlay" id="createModal">
-    <div class="modal-card">
-      <div class="modal-title">➕ CREATE NEW USER</div>
-      <div class="modal-form-group">
-        <label class="modal-label">Full Name</label>
-        <input type="text" class="modal-input" id="createName" placeholder="Enter name">
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Email</label>
-        <input type="email" class="modal-input" id="createEmail" placeholder="email@example.com">
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Cell Number</label>
-        <input type="tel" class="modal-input" id="createCell" placeholder="0712345678">
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Password</label>
-        <input type="password" class="modal-input" id="createPassword" placeholder="Min 6 characters">
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Initial Eggz Balance</label>
-        <input type="number" class="modal-input" id="createBalance" value="0" min="0">
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn modal-btn-secondary" onclick="closeModal('createModal')">Cancel</button>
-        <button class="modal-btn modal-btn-primary" onclick="createNewUser()">Create User</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Update Coins Modal -->
-  <div class="modal-overlay" id="coinsModal">
-    <div class="modal-card">
-      <div class="modal-title">🪙 UPDATE EGGZ BALANCE</div>
-      <div class="modal-form-group">
-        <label class="modal-label">User</label>
-        <input type="text" class="modal-input" id="coinsUserEmail" readonly>
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Current Balance</label>
-        <input type="text" class="modal-input" id="coinsCurrentBalance" readonly>
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">New Balance</label>
-        <input type="number" class="modal-input" id="coinsNewBalance" min="0">
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn modal-btn-secondary" onclick="closeModal('coinsModal')">Cancel</button>
-        <button class="modal-btn modal-btn-primary" onclick="saveCoinUpdate()">Update Balance</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Transaction Details Modal -->
-  <div class="modal-overlay" id="txDetailsModal">
-    <div class="modal-card">
-      <div class="modal-title">📋 TRANSACTION DETAILS</div>
-      <div id="txDetailsContent" style="font-size: 13px; line-height: 1.8; color: #c0d0f0;"></div>
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button class="modal-btn modal-btn-secondary" onclick="closeModal('txDetailsModal')">Close</button>
-      </div>
-    </div>
-  </div>
-
   <div id="notification" class="notification" role="alert"></div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <script>
-    // ===== REAL DATA STORE =====
-    // Connects to the actual game's localStorage keys
-    // No demo data, no fake users - only real registered players
-    const DB_KEYS = {
-      USERS: 'chickenAdmin_users',
-      TRANSACTIONS: 'chickenAdmin_transactions',
-      REWARDS: 'chickenAdmin_rewards',
-      SESSION: 'chickenAdmin_session',
-      GAME_EGGS: 'chickenEmpire_v1.eggs'
+    const firebaseConfig = {
+      apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+      authDomain: "chickeneggz.firebaseapp.com",
+      projectId: "chickeneggz",
+      storageBucket: "chickeneggz.firebasestorage.app",
+      messagingSenderId: "378281633320",
+      appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
     };
 
-    // Admin credentials
-    const ADMIN_CREDENTIALS = {
-      email: 'admin@chicken.com',
-      password: 'admin2026'
-    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    let currentEditUid = null;
-    let currentCoinsUid = null;
-    let allUsers = {};
+    let currentAdmin = null;
 
-    // ===== LOCAL STORAGE HELPERS =====
-    function getStore(key) {
-      try {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function setStore(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function getUsers() {
-      return getStore(DB_KEYS.USERS) || {};
-    }
-
-    function setUsers(users) {
-      setStore(DB_KEYS.USERS, users);
-    }
-
-    function getTransactions() {
-      return getStore(DB_KEYS.TRANSACTIONS) || [];
-    }
-
-    function setTransactions(txs) {
-      setStore(DB_KEYS.TRANSACTIONS, txs);
-    }
-
-    function getRewards() {
-      return getStore(DB_KEYS.REWARDS) || [];
-    }
-
-    function setRewards(rewards) {
-      setStore(DB_KEYS.REWARDS, rewards);
-    }
-
-    function generateId() {
-      return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    function now() {
-      return new Date().toISOString();
-    }
-
-    // ===== SYNC GAME EGGS TO ADMIN PANEL =====
-    // This ensures the admin panel sees real egg balances from the game
-    function syncGameEggsToUsers() {
-      const users = getUsers();
-      const gameEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
-
-      // Find the current logged-in game user and sync their eggs
-      // We look for users that match the game's current session
-      const gameSession = getStore('chickenEmpire_v1.session');
-      if (gameSession && gameSession.email) {
-        const userEntry = Object.entries(users).find(([uid, u]) => u.email === gameSession.email);
-        if (userEntry) {
-          const [uid, user] = userEntry;
-          if ((user.eggs || 0) !== gameEggs) {
-            users[uid].eggs = gameEggs;
-            users[uid].updatedAt = now();
-            setUsers(users);
-          }
-        }
-      }
-    }
-
-    // ===== NOTIFICATION =====
     function showNotification(msg, type = 'error') {
       const notif = document.getElementById('notification');
       notif.textContent = msg;
@@ -961,233 +560,128 @@
       setTimeout(() => notif.classList.remove('show'), 4000);
     }
 
-    // ===== TAB NAVIGATION =====
-    function showTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(panel => {
-        panel.classList.remove('active');
-        panel.style.display = 'none';
-      });
-
-      if (tabName === 'users') {
-        document.getElementById('usersTab').classList.add('active');
-        document.getElementById('usersPanel').classList.add('active');
-        document.getElementById('usersPanel').style.display = 'block';
-        loadUsers();
-      } else if (tabName === 'rewards') {
-        document.getElementById('rewardsTab').classList.add('active');
-        document.getElementById('rewardsPanel').classList.add('active');
-        document.getElementById('rewardsPanel').style.display = 'block';
-        loadRewards();
-      } else {
-        document.getElementById('transactionsTab').classList.add('active');
-        document.getElementById('transactionsPanel').classList.add('active');
-        document.getElementById('transactionsPanel').style.display = 'block';
-        loadTransactions();
-      }
-    }
-
-    function refreshAll() {
-      syncGameEggsToUsers();
-      updateStats();
-      if (document.getElementById('usersPanel').classList.contains('active')) {
-        loadUsers();
-      } else if (document.getElementById('rewardsPanel').classList.contains('active')) {
-        loadRewards();
-      } else {
-        loadTransactions();
-      }
-      showNotification('Data refreshed!', 'success');
-    }
-
-    // ===== LOGIN / LOGOUT =====
+    // ===== LOGIN =====
     function adminLogin() {
-      ensureAdminExists(); // Ensure admin exists before login attempt
       const email = document.getElementById('adminEmail').value.trim().toLowerCase();
       const password = document.getElementById('adminPassword').value;
       const errorEl = document.getElementById('loginError');
 
-      if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-        setStore(DB_KEYS.SESSION, { email: email, loggedInAt: now() });
-        document.getElementById('adminLoginScreen').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        syncGameEggsToUsers();
-        loadUsers();
-        updateStats();
-        showNotification('Welcome, Administrator!', 'success');
-        errorEl.textContent = '';
-      } else {
-        errorEl.textContent = 'Invalid email or password.';
-        showNotification('Invalid credentials');
-      }
+      errorEl.textContent = '';
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          // Verify this user is actually an admin in Firestore
+          return db.collection('users').doc(user.uid).get().then((doc) => {
+            if (!doc.exists) {
+              throw new Error('Admin data not found');
+            }
+            const userData = doc.data();
+            if (!userData.isAdmin) {
+              auth.signOut();
+              throw new Error('Not authorized as admin');
+            }
+            currentAdmin = user;
+            document.getElementById('adminLoginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadUsers();
+            showNotification('Welcome, Administrator!', 'success');
+          });
+        })
+        .catch((error) => {
+          console.error('Admin login error:', error);
+          let msg = 'Login failed. Please try again.';
+          if (error.message === 'Not authorized as admin') msg = 'This account is not an administrator.';
+          if (error.message === 'Admin data not found') msg = 'Admin account not found. Please register first.';
+          if (error.code === 'auth/user-not-found') msg = 'Account not found.';
+          if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
+          errorEl.textContent = msg;
+        });
     }
 
     function adminLogout() {
-      localStorage.removeItem(DB_KEYS.SESSION);
-      location.reload();
+      auth.signOut().then(() => {
+        currentAdmin = null;
+        location.reload();
+      });
     }
 
-    // Check existing session on load
-    
-    // ===== MOBILE RESET =====
-    function resetAdmin() {
-      localStorage.removeItem(DB_KEYS.SESSION);
-      localStorage.removeItem('chickenAdmin_users');
-      localStorage.removeItem('chickenAdmin_transactions');
-      localStorage.removeItem('chickenAdmin_rewards');
-      showNotification('All data cleared. Reloading...', 'success');
-      setTimeout(() => { 
-        ensureAdminExists(); // Recreate admin after reset
-        location.reload(true); 
-      }, 1500);
-    }
-
-    // Auto-clear any corrupted session on load
-    (function() {
-      try {
-        const session = getStore(DB_KEYS.SESSION);
-        if (session && typeof session !== 'object') {
-          localStorage.removeItem(DB_KEYS.SESSION);
-        }
-      } catch(e) {
-        localStorage.removeItem(DB_KEYS.SESSION);
+    // Check if already logged in
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        db.collection('users').doc(user.uid).get().then((doc) => {
+          if (doc.exists && doc.data().isAdmin) {
+            currentAdmin = user;
+            document.getElementById('adminLoginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadUsers();
+          }
+        });
       }
-    })();
+    });
 
-    // ===== ENSURE ADMIN ALWAYS EXISTS =====
-    // This creates the master admin account if deleted.
-    // The admin has full authority: approve users, manage transactions,
-    // edit any user, update coins, block/unblock, and cannot be deleted.
-    function ensureAdminExists() {
-      const users = getUsers();
-
-      // Check if admin@chicken.com exists
-      const adminEntry = Object.entries(users).find(([uid, u]) => u.email === 'admin@chicken.com');
-
-      if (!adminEntry) {
-        // Admin was deleted — recreate with full authority
-        const adminId = 'admin_superuser_' + Date.now();
-        users[adminId] = {
-          uid: adminId,
-          name: 'Administrator',
-          email: 'admin@chicken.com',
-          cellNumber: '0792840349',
-          password: 'admin2026',
-          isAdmin: true,
-          isBlocked: false,
-          status: 'approved',
-          eggs: 999999,
-          isSystemAdmin: true,  // Protected — cannot be deleted or blocked
-          createdAt: now(),
-          updatedAt: now()
-        };
-        setUsers(users);
-        showNotification('Admin account restored with full authority', 'success');
-        console.log('Admin superuser recreated with full permissions');
-      } else {
-        // Admin exists — ensure full authority flags are set
-        const [adminId, adminUser] = adminEntry;
-        let updated = false;
-
-        if (!adminUser.isAdmin) { adminUser.isAdmin = true; updated = true; }
-        if (adminUser.isBlocked) { adminUser.isBlocked = false; updated = true; }
-        if (adminUser.status !== 'approved') { adminUser.status = 'approved'; updated = true; }
-        if (!adminUser.isSystemAdmin) { adminUser.isSystemAdmin = true; updated = true; }
-
-        if (updated) {
-          adminUser.updatedAt = now();
-          setUsers(users);
-          console.log('Admin authority restored');
-        }
-      }
-    }
-
-function checkSession() {
-      ensureAdminExists(); // Always ensure admin exists
-      const session = getStore(DB_KEYS.SESSION);
-      if (session && session.email === ADMIN_CREDENTIALS.email) {
-        document.getElementById('adminLoginScreen').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        syncGameEggsToUsers();
-        loadUsers();
-        updateStats();
-      }
-    }
-
-    // ===== STATS =====
-    function updateStats() {
-      const users = getUsers();
-      const txs = getTransactions();
-      const rewards = getRewards();
-
-      document.getElementById('totalUsers').textContent = Object.keys(users).length;
-      document.getElementById('pendingRewards').textContent = rewards.filter(r => r.status === 'pending').length;
-      document.getElementById('pendingTx').textContent = txs.filter(t => t.status === 'pending').length;
-
-      let totalEggs = 0;
-      Object.values(users).forEach(u => { totalEggs += (u.eggs || 0); });
-      document.getElementById('totalEggs').textContent = totalEggs;
-    }
-
-    // ===== USERS =====
+    // ===== LOAD USERS FROM FIRESTORE =====
     function loadUsers() {
       const tbody = document.getElementById('usersTableBody');
-      const users = getUsers();
-      allUsers = users;
-      tbody.innerHTML = '';
+      tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Loading users from Firestore...</td></tr>';
 
-      const userList = Object.entries(users);
-      if (userList.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="8">
-              <div class="empty-state">
-                <div class="empty-state-icon">👤</div>
-                <div class="empty-state-text">No registered users yet</div>
-                <div class="empty-state-hint">Users will appear here when they register through the game</div>
-              </div>
-            </td>
-          </tr>`;
-        return;
-      }
+      db.collection('users').get()
+        .then((snapshot) => {
+          let total = 0, pending = 0, approved = 0, blocked = 0;
+          tbody.innerHTML = '';
 
-      userList.forEach(([uid, user]) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escapeHtml(user.name || 'N/A')}</td>
-          <td>${escapeHtml(user.email)}</td>
-          <td>${escapeHtml(user.cellNumber || 'N/A')}</td>
-          <td><span class="status-badge status-${user.status || 'pending'}">${(user.status || 'pending').toUpperCase()}</span></td>
-          <td>${user.eggs || 0}</td>
-          <td>${user.isAdmin ? '<span style="color:#22c55e">YES</span>' : '<span style="color:#666">No</span>'}</td>
-          <td>${user.isBlocked ? '<span style="color:#ef4444">YES</span>' : '<span style="color:#666">No</span>'}</td>
-          <td>
-            <div class="user-actions">
-              ${user.status === 'pending' ? `<button class="user-action-btn btn-approve" onclick="approveUser('${uid}')">Approve</button>` : ''}
-              <button class="user-action-btn btn-edit" onclick="openEditModal('${uid}')">Edit</button>
-              <button class="user-action-btn btn-coins" onclick="openCoinsModal('${uid}', ${user.eggs || 0})">Coins</button>
-              ${user.isSystemAdmin ? '<span style="color:#FFD700;font-size:10px;">🔒 Protected</span>' : 
-                (user.isBlocked 
-                  ? `<button class="user-action-btn btn-unblock" onclick="toggleBlockUser('${uid}', false)">Unblock</button>`
-                  : `<button class="user-action-btn btn-block" onclick="toggleBlockUser('${uid}', true)">Block</button>`
-                )
-              }
-              ${user.isSystemAdmin ? '' : `<button class="user-action-btn btn-delete" onclick="deleteUser('${uid}', '${escapeHtml(user.email)}')">Delete</button>`}
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+          if (snapshot.empty) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="8">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">👤</div>
+                    <div class="empty-state-text">No registered users yet</div>
+                    <div class="empty-state-hint">Users will appear here when they register</div>
+                  </div>
+                </td>
+              </tr>`;
+            return;
+          }
 
-    function filterUsers() {
-      const query = document.getElementById('userSearch').value.toLowerCase().trim();
-      const rows = document.querySelectorAll('#usersTableBody tr');
-      rows.forEach(row => {
-        const name = row.cells[0]?.textContent.toLowerCase() || '';
-        const email = row.cells[1]?.textContent.toLowerCase() || '';
-        row.style.display = (name.includes(query) || email.includes(query)) ? '' : 'none';
-      });
+          snapshot.forEach((doc) => {
+            const user = doc.data();
+            total++;
+            if (user.status === 'pending') pending++;
+            if (user.status === 'approved') approved++;
+            if (user.isBlocked) blocked++;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${escapeHtml(user.name || 'N/A')}</td>
+              <td>${escapeHtml(user.email)}</td>
+              <td>${escapeHtml(user.cellNumber || 'N/A')}</td>
+              <td><span class="status-badge status-${user.status || 'pending'}">${(user.status || 'pending').toUpperCase()}</span></td>
+              <td>${user.eggs || 0}</td>
+              <td>${user.isAdmin ? '<span style="color:#22c55e">YES</span>' : '<span style="color:#666">No</span>'}</td>
+              <td>${user.isBlocked ? '<span style="color:#ef4444">YES</span>' : '<span style="color:#666">No</span>'}</td>
+              <td>
+                <div class="user-actions">
+                  ${user.status === 'pending' ? `<button class="user-action-btn btn-approve" onclick="approveUser('${doc.id}')">Approve</button>` : ''}
+                  ${user.status === 'pending' ? `<button class="user-action-btn btn-reject" onclick="rejectUser('${doc.id}')">Reject</button>` : ''}
+                  ${!user.isBlocked ? `<button class="user-action-btn btn-block" onclick="toggleBlockUser('${doc.id}', true)">Block</button>` : `<button class="user-action-btn btn-unblock" onclick="toggleBlockUser('${doc.id}', false)">Unblock</button>`}
+                </div>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          document.getElementById('totalUsers').textContent = total;
+          document.getElementById('pendingUsers').textContent = pending;
+          document.getElementById('approvedUsers').textContent = approved;
+          document.getElementById('blockedUsers').textContent = blocked;
+        })
+        .catch((error) => {
+          console.error('Error loading users:', error);
+          tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Error loading users. Check Firestore rules.</td></tr>';
+          showNotification('Error loading users: ' + error.message);
+        });
     }
 
     function escapeHtml(text) {
@@ -1197,434 +691,54 @@ function checkSession() {
       return div.innerHTML;
     }
 
+    // ===== APPROVE USER =====
     function approveUser(uid) {
-      const users = getUsers();
-      if (users[uid]) {
-        users[uid].status = 'approved';
-        users[uid].approvedAt = now();
-        users[uid].updatedAt = now();
-        setUsers(users);
+      db.collection('users').doc(uid).update({
+        status: 'approved',
+        approvedAt: new Date().toISOString()
+      })
+      .then(() => {
+        showNotification('User approved!', 'success');
         loadUsers();
-        updateStats();
-        showNotification('User approved successfully!', 'success');
-      }
+      })
+      .catch((error) => {
+        showNotification('Error: ' + error.message);
+      });
     }
 
+    // ===== REJECT USER =====
+    function rejectUser(uid) {
+      db.collection('users').doc(uid).update({
+        status: 'rejected',
+        rejectedAt: new Date().toISOString()
+      })
+      .then(() => {
+        showNotification('User rejected', 'success');
+        loadUsers();
+      })
+      .catch((error) => {
+        showNotification('Error: ' + error.message);
+      });
+    }
+
+    // ===== BLOCK/UNBLOCK USER =====
     function toggleBlockUser(uid, block) {
-      const users = getUsers();
-      if (users[uid] && users[uid].isSystemAdmin) {
-        showNotification('Cannot block the system administrator!', 'error');
-        return;
-      }
-      if (users[uid]) {
-        users[uid].isBlocked = block;
-        users[uid].updatedAt = now();
-        setUsers(users);
-        loadUsers();
+      db.collection('users').doc(uid).update({
+        isBlocked: block
+      })
+      .then(() => {
         showNotification(block ? 'User blocked' : 'User unblocked', 'success');
-      }
-    }
-
-    function openEditModal(uid) {
-      const users = getUsers();
-      const user = users[uid];
-      if (!user) { showNotification('User not found'); return; }
-      document.getElementById('editName').value = user.name || '';
-      document.getElementById('editEmail').value = user.email;
-      document.getElementById('editCell').value = user.cellNumber || '';
-      document.getElementById('editStatus').value = user.status || 'pending';
-      document.getElementById('editIsAdmin').value = user.isAdmin ? 'true' : 'false';
-      document.getElementById('editIsBlocked').value = user.isBlocked ? 'true' : 'false';
-      currentEditUid = uid;
-      document.getElementById('editModal').classList.add('show');
-    }
-
-    function saveUserEdit() {
-      const users = getUsers();
-      if (users[currentEditUid]) {
-        users[currentEditUid].name = document.getElementById('editName').value.trim();
-        users[currentEditUid].cellNumber = document.getElementById('editCell').value.trim();
-        users[currentEditUid].status = document.getElementById('editStatus').value;
-        users[currentEditUid].isAdmin = document.getElementById('editIsAdmin').value === 'true';
-        users[currentEditUid].isBlocked = document.getElementById('editIsBlocked').value === 'true';
-        users[currentEditUid].updatedAt = now();
-        setUsers(users);
         loadUsers();
-        updateStats();
-        showNotification('User updated successfully!', 'success');
-        closeModal('editModal');
-      }
-    }
-
-    function openCreateUserModal() {
-      document.getElementById('createModal').classList.add('show');
-    }
-
-    function createNewUser() {
-      const name = document.getElementById('createName').value.trim();
-      const email = document.getElementById('createEmail').value.trim().toLowerCase();
-      const cell = document.getElementById('createCell').value.trim();
-      const password = document.getElementById('createPassword').value;
-      const balance = parseInt(document.getElementById('createBalance').value) || 0;
-
-      if (!name || !email || !password) {
-        showNotification('Please fill in all required fields');
-        return;
-      }
-
-      const users = getUsers();
-      const exists = Object.values(users).some(u => u.email === email);
-      if (exists) {
-        showNotification('A user with this email already exists');
-        return;
-      }
-
-      const uid = generateId();
-      users[uid] = {
-        uid: uid,
-        name: name,
-        email: email,
-        cellNumber: cell,
-        password: password,
-        isAdmin: false,
-        isBlocked: false,
-        status: 'pending',
-        eggs: balance,
-        createdAt: now(),
-        updatedAt: now()
-      };
-      setUsers(users);
-      showNotification('User created successfully! Status: PENDING (needs approval)', 'success');
-      closeModal('createModal');
-      document.getElementById('createName').value = '';
-      document.getElementById('createEmail').value = '';
-      document.getElementById('createCell').value = '';
-      document.getElementById('createPassword').value = '';
-      document.getElementById('createBalance').value = '0';
-      loadUsers();
-      updateStats();
-    }
-
-    function openCoinsModal(uid, currentBalance) {
-      const users = getUsers();
-      const user = users[uid];
-      document.getElementById('coinsUserEmail').value = user ? user.email : uid;
-      document.getElementById('coinsCurrentBalance').value = currentBalance;
-      document.getElementById('coinsNewBalance').value = currentBalance;
-      currentCoinsUid = uid;
-      document.getElementById('coinsModal').classList.add('show');
-    }
-
-    function saveCoinUpdate() {
-      const newBalance = parseInt(document.getElementById('coinsNewBalance').value) || 0;
-      const users = getUsers();
-      if (users[currentCoinsUid]) {
-        users[currentCoinsUid].eggs = newBalance;
-        users[currentCoinsUid].updatedAt = now();
-        setUsers(users);
-
-        // Also sync to game if this is the current game user
-        const gameSession = getStore('chickenEmpire_v1.session');
-        if (gameSession && gameSession.email === users[currentCoinsUid].email) {
-          localStorage.setItem(DB_KEYS.GAME_EGGS, String(newBalance));
-        }
-
-        showNotification('Eggz balance updated!', 'success');
-        closeModal('coinsModal');
-        loadUsers();
-        updateStats();
-      }
-    }
-
-    function deleteUser(uid, userEmail) {
-      const users = getUsers();
-      if (users[uid] && users[uid].isSystemAdmin) {
-        showNotification('Cannot delete the system administrator!', 'error');
-        return;
-      }
-      if (!confirm('Are you sure you want to delete user ' + userEmail + '? This action cannot be undone.')) {
-        return;
-      }
-      delete users[uid];
-      setUsers(users);
-      showNotification('User deleted successfully!', 'success');
-      loadUsers();
-      updateStats();
-    }
-
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('show');
-    }
-
-    // ===== REWARD QUEUE =====
-    function loadRewards() {
-      const tbody = document.getElementById('rewardsTableBody');
-      const rewards = getRewards();
-      tbody.innerHTML = '';
-
-      let pendingCount = 0, approvedCount = 0, rejectedCount = 0;
-
-      if (rewards.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6">
-              <div class="empty-state">
-                <div class="empty-state-icon">🎁</div>
-                <div class="empty-state-text">No rewards in queue</div>
-                <div class="empty-state-hint">Rewards appear when players earn them in-game</div>
-              </div>
-            </td>
-          </tr>`;
-      }
-
-      rewards.slice().reverse().forEach(data => {
-        const date = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'N/A';
-        const rewardClass = (data.reward || 0) >= 0 ? 'reward-positive' : 'reward-negative';
-        const isPending = data.status === 'pending';
-
-        if (data.status === 'pending') pendingCount++;
-        if (data.status === 'approved') approvedCount++;
-        if (data.status === 'rejected') rejectedCount++;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escapeHtml(date)}</td>
-          <td class="tx-detail" title="${escapeHtml(data.email || '')}">${escapeHtml(data.email || 'N/A')}</td>
-          <td class="${rewardClass}">${data.reward > 0 ? '+' : ''}${data.reward || 0}</td>
-          <td>${escapeHtml(data.reason || 'N/A')}</td>
-          <td><span class="status-badge status-${data.status || 'pending'}">${(data.status || 'pending').toUpperCase()}</span></td>
-          <td>
-            <div class="user-actions">
-              ${isPending ? `
-                <button class="user-action-btn btn-approve" onclick="approveReward('${data.id}', ${data.reward || 0}, '${data.uid || ''}')">Approve</button>
-                <button class="user-action-btn btn-reject" onclick="rejectReward('${data.id}')">Reject</button>
-              ` : '<span style="color:#666;font-size:10px;">Processed</span>'}
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
+      })
+      .catch((error) => {
+        showNotification('Error: ' + error.message);
       });
-
-      document.getElementById('pendingRewardCount').textContent = pendingCount;
-      document.getElementById('approvedRewardCount').textContent = approvedCount;
-      document.getElementById('rejectedRewardCount').textContent = rejectedCount;
     }
 
-    function approveReward(rewardId, amount, userId) {
-      const rewards = getRewards();
-      const users = getUsers();
-      const rewardIndex = rewards.findIndex(r => r.id === rewardId);
-
-      if (rewardIndex === -1) { showNotification('Reward not found', 'error'); return; }
-      if (!userId || !users[userId]) { showNotification('Error: User not found', 'error'); return; }
-
-      rewards[rewardIndex].status = 'approved';
-      rewards[rewardIndex].approvedAt = now();
-      rewards[rewardIndex].approvedBy = 'admin';
-      users[userId].eggs = (users[userId].eggs || 0) + amount;
-      users[userId].updatedAt = now();
-
-      setRewards(rewards);
-      setUsers(users);
-      showNotification('Reward approved and applied!', 'success');
-      loadRewards();
-      updateStats();
-    }
-
-    function rejectReward(rewardId) {
-      const rewards = getRewards();
-      const rewardIndex = rewards.findIndex(r => r.id === rewardId);
-      if (rewardIndex === -1) { showNotification('Reward not found', 'error'); return; }
-
-      rewards[rewardIndex].status = 'rejected';
-      rewards[rewardIndex].rejectedAt = now();
-      rewards[rewardIndex].rejectedBy = 'admin';
-      setRewards(rewards);
-      showNotification('Reward rejected', 'success');
-      loadRewards();
-      updateStats();
-    }
-
-    // ===== TRANSACTIONS =====
-    function loadTransactions() {
-      const tbody = document.getElementById('transactionsTableBody');
-      const txs = getTransactions();
-      tbody.innerHTML = '';
-
-      let pendingCount = 0, depositCount = 0, withdrawCount = 0;
-
-      if (txs.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="8">
-              <div class="empty-state">
-                <div class="empty-state-icon">💰</div>
-                <div class="empty-state-text">No transactions yet</div>
-                <div class="empty-state-hint">Transactions appear when players request deposits or withdrawals</div>
-              </div>
-            </td>
-          </tr>`;
-      }
-
-      txs.slice().reverse().forEach(tx => {
-        const date = tx.createdAt ? new Date(tx.createdAt).toLocaleString() : 'N/A';
-        const userEmail = tx.userEmail || 'Unknown';
-        const details = tx.paymentDetails ?
-          (tx.paymentDetails.transferMethod === 'bank' ? 'Bank: ' + tx.paymentDetails.bankAccount : 'Cell: ' + tx.paymentDetails.cellphone) :
-          (tx.accountNumber ? 'Acc: ' + tx.accountNumber : 'Ref: ' + (tx.reference || 'N/A'));
-
-        if (tx.status === 'pending') pendingCount++;
-        if (tx.type === 'deposit') depositCount++;
-        if (tx.type === 'withdraw') withdrawCount++;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escapeHtml(date)}</td>
-          <td class="tx-detail" title="${escapeHtml(userEmail)}">${escapeHtml(userEmail)}</td>
-          <td><span class="status-badge status-${tx.type === 'deposit' ? 'approved' : 'rejected'}">${tx.type.toUpperCase()}</span></td>
-          <td>${tx.coinAmount || 0}</td>
-          <td>R${tx.cost || 0}</td>
-          <td><span class="status-badge status-${tx.status || 'pending'}">${(tx.status || 'pending').toUpperCase()}</span></td>
-          <td class="tx-detail" title="${escapeHtml(details)}">${escapeHtml(details)}</td>
-          <td>
-            <div class="user-actions">
-              ${tx.status === 'pending' ? `
-                <button class="user-action-btn btn-approve" onclick="approveTransaction('${tx.id}', '${tx.type}', '${tx.userId}', ${tx.coinAmount || 0})">Approve</button>
-                <button class="user-action-btn btn-reject" onclick="rejectTransaction('${tx.id}', '${tx.type}', '${tx.userId}', ${tx.coinAmount || 0})">Reject</button>
-              ` : '<span style="color:#666;font-size:10px;">Processed</span>'}
-              <button class="user-action-btn btn-edit" onclick="viewTxDetails('${tx.id}')">View</button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('pendingTxCount').textContent = pendingCount;
-      document.getElementById('depositTxCount').textContent = depositCount;
-      document.getElementById('withdrawTxCount').textContent = withdrawCount;
-    }
-
-    function viewTxDetails(txId) {
-      const txs = getTransactions();
-      const tx = txs.find(t => t.id === txId);
-      if (!tx) return;
-
-      let html = '';
-      html += '<strong>Transaction ID:</strong> ' + escapeHtml(tx.id) + '<br>';
-      html += '<strong>User:</strong> ' + escapeHtml(tx.userEmail || 'Unknown') + '<br>';
-      html += '<strong>Type:</strong> ' + escapeHtml(tx.type) + '<br>';
-      html += '<strong>Eggz Amount:</strong> ' + (tx.coinAmount || 0) + '<br>';
-      html += '<strong>Cost/Payout:</strong> R' + (tx.cost || 0) + '<br>';
-      html += '<strong>Rate:</strong> 1 Eggz = R0.10<br>';
-      html += '<strong>Status:</strong> ' + escapeHtml(tx.status || 'pending') + '<br>';
-      html += '<strong>Date:</strong> ' + (tx.createdAt ? new Date(tx.createdAt).toLocaleString() : 'N/A') + '<br>';
-      if (tx.paymentDetails) {
-        html += '<strong>Payment Method:</strong> ' + escapeHtml(tx.paymentDetails.transferMethod || 'N/A') + '<br>';
-        if (tx.paymentDetails.bankAccount) html += '<strong>Bank Account:</strong> ' + escapeHtml(tx.paymentDetails.bankAccount) + '<br>';
-        if (tx.paymentDetails.cellphone) html += '<strong>Cellphone:</strong> ' + escapeHtml(tx.paymentDetails.cellphone) + '<br>';
-      }
-      if (tx.notes) html += '<strong>Notes:</strong> ' + escapeHtml(tx.notes) + '<br>';
-      if (tx.approvedAt) html += '<strong>Approved At:</strong> ' + new Date(tx.approvedAt).toLocaleString() + '<br>';
-      if (tx.rejectedAt) html += '<strong>Rejected At:</strong> ' + new Date(tx.rejectedAt).toLocaleString() + '<br>';
-
-      document.getElementById('txDetailsContent').innerHTML = html;
-      document.getElementById('txDetailsModal').classList.add('show');
-    }
-
-    function approveTransaction(txId, type, userId, amount) {
-      const txs = getTransactions();
-      const users = getUsers();
-      const txIndex = txs.findIndex(t => t.id === txId);
-
-      if (txIndex === -1) { showNotification('Transaction not found', 'error'); return; }
-      if (!userId || !users[userId]) { showNotification('Error: User not found', 'error'); return; }
-
-      txs[txIndex].status = 'approved';
-      txs[txIndex].approvedAt = now();
-      txs[txIndex].approvedBy = 'admin';
-      txs[txIndex].notes = 'Approved by admin';
-
-      if (type === 'deposit') {
-        users[userId].eggs = (users[userId].eggs || 0) + amount;
-        users[userId].updatedAt = now();
-      }
-
-      setTransactions(txs);
-      setUsers(users);
-      showNotification('Transaction approved!', 'success');
-      loadTransactions();
-      updateStats();
-    }
-
-    function rejectTransaction(txId, type, userId, amount) {
-      const txs = getTransactions();
-      const users = getUsers();
-      const txIndex = txs.findIndex(t => t.id === txId);
-
-      if (txIndex === -1) { showNotification('Transaction not found', 'error'); return; }
-
-      txs[txIndex].status = 'rejected';
-      txs[txIndex].rejectedAt = now();
-      txs[txIndex].rejectedBy = 'admin';
-      txs[txIndex].notes = 'Rejected by admin';
-
-      if (type === 'withdraw' && userId && users[userId]) {
-        users[userId].eggs = (users[userId].eggs || 0) + amount;
-        users[userId].updatedAt = now();
-        setUsers(users);
-      }
-
-      setTransactions(txs);
-      showNotification('Transaction rejected. Coins refunded if applicable.', 'success');
-      loadTransactions();
-      updateStats();
-    }
-
-    // ===== EXPORT DATA =====
-    function exportData() {
-      const data = {
-        users: getUsers(),
-        transactions: getTransactions(),
-        rewards: getRewards(),
-        exportedAt: now()
-      };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'chicken-admin-data-' + new Date().toISOString().slice(0,10) + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showNotification('Data exported successfully!', 'success');
-    }
-
-    // ===== CLEAR ALL DATA =====
-    function clearAllData() {
-      if (!confirm('WARNING: This will delete ALL users, transactions, and rewards. This cannot be undone. Are you sure?')) return;
-      if (!confirm('FINAL WARNING: All data will be permanently lost. Confirm?')) return;
-
-      localStorage.removeItem(DB_KEYS.USERS);
-      localStorage.removeItem(DB_KEYS.TRANSACTIONS);
-      localStorage.removeItem(DB_KEYS.REWARDS);
-      showNotification('All data cleared!', 'success');
-      loadUsers();
-      updateStats();
-    }
-
-    // ===== MODAL CLOSE ON BACKDROP CLICK =====
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.classList.remove('show');
-      });
-    });
-
-    // ===== ENTER KEY ON LOGIN =====
+    // Enter key on password
     document.getElementById('adminPassword').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') adminLogin();
     });
-
-    // ===== INIT =====
-    checkSession();
   </script>
 </body>
 </html>
