@@ -177,13 +177,24 @@
 
   <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <script>
-    // ===== LOCAL STORAGE KEYS (must match admin panel & reg.html) =====
-    const DB_KEYS = {
-      USERS: 'chickenAdmin_users',
-      SESSION: 'chickenEmpire_v1.session',
-      GAME_EGGS: 'chickenEmpire_v1.eggs'
+    const firebaseConfig = {
+      apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+      authDomain: "chickeneggz.firebaseapp.com",
+      projectId: "chickeneggz",
+      storageBucket: "chickeneggz.firebasestorage.app",
+      messagingSenderId: "378281633320",
+      appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
     };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
     function showNotification(msg, type = 'error') {
       const notif = document.getElementById('notification');
@@ -194,22 +205,6 @@
       setTimeout(() => notif.classList.remove('show'), 5000);
     }
 
-    function getStore(key) {
-      try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; }
-      catch (e) { return null; }
-    }
-
-    function setStore(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function now() {
-      return new Date().toISOString();
-    }
-
-    // ============================================
-    // USER LOGIN
-    // ============================================
     const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
     const loginStatus = document.getElementById('loginStatus');
@@ -230,64 +225,71 @@
       loginBtn.disabled = true;
       loginBtn.innerHTML = 'LOGGING IN... <span class="loading-spinner"></span>';
 
-      // Read users from chickenAdmin_users
-      const users = getStore(DB_KEYS.USERS) || {};
-      const userEntry = Object.entries(users).find(([uid, u]) => u.email === email);
+      // Firebase Auth Login
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
 
-      if (!userEntry) {
-        showNotification('Account not found. Please register first.');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = 'LOGIN';
-        return;
-      }
+          // Read user data from Firestore
+          return db.collection('users').doc(user.uid).get().then((doc) => {
+            if (!doc.exists) {
+              throw new Error('User data not found in database.');
+            }
 
-      const [uid, user] = userEntry;
+            const userData = doc.data();
 
-      // Check password
-      if (user.password !== password) {
-        showNotification('Incorrect password. Please try again.');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = 'LOGIN';
-        return;
-      }
+            // Check if blocked
+            if (userData.isBlocked) {
+              auth.signOut();
+              loginStatus.innerHTML = '<div class="status-blocked">⛔ Your account has been blocked. Contact admin.</div>';
+              loginBtn.disabled = false;
+              loginBtn.innerHTML = 'LOGIN';
+              return;
+            }
 
-      // Check if blocked
-      if (user.isBlocked) {
-        loginStatus.innerHTML = '<div class="status-blocked">⛔ Your account has been blocked. Contact admin.</div>';
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = 'LOGIN';
-        return;
-      }
+            // Check if approved
+            if (userData.status !== 'approved') {
+              auth.signOut();
+              loginStatus.innerHTML = '<div class="status-pending">⏳ Your account is pending admin approval. Please wait for the admin to approve your registration.</div>';
+              loginBtn.disabled = false;
+              loginBtn.innerHTML = 'LOGIN';
+              return;
+            }
 
-      // Check if approved
-      if (user.status !== 'approved') {
-        loginStatus.innerHTML = '<div class="status-pending">⏳ Your account is pending admin approval. Please wait for the admin to approve your registration.</div>';
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = 'LOGIN';
-        return;
-      }
+            // Save to localStorage as fallback
+            localStorage.setItem('chickenEmpire_v1.session', JSON.stringify({
+              uid: user.uid,
+              email: user.email,
+              name: userData.name || user.email,
+              loggedInAt: new Date().toISOString()
+            }));
+            localStorage.setItem('chickenEmpire_v1.eggs', String(userData.eggs || 0));
+            localStorage.setItem('chickenEmpire_v1.uid', user.uid);
+            localStorage.setItem('chickenEmpire_v1.email', user.email);
 
-      // Login successful - create session
-      setStore(DB_KEYS.SESSION, {
-        uid: uid,
-        email: user.email,
-        name: user.name,
-        loggedInAt: now()
-      });
+            showNotification('Welcome back, ' + (userData.name || user.email) + '!', 'success');
 
-      // Sync eggs from user record to game
-      localStorage.setItem(DB_KEYS.GAME_EGGS, String(user.eggs || 0));
-
-      showNotification('Welcome back, ' + user.name + '!', 'success');
-
-      // Redirect based on role
-      setTimeout(() => {
-        if (user.isAdmin) {
-          window.location.href = 'admin.html';
-        } else {
-          window.location.href = 'game.html';
-        }
-      }, 1500);
+            // Redirect based on role
+            setTimeout(() => {
+              if (userData.isAdmin) {
+                window.location.href = 'admin.html';
+              } else {
+                window.location.href = 'game.html';
+              }
+            }, 1500);
+          });
+        })
+        .catch((error) => {
+          console.error('Login error:', error);
+          let msg = 'Login failed. Please try again.';
+          if (error.code === 'auth/user-not-found') msg = 'Account not found. Please register first.';
+          if (error.code === 'auth/wrong-password') msg = 'Incorrect password. Please try again.';
+          if (error.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
+          if (error.code === 'auth/too-many-requests') msg = 'Too many failed attempts. Please try again later.';
+          showNotification(msg);
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = 'LOGIN';
+        });
     });
   </script>
 </body>
