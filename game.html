@@ -31,11 +31,18 @@
     .bottom-nav-btn:hover { color: #fff; }
     .bottom-nav-icon { font-size: 16px; }
     .bottom-nav-label { font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 1000; letter-spacing: 0.5px; text-transform: uppercase; color: #fff; }
+    .auth-bar { position: fixed; top: 8px; right: 12px; z-index: 10000; display: flex; align-items: center; gap: 8px; }
+    .auth-bar span { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #a0b0d0; }
+    .auth-btn { background: rgba(255,0,125,0.8); border: none; color: #fff; padding: 4px 10px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 9px; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="bg-layer"><img src="Green.png" alt="Green Background"></div>
   <div class="bg-overlay"></div>
+  <div class="auth-bar" id="authBar">
+    <span id="userName">Guest</span>
+    <button class="auth-btn" id="authBtn" onclick="toggleAuth()">Login</button>
+  </div>
   <div class="page-wrapper">
     <header><div class="logo">Chicken Eggz</div></header>
     <div class="main-game-area" id="gameArea"><canvas id="gameCanvas"></canvas></div>
@@ -64,18 +71,34 @@
     <h2>LEVEL UP!</h2>
     <p id="levelUpText">Level 2 Unlocked!</p>
   </div>
-  <script>
-    // ===== STORAGE (localStorage only - OFFLINE) =====
-    const Storage = {
-      get(key, def) { try { var v = localStorage.getItem(key); return v !== null ? v : def; } catch(e) { return def; } },
-      set(key, val) { try { localStorage.setItem(key, val); } catch(e) {} },
-      getInt(key, def) { var v = this.get(key); return v !== null ? parseInt(v, 10) || def : def; }
-    };
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+  authDomain: "chickeneggz.firebaseapp.com",
+  projectId: "chickeneggz",
+  storageBucket: "chickeneggz.firebasestorage.app",
+  messagingSenderId: "378281633320",
+  appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let userDocRef = null;
+    let isGuest = false;
+    let syncTimeout = null;
 
     // ===== STATE =====
-    let coins = Storage.getInt('chickenEmpire_v1.eggs', 0);
-    let level = Storage.getInt('chickenEmpire_v1.level', 1);
-    let totalEarned = Storage.getInt('chickenEmpire_v1.totalEarned', 0);
+    let coins = 0;
+    let level = 1;
+    let totalEarned = 0;
     let gameActive = true;
     let comboCount = 0;
     let lastHitTime = 0;
@@ -83,20 +106,10 @@
     const MAX_COMBO = 10;
     const BASE_BIRD_COUNT = 10;
 
-    // Level thresholds: eggs needed to reach each level
-    function getLevelThreshold(lvl) {
-      return Math.floor(20 * Math.pow(1.5, lvl - 1));
-    }
+    function getLevelThreshold(lvl) { return Math.floor(20 * Math.pow(1.5, lvl - 1)); }
+    function getBirdCountForLevel(lvl) { return BASE_BIRD_COUNT + Math.floor((lvl - 1) * 1.5); }
+    function getBirdSpeedMultiplier(lvl) { return 1 + (lvl - 1) * 0.15; }
 
-    function getBirdCountForLevel(lvl) {
-      return BASE_BIRD_COUNT + Math.floor((lvl - 1) * 1.5);
-    }
-
-    function getBirdSpeedMultiplier(lvl) {
-      return 1 + (lvl - 1) * 0.15;
-    }
-
-    // ===== NOTIFICATION =====
     function showNotification(msg) {
       var n = document.getElementById('notification');
       if (!n) return;
@@ -114,6 +127,75 @@
       setTimeout(function() { n.classList.remove('show'); }, 2500);
     }
 
+    // ===== AUTH =====
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        isGuest = false;
+        document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+        document.getElementById('authBtn').textContent = 'Logout';
+        userDocRef = doc(db, 'users', user.uid);
+        await loadUserData();
+        listenForDeposits();
+      } else {
+        currentUser = null;
+        isGuest = localStorage.getItem('chickenEmpire_v1.guest') === 'true';
+        if (!isGuest) {
+          window.location.href = 'login.html';
+          return;
+        }
+        document.getElementById('userName').textContent = 'Guest';
+        document.getElementById('authBtn').textContent = 'Login';
+        coins = parseInt(localStorage.getItem('chickenEmpire_v1.eggs')) || 0;
+        level = parseInt(localStorage.getItem('chickenEmpire_v1.level')) || 1;
+        totalEarned = parseInt(localStorage.getItem('chickenEmpire_v1.totalEarned')) || 0;
+        updateHUD();
+      }
+    });
+
+    window.toggleAuth = function() {
+      if (currentUser) {
+        signOut(auth).then(() => { localStorage.removeItem('chickenEmpire_v1.guest'); window.location.href = 'login.html'; });
+      } else {
+        window.location.href = 'login.html';
+      }
+    };
+
+    async function loadUserData() {
+      if (!userDocRef) return;
+      const snap = await getDoc(userDocRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        coins = data.eggs || 0;
+        level = data.level || 1;
+        totalEarned = data.totalEarned || 0;
+      } else {
+        // Create doc if missing
+        await setDoc(userDocRef, {
+          uid: currentUser.uid, email: currentUser.email, name: currentUser.displayName || currentUser.email.split('@')[0],
+          eggs: 0, level: 1, totalEarned: 0, isAdmin: currentUser.email === 'admin@chicken.com',
+          isBlocked: false, createdAt: serverTimestamp()
+        });
+      }
+      updateHUD();
+    }
+
+    function syncToFirestore() {
+      if (!userDocRef || isGuest) return;
+      if (syncTimeout) clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(async () => {
+        try {
+          await updateDoc(userDocRef, { eggs: coins, level: level, totalEarned: totalEarned, updatedAt: serverTimestamp() });
+        } catch (e) { console.error('Sync error:', e); }
+      }, 2000);
+    }
+
+    function listenForDeposits() {
+      if (!currentUser) return;
+      // Listen for approved deposits on this user
+      // This is a simplified approach - in production you'd use a subcollection or query
+    }
+
     // ===== HUD =====
     function updateHUD() {
       var bal = document.getElementById('coin-balance');
@@ -125,43 +207,23 @@
       var progress = totalEarned - getLevelThreshold(level - 1);
       var needed = threshold - getLevelThreshold(level - 1);
       if (next) next.textContent = Math.max(0, needed - progress);
-      Storage.set('chickenEmpire_v1.eggs', coins);
-      Storage.set('chickenEmpire_v1.level', level);
-      Storage.set('chickenEmpire_v1.totalEarned', totalEarned);
-
-      // Sync eggs to admin panel
-      var session = null;
-      try { session = JSON.parse(localStorage.getItem('chickenEmpire_v1.session')); } catch(e) {}
-      if (session && session.email) {
-        var users = JSON.parse(localStorage.getItem('chickenAdmin_users') || '{}');
-        var entry = Object.entries(users).find(function(pair) { return pair[1].email === session.email; });
-        if (entry) {
-          users[entry[0]].eggs = coins;
-          users[entry[0]].level = level;
-          users[entry[0]].updatedAt = new Date().toISOString();
-          localStorage.setItem('chickenAdmin_users', JSON.stringify(users));
-        }
+      if (isGuest) {
+        localStorage.setItem('chickenEmpire_v1.eggs', coins);
+        localStorage.setItem('chickenEmpire_v1.level', level);
+        localStorage.setItem('chickenEmpire_v1.totalEarned', totalEarned);
+      } else {
+        syncToFirestore();
       }
     }
 
     function checkLevelUp() {
       var prevLevel = level;
-      while (totalEarned >= getLevelThreshold(level)) {
-        level++;
-      }
+      while (totalEarned >= getLevelThreshold(level)) { level++; }
       if (level > prevLevel) {
         showLevelUp(level);
-        // Increase difficulty: add more birds
         var targetCount = getBirdCountForLevel(level);
-        while (birds.length < targetCount) {
-          birds.push(new Bird(false));
-        }
-        // Speed up existing birds
-        birds.forEach(function(b) {
-          if (!b.isMother) {
-            b.speed = (Math.random() * 2 + 1.5) * getBirdSpeedMultiplier(level);
-          }
-        });
+        while (birds.length < targetCount) { birds.push(new Bird(false)); }
+        birds.forEach(function(b) { if (!b.isMother) { b.speed = (Math.random() * 2 + 1.5) * getBirdSpeedMultiplier(level); } });
       }
     }
 
@@ -169,7 +231,6 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const gameArea = document.getElementById('gameArea');
-
     const slingshot = { x: 0, y: 0, baseRadius: 35, elasticX: 0, elasticY: 0, isDragging: false, maxPull: 90 };
     const birds = [];
     const projectiles = [];
@@ -186,7 +247,6 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // ===== CLASSES =====
     class Bird {
       constructor(isMother) {
         this.isMother = isMother;
@@ -207,10 +267,7 @@
           else if (r < 0.08) { this.type = 'golden'; this.color = '#FFE600'; }
           else if (r < 0.16) { this.type = 'rainbow'; this.color = 'rainbow'; }
           else { this.type = 'normal'; this.color = this.getRandomNormalColor(); }
-        } else {
-          this.type = 'mother';
-          this.color = '#4169E1';
-        }
+        } else { this.type = 'mother'; this.color = '#4169E1'; }
         this.radius = this.isMother ? 38 : (this.type === 'golden' ? 22 : (this.type === 'bomb' ? 20 : 16));
         this.speed = this.isMother ? (Math.random() * 0.8 + 0.6) : (Math.random() * 2 + 1.5) * getBirdSpeedMultiplier(level);
         this.direction = Math.random() > 0.5 ? 1 : -1;
@@ -235,51 +292,21 @@
         ctx.translate(this.x, this.y);
         if (this.direction === -1) ctx.scale(-1, 1);
         var flap = Math.sin(this.wingWave);
-
         let fillStyle = this.color;
         if (this.type === 'rainbow') {
           let gradient = ctx.createLinearGradient(-this.radius, 0, this.radius, 0);
-          gradient.addColorStop(0.0, '#FF0000');
-          gradient.addColorStop(0.2, '#FF7F00');
-          gradient.addColorStop(0.4, '#FFFF00');
-          gradient.addColorStop(0.6, '#00FF00');
-          gradient.addColorStop(0.8, '#0000FF');
-          gradient.addColorStop(1.0, '#8B00FF');
+          gradient.addColorStop(0.0, '#FF0000'); gradient.addColorStop(0.2, '#FF7F00'); gradient.addColorStop(0.4, '#FFFF00');
+          gradient.addColorStop(0.6, '#00FF00'); gradient.addColorStop(0.8, '#0000FF'); gradient.addColorStop(1.0, '#8B00FF');
           fillStyle = gradient;
         }
-
-        ctx.fillStyle = fillStyle;
-        ctx.globalAlpha = 0.5;
-        ctx.beginPath();
-        ctx.ellipse(-5, flap * 5, this.radius * 0.8, this.radius * 1.3, (flap * 25 * Math.PI) / 180, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillStyle = fillStyle; ctx.globalAlpha = 0.5;
+        ctx.beginPath(); ctx.ellipse(-5, flap * 5, this.radius * 0.8, this.radius * 1.3, (flap * 25 * Math.PI) / 180, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 1.0;
-
-        ctx.beginPath();
-        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = fillStyle;
-        ctx.fill();
-
-        ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(this.radius * 0.35, -this.radius * 0.25, this.radius * 0.18, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(this.radius * 0.4, -this.radius * 0.3, this.radius * 0.07, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffaa00';
-        ctx.beginPath();
-        ctx.moveTo(this.radius * 0.8, -this.radius * 0.1);
-        ctx.lineTo(this.radius * 1.3, this.radius * 0.05);
-        ctx.lineTo(this.radius * 0.7, this.radius * 0.3);
-        ctx.closePath();
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(0, 0, this.radius, 0, Math.PI * 2); ctx.fillStyle = fillStyle; ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(this.radius * 0.35, -this.radius * 0.25, this.radius * 0.18, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(this.radius * 0.4, -this.radius * 0.3, this.radius * 0.07, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffaa00'; ctx.beginPath(); ctx.moveTo(this.radius * 0.8, -this.radius * 0.1); ctx.lineTo(this.radius * 1.3, this.radius * 0.05); ctx.lineTo(this.radius * 0.7, this.radius * 0.3); ctx.closePath(); ctx.fill();
         ctx.restore();
       }
     }
@@ -288,34 +315,15 @@
       constructor(sx, sy, tx, ty) {
         this.x = sx; this.y = sy;
         var angle = Math.atan2(ty - sy, tx - sx);
-        this.vx = Math.cos(angle) * 14;
-        this.vy = Math.sin(angle) * 14;
-        this.radius = 6;
-        this.active = true;
+        this.vx = Math.cos(angle) * 14; this.vy = Math.sin(angle) * 14;
+        this.radius = 6; this.active = true;
       }
-      update() {
-        this.x += this.vx; this.y += this.vy;
-        if (this.y < -20 || this.x < -20 || this.x > canvas.width + 20) this.active = false;
-      }
-      draw() {
-        ctx.save();
-        ctx.shadowColor = '#00f2fe'; ctx.shadowBlur = 15;
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      }
+      update() { this.x += this.vx; this.y += this.vy; if (this.y < -20 || this.x < -20 || this.x > canvas.width + 20) this.active = false; }
+      draw() { ctx.save(); ctx.shadowColor = '#00f2fe'; ctx.shadowBlur = 15; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
     }
 
     class Particle {
-      constructor(x, y, color) {
-        this.x = x; this.y = y;
-        this.color = color === 'rainbow' ? '#ff00ff' : color;
-        var a = Math.random() * Math.PI * 2;
-        var s = Math.random() * 4 + 1;
-        this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s;
-        this.alpha = 1; this.decay = 0.02 + Math.random() * 0.015;
-        this.size = 2 + Math.random() * 2;
-      }
+      constructor(x, y, color) { this.x = x; this.y = y; this.color = color === 'rainbow' ? '#ff00ff' : color; var a = Math.random() * Math.PI * 2; var s = Math.random() * 4 + 1; this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s; this.alpha = 1; this.decay = 0.02 + Math.random() * 0.015; this.size = 2 + Math.random() * 2; }
       update() { this.x += this.vx; this.y += this.vy; this.alpha -= this.decay; }
       draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
     }
@@ -326,47 +334,15 @@
       draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.font = 'bold 18px Arial'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6; ctx.textAlign = 'center'; ctx.fillText(this.text, this.x, this.y); ctx.restore(); }
     }
 
-    // ===== INPUT =====
     function getPos(e) {
       var rect = canvas.getBoundingClientRect();
       var cx = e.touches ? e.touches[0].clientX : e.clientX;
       var cy = e.touches ? e.touches[0].clientY : e.clientY;
       return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
     }
-
-    function onStart(e) {
-      if (!gameActive) return;
-      var pos = getPos(e);
-      if (Math.hypot(pos.x - slingshot.x, pos.y - slingshot.y) < slingshot.baseRadius + 30) {
-        slingshot.isDragging = true;
-      }
-    }
-
-    function onMove(e) {
-      if (!slingshot.isDragging || !gameActive) return;
-      if (e.type === 'touchmove') e.preventDefault();
-      var pos = getPos(e);
-      var dx = pos.x - slingshot.x; var dy = pos.y - slingshot.y;
-      var dist = Math.hypot(dx, dy);
-      if (dist > slingshot.maxPull) {
-        var angle = Math.atan2(dy, dx);
-        slingshot.elasticX = slingshot.x + Math.cos(angle) * slingshot.maxPull;
-        slingshot.elasticY = slingshot.y + Math.sin(angle) * slingshot.maxPull;
-      } else {
-        slingshot.elasticX = pos.x; slingshot.elasticY = pos.y;
-      }
-    }
-
-    function onEnd() {
-      if (!slingshot.isDragging || !gameActive) return;
-      slingshot.isDragging = false;
-      var dx = slingshot.x - slingshot.elasticX; var dy = slingshot.y - slingshot.elasticY;
-      if (Math.hypot(dx, dy) > 10) {
-        projectiles.push(new Projectile(slingshot.x, slingshot.y, slingshot.x + dx * 3, slingshot.y + dy * 3));
-      }
-      slingshot.elasticX = slingshot.x; slingshot.elasticY = slingshot.y;
-    }
-
+    function onStart(e) { if (!gameActive) return; var pos = getPos(e); if (Math.hypot(pos.x - slingshot.x, pos.y - slingshot.y) < slingshot.baseRadius + 30) { slingshot.isDragging = true; } }
+    function onMove(e) { if (!slingshot.isDragging || !gameActive) return; if (e.type === 'touchmove') e.preventDefault(); var pos = getPos(e); var dx = pos.x - slingshot.x; var dy = pos.y - slingshot.y; var dist = Math.hypot(dx, dy); if (dist > slingshot.maxPull) { var angle = Math.atan2(dy, dx); slingshot.elasticX = slingshot.x + Math.cos(angle) * slingshot.maxPull; slingshot.elasticY = slingshot.y + Math.sin(angle) * slingshot.maxPull; } else { slingshot.elasticX = pos.x; slingshot.elasticY = pos.y; } }
+    function onEnd() { if (!slingshot.isDragging || !gameActive) return; slingshot.isDragging = false; var dx = slingshot.x - slingshot.elasticX; var dy = slingshot.y - slingshot.elasticY; if (Math.hypot(dx, dy) > 10) { projectiles.push(new Projectile(slingshot.x, slingshot.y, slingshot.x + dx * 3, slingshot.y + dy * 3)); } slingshot.elasticX = slingshot.x; slingshot.elasticY = slingshot.y; }
     canvas.addEventListener('mousedown', onStart);
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onEnd);
@@ -374,28 +350,18 @@
     window.addEventListener('touchmove', onMove, { passive: false });
     window.addEventListener('touchend', onEnd);
 
-    // ===== HIT HANDLER =====
     function handleHit(bird) {
       if (!gameActive) return;
       if (navigator.vibrate) navigator.vibrate(50);
-
       var now = Date.now();
       if (now - lastHitTime < COMBO_WINDOW) { comboCount++; } else { comboCount = 1; }
       lastHitTime = now;
       var comboMultiplier = Math.min(comboCount, MAX_COMBO);
-
       for (var k = 0; k < 15; k++) { particles.push(new Particle(bird.x, bird.y, bird.color)); }
-
-      var rewardAmount = 0;
-      var rewardText = '';
-      var rewardColor = '#ffd700';
-
+      var rewardAmount = 0; var rewardText = ''; var rewardColor = '#ffd700';
       if (bird.isMother) {
-        comboCount = 0;
-        var penalty = Math.min(coins, 10);
-        coins -= penalty;
-        rewardText = '-' + penalty + ' Eggz (-R' + (penalty * 0.10).toFixed(2) + ')';
-        rewardColor = '#ff4b4b';
+        comboCount = 0; var penalty = Math.min(coins, 10); coins -= penalty;
+        rewardText = '-' + penalty + ' Eggz (-R' + (penalty * 0.10).toFixed(2) + ')'; rewardColor = '#ff4b4b';
         showNotification('MOTHER BIRD! -' + penalty + ' Eggz (-R' + (penalty * 0.10).toFixed(2) + ')! Combo lost!');
       } else {
         if (bird.type === 'golden') { rewardAmount = 5 * comboMultiplier; rewardText = '+' + rewardAmount + ' (+R' + (rewardAmount * 0.10).toFixed(2) + ')'; rewardColor = '#FFE600'; }
@@ -403,45 +369,30 @@
         else if (bird.type === 'bomb') { rewardAmount = -10; rewardText = '-10 (-R1.00)'; rewardColor = '#FF0033'; comboCount = 0; showNotification('BOMB BIRD! -10 Eggz (-R1.00)!'); }
         else { rewardAmount = comboMultiplier; rewardText = (comboCount > 1 ? 'x' + comboMultiplier + ' ' : '+') + rewardAmount + ' (+R' + (rewardAmount * 0.10).toFixed(2) + ')'; rewardColor = bird.color === 'rainbow' ? '#ff00ff' : bird.color; }
         coins += rewardAmount;
-        if (rewardAmount > 0) {
-          totalEarned += rewardAmount;
-        }
+        if (rewardAmount > 0) totalEarned += rewardAmount;
       }
-
-      updateHUD();
-      checkLevelUp();
-
+      updateHUD(); checkLevelUp();
       floatingTexts.push(new FloatingText(bird.x, bird.y, rewardText, rewardColor));
-      if (comboCount > 1 && !bird.isMother && bird.type !== 'bomb') {
-        floatingTexts.push(new FloatingText(bird.x, bird.y - 30, 'COMBO x' + comboCount + '!', '#00f2fe'));
-      }
+      if (comboCount > 1 && !bird.isMother && bird.type !== 'bomb') { floatingTexts.push(new FloatingText(bird.x, bird.y - 30, 'COMBO x' + comboCount + '!', '#00f2fe')); }
       bird.reset();
     }
 
-    // ===== GAME LOOP =====
     function gameLoop() {
       requestAnimationFrame(gameLoop);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       if (gameActive) {
         birds.forEach(function(b) { b.update(); });
-
         for (var i = projectiles.length - 1; i >= 0; i--) {
-          var p = projectiles[i];
-          p.update();
+          var p = projectiles[i]; p.update();
           if (!p.active) { projectiles.splice(i, 1); continue; }
           for (var j = 0; j < birds.length; j++) {
             var b = birds[j];
-            if (Math.hypot(p.x - b.x, p.y - b.y) < b.radius + p.radius) {
-              p.active = false; projectiles.splice(i, 1); handleHit(b); break;
-            }
+            if (Math.hypot(p.x - b.x, p.y - b.y) < b.radius + p.radius) { p.active = false; projectiles.splice(i, 1); handleHit(b); break; }
           }
         }
-
         for (var i = particles.length - 1; i >= 0; i--) { particles[i].update(); if (particles[i].alpha <= 0) particles.splice(i, 1); }
         for (var i = floatingTexts.length - 1; i >= 0; i--) { floatingTexts[i].update(); if (floatingTexts[i].alpha <= 0) floatingTexts.splice(i, 1); }
       }
-
       ctx.strokeStyle = 'rgba(0,242,254,0.3)'; ctx.lineWidth = 4;
       ctx.beginPath(); ctx.moveTo(slingshot.x, slingshot.y); ctx.lineTo(slingshot.x, canvas.height); ctx.stroke();
       if (slingshot.isDragging) {
@@ -452,14 +403,12 @@
       ctx.save(); ctx.shadowColor = '#00f2fe'; ctx.shadowBlur = slingshot.isDragging ? 20 : 10;
       ctx.fillStyle = slingshot.isDragging ? '#fff' : '#00f2fe';
       ctx.beginPath(); ctx.arc(slingshot.elasticX, slingshot.elasticY, 14, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-
       birds.forEach(function(b) { b.draw(); });
       projectiles.forEach(function(p) { p.draw(); });
       particles.forEach(function(p) { p.draw(); });
       floatingTexts.forEach(function(t) { t.draw(); });
     }
 
-    // ===== INIT =====
     function init() {
       resizeCanvas();
       birds.push(new Bird(true));
@@ -468,7 +417,6 @@
       updateHUD();
       requestAnimationFrame(gameLoop);
     }
-
     init();
   </script>
 </body>
