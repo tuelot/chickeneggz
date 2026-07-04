@@ -91,13 +91,13 @@
     import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
-  authDomain: "chickeneggz.firebaseapp.com",
-  projectId: "chickeneggz",
-  storageBucket: "chickeneggz.firebasestorage.app",
-  messagingSenderId: "378281633320",
-  appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
-};
+      apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
+      authDomain: "chickeneggz.firebaseapp.com",
+      projectId: "chickeneggz",
+      storageBucket: "chickeneggz.firebasestorage.app",
+      messagingSenderId: "378281633320",
+      appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -125,9 +125,16 @@
       if (!email || !password) { showNotification('Please enter email and password'); return; }
       btn.disabled = true; btn.innerHTML = 'LOGGING IN... <span class="loading-spinner"></span>';
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        showNotification('Welcome back! 🐔', 'success');
-        setTimeout(() => window.location.href = 'game.html', 1000);
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        // === ADMIN REDIRECT GUARD ===
+        const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
+        if (userDoc.exists() && userDoc.data().isAdmin === true) {
+          showNotification('Welcome Admin! 🛡️', 'success');
+          setTimeout(() => window.location.href = 'admin_dashboard.html', 1000);
+        } else {
+          showNotification('Welcome back! 🐔', 'success');
+          setTimeout(() => window.location.href = 'game.html', 1000);
+        }
       } catch (e) { showNotification(e.message); btn.disabled = false; btn.innerHTML = 'LOGIN'; }
     };
 
@@ -164,9 +171,15 @@
       setTimeout(() => window.location.href = 'game.html', 1000);
     };
 
-    onAuthStateChanged(auth, user => {
+    // === ADMIN REDIRECT GUARD on page load ===
+    onAuthStateChanged(auth, async (user) => {
       if (user && !localStorage.getItem('chickenEmpire_v1.guest')) {
-        window.location.href = 'game.html';
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists() && userDoc.data().isAdmin === true) {
+          window.location.href = 'admin_dashboard.html';
+        } else {
+          window.location.href = 'game.html';
+        }
       }
     });
   </script>
