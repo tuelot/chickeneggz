@@ -256,27 +256,47 @@
 
     let db = null;
     let useFirestore = false;
+    let authChecked = false;
 
     // ===== INIT =====
     function init() {
       try {
-        if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('YOUR')) {
+        if (typeof firebase !== 'undefined' && firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('YOUR')) {
           firebase.initializeApp(firebaseConfig);
           db = firebase.firestore();
           useFirestore = true;
 
-          // Check if already logged in
+          // Check auth state first before localStorage redirect
           firebase.auth().onAuthStateChanged(async (user) => {
+            if (authChecked) return; // Prevent double handling
+            authChecked = true;
+
             if (user) {
-              const userDoc = await db.collection('users').doc(user.uid).get();
-              if (userDoc.exists && userDoc.data().isAdmin) {
-                // Already logged in as admin - redirect to admin panel
-                window.location.href = 'admin_dashboard.html';
-              } else if (userDoc.exists) {
-                // Regular user - redirect to game
-                window.location.href = 'game.html';
+              try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().isAdmin) {
+                  setStore(DB_KEYS.SESSION, { email: user.email, loggedInAt: new Date().toISOString() });
+                  window.location.replace('admin_dashboard.html');
+                  return;
+                } else if (userDoc.exists) {
+                  setStore(DB_KEYS.GAME_SESSION, {
+                    uid: user.uid,
+                    email: user.email,
+                    name: userDoc.data().name || user.email,
+                    loggedInAt: new Date().toISOString()
+                  });
+                  window.location.replace('game.html');
+                  return;
+                }
+                // User exists in Auth but not in Firestore - sign them out
+                await firebase.auth().signOut();
+              } catch (e) {
+                console.warn('Auth state check failed:', e);
               }
             }
+
+            // Only check localStorage if Firebase auth didn't redirect
+            checkLocalSession();
           });
 
           const badge = document.getElementById('connectionBadge');
@@ -284,13 +304,15 @@
             badge.textContent = 'Firestore Online';
             badge.className = 'firestore-badge online';
           }
+        } else {
+          // No Firebase - use localStorage only
+          checkLocalSession();
         }
       } catch (e) {
         console.warn('Firebase init failed:', e);
+        useFirestore = false;
+        checkLocalSession();
       }
-
-      // Check local session (fallback mode)
-      checkLocalSession();
 
       // Enter key support
       document.getElementById('loginPassword').addEventListener('keypress', function(e) {
@@ -311,14 +333,12 @@
     function checkLocalSession() {
       const session = getStore(DB_KEYS.SESSION);
       if (session && session.email === ADMIN_EMAIL) {
-        // Admin already logged in locally - redirect to admin panel
-        window.location.href = 'admin_dashboard.html';
+        window.location.replace('admin_dashboard.html');
         return;
       }
       const gameSession = getStore(DB_KEYS.GAME_SESSION);
       if (gameSession && gameSession.email) {
-        // Regular user logged in - redirect to game
-        window.location.href = 'game.html';
+        window.location.replace('game.html');
       }
     }
 
@@ -349,6 +369,7 @@
       }
 
       setLoading(true);
+      errorEl.textContent = '';
 
       if (useFirestore && db) {
         try {
@@ -356,6 +377,7 @@
           const userDoc = await db.collection('users').doc(cred.user.uid).get();
 
           if (!userDoc.exists) {
+            // No Firestore profile found
             await firebase.auth().signOut();
             setLoading(false);
             errorEl.textContent = 'User profile not found. Please register first.';
@@ -364,23 +386,49 @@
 
           const userData = userDoc.data();
 
-          // Save game session for regular users
-          setStore(DB_KEYS.GAME_SESSION, {
-            uid: cred.user.uid,
-            email: email,
-            name: userData.name || email,
-            loggedInAt: new Date().toISOString()
-          });
-
           if (userData.isAdmin) {
-            // Admin user - redirect to admin panel
             setStore(DB_KEYS.SESSION, { email: email, loggedInAt: new Date().toISOString() });
-            window.location.href = 'admin_dashboard.html';
+            window.location.replace('admin_dashboard.html');
           } else {
-            // Regular user - redirect to game
-            window.location.href = 'game.html';
+            setStore(DB_KEYS.GAME_SESSION, {
+              uid: cred.user.uid,
+              email: email,
+              name: userData.name || email,
+              loggedInAt: new Date().toISOString()
+            });
+            window.location.replace('game.html');
           }
         } catch (err) {
+          console.error('Login error:', err);
+
+          // If admin account doesn't exist in Firebase Auth, create it
+          if (err.code === 'auth/user-not-found' && email === ADMIN_EMAIL) {
+            try {
+              const newCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+              await db.collection('users').doc(newCred.user.uid).set({
+                uid: newCred.user.uid,
+                name: 'Administrator',
+                email: email,
+                cellNumber: '0792840349',
+                isAdmin: true,
+                isBlocked: false,
+                status: 'approved',
+                eggs: 999999,
+                isSystemAdmin: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              setStore(DB_KEYS.SESSION, { email: email, loggedInAt: new Date().toISOString() });
+              window.location.replace('admin_dashboard.html');
+              return;
+            } catch (createErr) {
+              console.error('Admin creation error:', createErr);
+              setLoading(false);
+              errorEl.textContent = getFriendlyError(createErr.code || createErr.message);
+              return;
+            }
+          }
+
           setLoading(false);
           errorEl.textContent = getFriendlyError(err.code || err.message);
         }
@@ -389,9 +437,8 @@
         setTimeout(() => {
           if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
             setStore(DB_KEYS.SESSION, { email: email, loggedInAt: new Date().toISOString() });
-            window.location.href = 'admin_dashboard.html';
+            window.location.replace('admin_dashboard.html');
           } else {
-            // Check if user exists in localStorage
             const users = getStore('chickenAdmin_users') || {};
             const userEntry = Object.entries(users).find(([uid, u]) => u.email === email && u.password === password);
             if (userEntry) {
@@ -402,13 +449,13 @@
                 name: user.name || email,
                 loggedInAt: new Date().toISOString()
               });
-              window.location.href = 'game.html';
+              window.location.replace('game.html');
             } else {
               setLoading(false);
               errorEl.textContent = 'Invalid email or password.';
             }
           }
-        }, 500);
+        }, 300);
       }
     }
 
@@ -420,9 +467,15 @@
         'auth/wrong-password': 'Incorrect password.',
         'auth/invalid-credential': 'Invalid email or password.',
         'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
-        'auth/network-request-failed': 'Network error. Please check your connection.'
+        'auth/network-request-failed': 'Network error. Please check your connection.',
+        'auth/email-already-in-use': 'This email is already registered.',
+        'auth/weak-password': 'Password is too weak.',
+        'auth/invalid-api-key': 'Firebase configuration error.',
+        'auth/app-deleted': 'Firebase app was deleted.',
+        'auth/invalid-user-token': 'Invalid user token. Please login again.',
+        'auth/user-token-expired': 'Session expired. Please login again.'
       };
-      return errors[code] || 'Login failed. Please try again.';
+      return errors[code] || ('Login failed: ' + code);
     }
 
     // ===== INIT =====
