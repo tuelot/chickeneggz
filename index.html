@@ -307,6 +307,13 @@
             localStorage.setItem('chickenEmpire_v1.eggs', currentEggs);
             localStorage.setItem('chickenEmpire_v1.uid', user.uid);
             localStorage.setItem('chickenEmpire_v1.email', user.email);
+
+            // === ADMIN REDIRECT GUARD ===
+            if (isAdmin === true) {
+              window.location.replace('admin_dashboard.html');
+              return;
+            }
+            // === END ADMIN REDIRECT GUARD ===
           }
         }).catch(function(err) {
           console.error('Firestore error:', err);
@@ -477,4 +484,4 @@
     }
   </script>
 </body>
-</html>
+  </html>
