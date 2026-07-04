@@ -103,12 +103,37 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Admin email constant
+    const ADMIN_EMAIL = 'admin@chicken.com';
+
     function showNotification(msg, type = 'error') {
       const notif = document.getElementById('notification');
       notif.textContent = msg;
       notif.className = 'notification ' + type;
       notif.classList.add('show');
       setTimeout(() => notif.classList.remove('show'), 5000);
+    }
+
+    // Helper: check if user is admin (Firestore doc OR email match)
+    async function checkIsAdmin(user) {
+      if (!user) return false;
+      // Fast path: email match
+      if (user.email && user.email.toLowerCase() === ADMIN_EMAIL) return true;
+      // Firestore check
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists() && userDoc.data().isAdmin === true) return true;
+      } catch (e) { console.warn('Firestore admin check failed:', e); }
+      return false;
+    }
+
+    // Helper: redirect based on role
+    function redirectByRole(isAdmin) {
+      if (isAdmin) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'game.html';
+      }
     }
 
     window.showTab = function(tab) {
@@ -119,32 +144,32 @@
     };
 
     window.doLogin = async function() {
-      const email = document.getElementById('loginEmail').value.trim();
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
       const btn = document.getElementById('loginBtn');
       if (!email || !password) { showNotification('Please enter email and password'); return; }
       btn.disabled = true; btn.innerHTML = 'LOGGING IN... <span class="loading-spinner"></span>';
       try {
         const cred = await signInWithEmailAndPassword(auth, email, password);
-        // === ADMIN REDIRECT GUARD ===
-        const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
-        if (userDoc.exists() && userDoc.data().isAdmin === true) {
+        const isAdmin = await checkIsAdmin(cred.user);
+        if (isAdmin) {
           showNotification('Welcome Admin! 🛡️', 'success');
-          setTimeout(() => window.location.href = 'admin_dashboard.html', 1000);
         } else {
           showNotification('Welcome back! 🐔', 'success');
-          setTimeout(() => window.location.href = 'game.html', 1000);
         }
+        setTimeout(() => redirectByRole(isAdmin), 1000);
       } catch (e) { showNotification(e.message); btn.disabled = false; btn.innerHTML = 'LOGIN'; }
     };
 
     window.doRegister = async function() {
       const name = document.getElementById('regName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const password = document.getElementById('regPassword').value;
       const btn = document.getElementById('regBtn');
       if (!name || !email || !password) { showNotification('Please fill all fields'); return; }
       if (password.length < 6) { showNotification('Password must be at least 6 characters'); return; }
+      // Prevent registering as admin email
+      if (email === ADMIN_EMAIL) { showNotification('This email is reserved'); return; }
       btn.disabled = true; btn.innerHTML = 'CREATING... <span class="loading-spinner"></span>';
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -156,7 +181,7 @@
           eggs: 0,
           level: 1,
           totalEarned: 0,
-          isAdmin: email === 'admin@chicken.com',
+          isAdmin: false,
           isBlocked: false,
           createdAt: serverTimestamp()
         });
@@ -171,15 +196,12 @@
       setTimeout(() => window.location.href = 'game.html', 1000);
     };
 
-    // === ADMIN REDIRECT GUARD on page load ===
+    // === AUTO-REDIRECT ON PAGE LOAD ===
+    // If already logged in, check role and redirect immediately
     onAuthStateChanged(auth, async (user) => {
       if (user && !localStorage.getItem('chickenEmpire_v1.guest')) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists() && userDoc.data().isAdmin === true) {
-          window.location.href = 'admin_dashboard.html';
-        } else {
-          window.location.href = 'game.html';
-        }
+        const isAdmin = await checkIsAdmin(user);
+        redirectByRole(isAdmin);
       }
     });
   </script>
