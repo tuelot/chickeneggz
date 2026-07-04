@@ -54,11 +54,11 @@
       <div id="loginPanel" class="panel active">
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="loginEmail" placeholder="you@email.com">
+          <input type="email" class="form-input" id="loginEmail" placeholder="you@email.com" value="admin@chicken.com">
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" class="form-input" id="loginPassword" placeholder="Enter password">
+          <input type="password" class="form-input" id="loginPassword" placeholder="Enter password" value="admin2026">
         </div>
         <button class="action-btn btn-primary" id="loginBtn" onclick="doLogin()">LOGIN</button>
       </div>
@@ -103,8 +103,8 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Admin email constant
     const ADMIN_EMAIL = 'admin@chicken.com';
+    let isRedirecting = false;
 
     function showNotification(msg, type = 'error') {
       const notif = document.getElementById('notification');
@@ -114,12 +114,9 @@
       setTimeout(() => notif.classList.remove('show'), 5000);
     }
 
-    // Helper: check if user is admin (Firestore doc OR email match)
     async function checkIsAdmin(user) {
       if (!user) return false;
-      // Fast path: email match
       if (user.email && user.email.toLowerCase() === ADMIN_EMAIL) return true;
-      // Firestore check
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists() && userDoc.data().isAdmin === true) return true;
@@ -127,13 +124,19 @@
       return false;
     }
 
-    // Helper: redirect based on role
     function redirectByRole(isAdmin) {
+      if (isRedirecting) return;
+      isRedirecting = true;
       if (isAdmin) {
         window.location.href = 'admin.html';
       } else {
         window.location.href = 'game.html';
       }
+    }
+
+    function resetLoginBtn() {
+      const btn = document.getElementById('loginBtn');
+      if (btn) { btn.disabled = false; btn.innerHTML = 'LOGIN'; }
     }
 
     window.showTab = function(tab) {
@@ -147,18 +150,32 @@
       const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
       const btn = document.getElementById('loginBtn');
-      if (!email || !password) { showNotification('Please enter email and password'); return; }
-      btn.disabled = true; btn.innerHTML = 'LOGGING IN... <span class="loading-spinner"></span>';
+
+      if (!email || !password) {
+        showNotification('Please enter email and password');
+        resetLoginBtn();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = 'LOGGING IN... <span class="loading-spinner"></span>';
+
       try {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         const isAdmin = await checkIsAdmin(cred.user);
+
         if (isAdmin) {
           showNotification('Welcome Admin! 🛡️', 'success');
         } else {
           showNotification('Welcome back! 🐔', 'success');
         }
-        setTimeout(() => redirectByRole(isAdmin), 1000);
-      } catch (e) { showNotification(e.message); btn.disabled = false; btn.innerHTML = 'LOGIN'; }
+
+        setTimeout(() => redirectByRole(isAdmin), 800);
+      } catch (e) {
+        console.error('Login error:', e);
+        showNotification(e.message || 'Login failed');
+        resetLoginBtn();
+      }
     };
 
     window.doRegister = async function() {
@@ -166,11 +183,14 @@
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const password = document.getElementById('regPassword').value;
       const btn = document.getElementById('regBtn');
+
       if (!name || !email || !password) { showNotification('Please fill all fields'); return; }
       if (password.length < 6) { showNotification('Password must be at least 6 characters'); return; }
-      // Prevent registering as admin email
       if (email === ADMIN_EMAIL) { showNotification('This email is reserved'); return; }
-      btn.disabled = true; btn.innerHTML = 'CREATING... <span class="loading-spinner"></span>';
+
+      btn.disabled = true;
+      btn.innerHTML = 'CREATING... <span class="loading-spinner"></span>';
+
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: name });
@@ -187,7 +207,11 @@
         });
         showNotification('Account created! 🐔', 'success');
         setTimeout(() => window.location.href = 'game.html', 1000);
-      } catch (e) { showNotification(e.message); btn.disabled = false; btn.innerHTML = 'CREATE ACCOUNT'; }
+      } catch (e) {
+        showNotification(e.message || 'Registration failed');
+        btn.disabled = false;
+        btn.innerHTML = 'CREATE ACCOUNT';
+      }
     };
 
     window.guestLogin = function() {
@@ -197,13 +221,15 @@
     };
 
     // === AUTO-REDIRECT ON PAGE LOAD ===
-    // If already logged in, check role and redirect immediately
+    // Only redirect if already logged in — do NOT interfere with manual login
     onAuthStateChanged(auth, async (user) => {
       if (user && !localStorage.getItem('chickenEmpire_v1.guest')) {
+        // User is already logged in from a previous session
         const isAdmin = await checkIsAdmin(user);
         redirectByRole(isAdmin);
       }
+      // If no user, stay on login page — button is ready to press
     });
   </script>
 </body>
-</html>
+    </html>
