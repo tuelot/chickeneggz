@@ -527,6 +527,16 @@
       font-size: 11px;
       color: #666;
     }
+
+    /* Force refresh indicator */
+    .refreshing {
+      animation: pulse 0.5s ease;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -783,7 +793,7 @@
 
   <script>
     // ============================================================
-    //  FIREBASE CONFIG - REPLACE WITH YOUR REAL PROJECT CONFIG
+    //  FIREBASE CONFIG
     // ============================================================
     const firebaseConfig = {
       apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
@@ -793,7 +803,6 @@
       messagingSenderId: "378281633320",
       appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
     };
-    // ============================================================
 
     const DB_KEYS = {
       USERS: 'chickenAdmin_users',
@@ -822,7 +831,6 @@
           db = firebase.firestore();
           useFirestore = true;
 
-          // Auth state listener - if logged in from login page, use that user
           firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
               currentAuthUser = user;
@@ -832,8 +840,6 @@
       } catch (e) {
         console.warn('Firebase init failed:', e);
       }
-
-      // Show dashboard immediately - no login screen
       showAdminPanel();
     }
 
@@ -874,31 +880,43 @@
 
     // ===== FIRESTORE LISTENERS =====
     function startFirestoreListeners() {
-      firestoreListeners.forEach(unsub => unsub());
+      // Clean up old listeners
+      firestoreListeners.forEach(unsub => { try { unsub(); } catch(e) {} });
       firestoreListeners = [];
 
       const unsubUsers = db.collection('users').onSnapshot(snap => {
         usersCache = {};
         snap.forEach(doc => { usersCache[doc.id] = doc.data(); });
-        if (document.getElementById('usersPanel').classList.contains('active')) loadUsers();
+        loadUsers();
         updateStats();
-      }, err => console.error('Users listener:', err));
+      }, err => {
+        console.error('Users listener error:', err);
+        showNotification('Firestore users sync error: ' + err.message, 'error');
+      });
       firestoreListeners.push(unsubUsers);
 
       const unsubTx = db.collection('transactions').onSnapshot(snap => {
         transactionsCache = [];
         snap.forEach(doc => { transactionsCache.push({ id: doc.id, ...doc.data() }); });
-        if (document.getElementById('transactionsPanel').classList.contains('active')) loadTransactions();
+        if (document.getElementById('transactionsPanel').classList.contains('active')) {
+          loadTransactions();
+        }
         updateStats();
-      }, err => console.error('Tx listener:', err));
+      }, err => {
+        console.error('Tx listener error:', err);
+      });
       firestoreListeners.push(unsubTx);
 
       const unsubRewards = db.collection('rewardQueue').onSnapshot(snap => {
         rewardsCache = [];
         snap.forEach(doc => { rewardsCache.push({ id: doc.id, ...doc.data() }); });
-        if (document.getElementById('rewardsPanel').classList.contains('active')) loadRewards();
+        if (document.getElementById('rewardsPanel').classList.contains('active')) {
+          loadRewards();
+        }
         updateStats();
-      }, err => console.error('Rewards listener:', err));
+      }, err => {
+        console.error('Rewards listener error:', err);
+      });
       firestoreListeners.push(unsubRewards);
     }
 
@@ -909,16 +927,20 @@
       if (!gameSession || !gameSession.email) return;
 
       if (useFirestore && db) {
-        const snap = await db.collection('users').where('email', '==', gameSession.email).get();
-        if (!snap.empty) {
-          const doc = snap.docs[0];
-          const currentEggs = doc.data().eggs || 0;
-          if (currentEggs !== gameEggs) {
-            await doc.ref.update({
-              eggs: gameEggs,
-              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+        try {
+          const snap = await db.collection('users').where('email', '==', gameSession.email).get();
+          if (!snap.empty) {
+            const doc = snap.docs[0];
+            const currentEggs = doc.data().eggs || 0;
+            if (currentEggs !== gameEggs) {
+              await doc.ref.update({
+                eggs: gameEggs,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+            }
           }
+        } catch (e) {
+          console.warn('Sync game eggs failed:', e);
         }
       } else {
         const users = getUsers();
@@ -935,10 +957,10 @@
     }
 
     // ===== NOTIFICATION =====
-    function showNotification(msg, type = 'error') {
+    function showNotification(msg, type) {
       const notif = document.getElementById('notification');
       notif.textContent = msg;
-      notif.className = 'notification ' + type;
+      notif.className = 'notification ' + (type || 'error');
       notif.classList.add('show');
       setTimeout(() => notif.classList.remove('show'), 4000);
     }
@@ -982,7 +1004,7 @@
       showNotification('Data refreshed!', 'success');
     }
 
-    // ===== LOGOUT - Redirects to login page =====
+    // ===== LOGOUT =====
     function adminLogout() {
       if (useFirestore && firebase.auth) {
         firebase.auth().signOut().then(() => {
@@ -1020,6 +1042,23 @@
       document.getElementById('totalEggs').textContent = totalEggs;
     }
 
+    // ===== ESCAPE FOR HTML ATTRIBUTES =====
+    function escapeAttr(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     // ===== USERS =====
     function loadUsers() {
       const tbody = document.getElementById('usersTableBody');
@@ -1044,6 +1083,29 @@
 
       userList.forEach(([uid, user]) => {
         const tr = document.createElement('tr');
+        tr.dataset.uid = uid;
+        const isProtected = user.isSystemAdmin;
+        const isBlocked = user.isBlocked;
+        const isPending = (user.status || 'pending') === 'pending';
+
+        let actionsHtml = '';
+        if (isPending) {
+          actionsHtml += `<button class="user-action-btn btn-approve" data-action="approve" data-uid="${escapeAttr(uid)}">Approve</button>`;
+        }
+        actionsHtml += `<button class="user-action-btn btn-edit" data-action="edit" data-uid="${escapeAttr(uid)}">Edit</button>`;
+        actionsHtml += `<button class="user-action-btn btn-coins" data-action="coins" data-uid="${escapeAttr(uid)}" data-balance="${user.eggs || 0}">Coins</button>`;
+
+        if (isProtected) {
+          actionsHtml += `<span style="color:#FFD700;font-size:10px;">🔒 Protected</span>`;
+        } else {
+          if (isBlocked) {
+            actionsHtml += `<button class="user-action-btn btn-unblock" data-action="unblock" data-uid="${escapeAttr(uid)}">Unblock</button>`;
+          } else {
+            actionsHtml += `<button class="user-action-btn btn-block" data-action="block" data-uid="${escapeAttr(uid)}">Block</button>`;
+          }
+          actionsHtml += `<button class="user-action-btn btn-delete" data-action="delete" data-uid="${escapeAttr(uid)}" data-email="${escapeAttr(user.email)}">Delete</button>`;
+        }
+
         tr.innerHTML = `
           <td>${escapeHtml(user.name || 'N/A')}</td>
           <td>${escapeHtml(user.email)}</td>
@@ -1051,23 +1113,25 @@
           <td><span class="status-badge status-${user.status || 'pending'}">${(user.status || 'pending').toUpperCase()}</span></td>
           <td>${user.eggs || 0}</td>
           <td>${user.isAdmin ? '<span style="color:#22c55e">YES</span>' : '<span style="color:#666">No</span>'}</td>
-          <td>${user.isBlocked ? '<span style="color:#ef4444">YES</span>' : '<span style="color:#666">No</span>'}</td>
-          <td>
-            <div class="user-actions">
-              ${user.status === 'pending' ? `<button class="user-action-btn btn-approve" onclick="approveUser('${uid}')">Approve</button>` : ''}
-              <button class="user-action-btn btn-edit" onclick="openEditModal('${uid}')">Edit</button>
-              <button class="user-action-btn btn-coins" onclick="openCoinsModal('${uid}', ${user.eggs || 0})">Coins</button>
-              ${user.isSystemAdmin ? '<span style="color:#FFD700;font-size:10px;">🔒 Protected</span>' : 
-                (user.isBlocked 
-                  ? `<button class="user-action-btn btn-unblock" onclick="toggleBlockUser('${uid}', false)">Unblock</button>`
-                  : `<button class="user-action-btn btn-block" onclick="toggleBlockUser('${uid}', true)">Block</button>`
-                )
-              }
-              ${user.isSystemAdmin ? '' : `<button class="user-action-btn btn-delete" onclick="deleteUser('${uid}', '${escapeHtml(user.email)}')">Delete</button>`}
-            </div>
-          </td>
+          <td>${isBlocked ? '<span style="color:#ef4444">YES</span>' : '<span style="color:#666">No</span>'}</td>
+          <td><div class="user-actions">${actionsHtml}</div></td>
         `;
         tbody.appendChild(tr);
+      });
+
+      // Attach event listeners to buttons (safer than inline onclick)
+      tbody.querySelectorAll('.user-action-btn[data-action]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const action = this.dataset.action;
+          const uid = this.dataset.uid;
+          if (action === 'approve') approveUser(uid);
+          else if (action === 'edit') openEditModal(uid);
+          else if (action === 'coins') openCoinsModal(uid, parseInt(this.dataset.balance) || 0);
+          else if (action === 'block') toggleBlockUser(uid, true);
+          else if (action === 'unblock') toggleBlockUser(uid, false);
+          else if (action === 'delete') deleteUser(uid, this.dataset.email);
+        });
       });
     }
 
@@ -1081,53 +1145,58 @@
       });
     }
 
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
     async function approveUser(uid) {
-      if (useFirestore && db) {
-        await db.collection('users').doc(uid).update({
-          status: 'approved',
-          approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      } else {
-        const users = getUsers();
-        if (users[uid]) {
-          users[uid].status = 'approved';
-          users[uid].approvedAt = now();
-          users[uid].updatedAt = now();
-          setUsers(users);
+      try {
+        if (useFirestore && db) {
+          await db.collection('users').doc(uid).update({
+            status: 'approved',
+            approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          const users = getUsers();
+          if (users[uid]) {
+            users[uid].status = 'approved';
+            users[uid].approvedAt = now();
+            users[uid].updatedAt = now();
+            setUsers(users);
+            loadUsers();
+            updateStats();
+          }
         }
+        showNotification('User approved successfully!', 'success');
+      } catch (err) {
+        console.error('approveUser error:', err);
+        showNotification('Failed to approve user: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification('User approved successfully!', 'success');
-      if (!useFirestore) { loadUsers(); updateStats(); }
     }
 
     async function toggleBlockUser(uid, block) {
-      const users = getUsers();
-      if (users[uid] && users[uid].isSystemAdmin) {
-        showNotification('Cannot block the system administrator!', 'error');
-        return;
-      }
-      if (useFirestore && db) {
-        await db.collection('users').doc(uid).update({
-          isBlocked: block,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      } else {
-        if (users[uid]) {
-          users[uid].isBlocked = block;
-          users[uid].updatedAt = now();
-          setUsers(users);
+      try {
+        const users = getUsers();
+        if (users[uid] && users[uid].isSystemAdmin) {
+          showNotification('Cannot block the system administrator!', 'error');
+          return;
         }
+        if (useFirestore && db) {
+          await db.collection('users').doc(uid).update({
+            isBlocked: block,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          if (users[uid]) {
+            users[uid].isBlocked = block;
+            users[uid].updatedAt = now();
+            setUsers(users);
+            loadUsers();
+            updateStats();
+          }
+        }
+        showNotification(block ? 'User blocked' : 'User unblocked', 'success');
+      } catch (err) {
+        console.error('toggleBlockUser error:', err);
+        showNotification('Failed: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification(block ? 'User blocked' : 'User unblocked', 'success');
-      if (!useFirestore) { loadUsers(); updateStats(); }
     }
 
     function openEditModal(uid) {
@@ -1145,27 +1214,33 @@
     }
 
     async function saveUserEdit() {
-      const updates = {
-        name: document.getElementById('editName').value.trim(),
-        cellNumber: document.getElementById('editCell').value.trim(),
-        status: document.getElementById('editStatus').value,
-        isAdmin: document.getElementById('editIsAdmin').value === 'true',
-        isBlocked: document.getElementById('editIsBlocked').value === 'true',
-        updatedAt: useFirestore ? firebase.firestore.FieldValue.serverTimestamp() : now()
-      };
+      try {
+        const updates = {
+          name: document.getElementById('editName').value.trim(),
+          cellNumber: document.getElementById('editCell').value.trim(),
+          status: document.getElementById('editStatus').value,
+          isAdmin: document.getElementById('editIsAdmin').value === 'true',
+          isBlocked: document.getElementById('editIsBlocked').value === 'true',
+          updatedAt: useFirestore ? firebase.firestore.FieldValue.serverTimestamp() : now()
+        };
 
-      if (useFirestore && db) {
-        await db.collection('users').doc(currentEditUid).update(updates);
-      } else {
-        const users = getUsers();
-        if (users[currentEditUid]) {
-          Object.assign(users[currentEditUid], updates);
-          setUsers(users);
+        if (useFirestore && db) {
+          await db.collection('users').doc(currentEditUid).update(updates);
+        } else {
+          const users = getUsers();
+          if (users[currentEditUid]) {
+            Object.assign(users[currentEditUid], updates);
+            setUsers(users);
+            loadUsers();
+            updateStats();
+          }
         }
+        showNotification('User updated successfully!', 'success');
+        closeModal('editModal');
+      } catch (err) {
+        console.error('saveUserEdit error:', err);
+        showNotification('Failed to update user: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification('User updated successfully!', 'success');
-      closeModal('editModal');
-      if (!useFirestore) { loadUsers(); updateStats(); }
     }
 
     function openCreateUserModal() {
@@ -1173,54 +1248,60 @@
     }
 
     async function createNewUser() {
-      const name = document.getElementById('createName').value.trim();
-      const email = document.getElementById('createEmail').value.trim().toLowerCase();
-      const cell = document.getElementById('createCell').value.trim();
-      const password = document.getElementById('createPassword').value;
-      const balance = parseInt(document.getElementById('createBalance').value) || 0;
+      try {
+        const name = document.getElementById('createName').value.trim();
+        const email = document.getElementById('createEmail').value.trim().toLowerCase();
+        const cell = document.getElementById('createCell').value.trim();
+        const password = document.getElementById('createPassword').value;
+        const balance = parseInt(document.getElementById('createBalance').value) || 0;
 
-      if (!name || !email || !password) {
-        showNotification('Please fill in all required fields');
-        return;
+        if (!name || !email || !password) {
+          showNotification('Please fill in all required fields');
+          return;
+        }
+
+        const users = getUsers();
+        const exists = Object.values(users).some(u => u.email === email);
+        if (exists) {
+          showNotification('A user with this email already exists');
+          return;
+        }
+
+        const uid = generateId();
+        const newUser = {
+          uid: uid,
+          name: name,
+          email: email,
+          cellNumber: cell,
+          isAdmin: false,
+          isBlocked: false,
+          status: 'pending',
+          eggs: balance,
+          createdAt: useFirestore ? firebase.firestore.FieldValue.serverTimestamp() : now(),
+          updatedAt: useFirestore ? firebase.firestore.FieldValue.serverTimestamp() : now()
+        };
+
+        if (useFirestore && db) {
+          await db.collection('users').doc(uid).set(newUser);
+        } else {
+          newUser.password = password;
+          users[uid] = newUser;
+          setUsers(users);
+          loadUsers();
+          updateStats();
+        }
+
+        showNotification('User created successfully! Status: PENDING', 'success');
+        closeModal('createModal');
+        document.getElementById('createName').value = '';
+        document.getElementById('createEmail').value = '';
+        document.getElementById('createCell').value = '';
+        document.getElementById('createPassword').value = '';
+        document.getElementById('createBalance').value = '0';
+      } catch (err) {
+        console.error('createNewUser error:', err);
+        showNotification('Failed to create user: ' + (err.message || 'Unknown error'), 'error');
       }
-
-      const users = getUsers();
-      const exists = Object.values(users).some(u => u.email === email);
-      if (exists) {
-        showNotification('A user with this email already exists');
-        return;
-      }
-
-      const uid = generateId();
-      const newUser = {
-        uid: uid,
-        name: name,
-        email: email,
-        cellNumber: cell,
-        isAdmin: false,
-        isBlocked: false,
-        status: 'pending',
-        eggs: balance,
-        createdAt: useFirestore ? firebase.firestore.FieldValue.serverTimestamp() : now(),
-        updatedAt: useFirestore ? firebase.firestore.FieldValue.serverTimestamp() : now()
-      };
-
-      if (useFirestore && db) {
-        await db.collection('users').doc(uid).set(newUser);
-      } else {
-        newUser.password = password;
-        users[uid] = newUser;
-        setUsers(users);
-      }
-
-      showNotification('User created successfully! Status: PENDING', 'success');
-      closeModal('createModal');
-      document.getElementById('createName').value = '';
-      document.getElementById('createEmail').value = '';
-      document.getElementById('createCell').value = '';
-      document.getElementById('createPassword').value = '';
-      document.getElementById('createBalance').value = '0';
-      if (!useFirestore) { loadUsers(); updateStats(); }
     }
 
     function openCoinsModal(uid, currentBalance) {
@@ -1234,51 +1315,69 @@
     }
 
     async function saveCoinUpdate() {
-      const newBalance = parseInt(document.getElementById('coinsNewBalance').value) || 0;
-      const users = getUsers();
+      try {
+        const newBalance = parseInt(document.getElementById('coinsNewBalance').value) || 0;
+        const users = getUsers();
 
-      if (useFirestore && db) {
-        await db.collection('users').doc(currentCoinsUid).update({
-          eggs: newBalance,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        const gameSession = getStore('chickenEmpire_v1.session');
-        if (gameSession && gameSession.email === users[currentCoinsUid]?.email) {
-          localStorage.setItem(DB_KEYS.GAME_EGGS, String(newBalance));
-        }
-      } else {
-        if (users[currentCoinsUid]) {
-          users[currentCoinsUid].eggs = newBalance;
-          users[currentCoinsUid].updatedAt = now();
-          setUsers(users);
+        if (useFirestore && db) {
+          await db.collection('users').doc(currentCoinsUid).update({
+            eggs: newBalance,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
           const gameSession = getStore('chickenEmpire_v1.session');
-          if (gameSession && gameSession.email === users[currentCoinsUid].email) {
+          if (gameSession && gameSession.email === users[currentCoinsUid]?.email) {
             localStorage.setItem(DB_KEYS.GAME_EGGS, String(newBalance));
           }
+        } else {
+          if (users[currentCoinsUid]) {
+            users[currentCoinsUid].eggs = newBalance;
+            users[currentCoinsUid].updatedAt = now();
+            setUsers(users);
+            const gameSession = getStore('chickenEmpire_v1.session');
+            if (gameSession && gameSession.email === users[currentCoinsUid].email) {
+              localStorage.setItem(DB_KEYS.GAME_EGGS, String(newBalance));
+            }
+            loadUsers();
+            updateStats();
+          }
         }
+        showNotification('Eggz balance updated!', 'success');
+        closeModal('coinsModal');
+      } catch (err) {
+        console.error('saveCoinUpdate error:', err);
+        showNotification('Failed to update balance: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification('Eggz balance updated!', 'success');
-      closeModal('coinsModal');
-      if (!useFirestore) { loadUsers(); updateStats(); }
     }
 
     async function deleteUser(uid, userEmail) {
-      const users = getUsers();
-      if (users[uid] && users[uid].isSystemAdmin) {
-        showNotification('Cannot delete the system administrator!', 'error');
-        return;
+      try {
+        const users = getUsers();
+        if (users[uid] && users[uid].isSystemAdmin) {
+          showNotification('Cannot delete the system administrator!', 'error');
+          return;
+        }
+        if (!confirm('Are you sure you want to delete user ' + (userEmail || uid) + '? This action cannot be undone.')) {
+          return;
+        }
+
+        if (useFirestore && db) {
+          await db.collection('users').doc(uid).delete();
+          // Force immediate UI refresh
+          delete usersCache[uid];
+          loadUsers();
+          updateStats();
+        } else {
+          const allUsers = getStore(DB_KEYS.USERS) || {};
+          delete allUsers[uid];
+          setStore(DB_KEYS.USERS, allUsers);
+          loadUsers();
+          updateStats();
+        }
+        showNotification('User deleted successfully!', 'success');
+      } catch (err) {
+        console.error('deleteUser error:', err);
+        showNotification('Failed to delete user: ' + (err.message || 'Unknown error'), 'error');
       }
-      if (!confirm('Are you sure you want to delete user ' + userEmail + '? This action cannot be undone.')) {
-        return;
-      }
-      if (useFirestore && db) {
-        await db.collection('users').doc(uid).delete();
-      } else {
-        delete users[uid];
-        setUsers(users);
-      }
-      showNotification('User deleted successfully!', 'success');
-      if (!useFirestore) { loadUsers(); updateStats(); }
     }
 
     function closeModal(modalId) {
@@ -1304,6 +1403,10 @@
               </div>
             </td>
           </tr>`;
+        document.getElementById('pendingRewardCount').textContent = '0';
+        document.getElementById('approvedRewardCount').textContent = '0';
+        document.getElementById('rejectedRewardCount').textContent = '0';
+        return;
       }
 
       rewards.slice().reverse().forEach(data => {
@@ -1316,22 +1419,37 @@
         if (data.status === 'rejected') rejectedCount++;
 
         const tr = document.createElement('tr');
+        let actionsHtml = '';
+        if (isPending) {
+          actionsHtml = `
+            <button class="user-action-btn btn-approve" data-action="approveReward" data-id="${escapeAttr(data.id)}" data-amount="${data.reward || 0}" data-uid="${escapeAttr(data.uid || '')}">Approve</button>
+            <button class="user-action-btn btn-reject" data-action="rejectReward" data-id="${escapeAttr(data.id)}">Reject</button>`;
+        } else {
+          actionsHtml = '<span style="color:#666;font-size:10px;">Processed</span>';
+        }
+
         tr.innerHTML = `
           <td>${escapeHtml(date)}</td>
           <td class="tx-detail" title="${escapeHtml(data.email || '')}">${escapeHtml(data.email || 'N/A')}</td>
           <td class="${rewardClass}">${data.reward > 0 ? '+' : ''}${data.reward || 0}</td>
           <td>${escapeHtml(data.reason || 'N/A')}</td>
           <td><span class="status-badge status-${data.status || 'pending'}">${(data.status || 'pending').toUpperCase()}</span></td>
-          <td>
-            <div class="user-actions">
-              ${isPending ? `
-                <button class="user-action-btn btn-approve" onclick="approveReward('${data.id}', ${data.reward || 0}, '${data.uid || ''}')">Approve</button>
-                <button class="user-action-btn btn-reject" onclick="rejectReward('${data.id}')">Reject</button>
-              ` : '<span style="color:#666;font-size:10px;">Processed</span>'}
-            </div>
-          </td>
+          <td><div class="user-actions">${actionsHtml}</div></td>
         `;
         tbody.appendChild(tr);
+      });
+
+      // Attach event listeners
+      tbody.querySelectorAll('.user-action-btn[data-action]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const action = this.dataset.action;
+          if (action === 'approveReward') {
+            approveReward(this.dataset.id, parseInt(this.dataset.amount) || 0, this.dataset.uid);
+          } else if (action === 'rejectReward') {
+            rejectReward(this.dataset.id);
+          }
+        });
       });
 
       document.getElementById('pendingRewardCount').textContent = pendingCount;
@@ -1340,54 +1458,71 @@
     }
 
     async function approveReward(rewardId, amount, userId) {
-      if (useFirestore && db) {
-        const batch = db.batch();
-        batch.update(db.collection('rewardQueue').doc(rewardId), {
-          status: 'approved',
-          approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          approvedBy: currentAuthUser ? currentAuthUser.uid : 'admin'
-        });
-        batch.update(db.collection('users').doc(userId), {
-          eggs: firebase.firestore.FieldValue.increment(amount),
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        await batch.commit();
-      } else {
-        const rewards = getRewards();
-        const users = getUsers();
-        const rewardIndex = rewards.findIndex(r => r.id === rewardId);
-        if (rewardIndex === -1) { showNotification('Reward not found', 'error'); return; }
-        if (!userId || !users[userId]) { showNotification('Error: User not found', 'error'); return; }
-        rewards[rewardIndex].status = 'approved';
-        rewards[rewardIndex].approvedAt = now();
-        rewards[rewardIndex].approvedBy = 'admin';
-        users[userId].eggs = (users[userId].eggs || 0) + amount;
-        users[userId].updatedAt = now();
-        setRewards(rewards);
-        setUsers(users);
+      try {
+        if (useFirestore && db) {
+          const batch = db.batch();
+          batch.update(db.collection('rewardQueue').doc(rewardId), {
+            status: 'approved',
+            approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            approvedBy: currentAuthUser ? currentAuthUser.uid : 'admin'
+          });
+          if (userId) {
+            batch.update(db.collection('users').doc(userId), {
+              eggs: firebase.firestore.FieldValue.increment(amount),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
+          await batch.commit();
+        } else {
+          const rewards = getRewards();
+          const users = getUsers();
+          const rewardIndex = rewards.findIndex(r => r.id === rewardId);
+          if (rewardIndex === -1) { showNotification('Reward not found', 'error'); return; }
+          if (userId && !users[userId]) { showNotification('Error: User not found', 'error'); return; }
+          rewards[rewardIndex].status = 'approved';
+          rewards[rewardIndex].approvedAt = now();
+          rewards[rewardIndex].approvedBy = 'admin';
+          if (userId) {
+            users[userId].eggs = (users[userId].eggs || 0) + amount;
+            users[userId].updatedAt = now();
+            setUsers(users);
+          }
+          setRewards(rewards);
+          loadRewards();
+          loadUsers();
+          updateStats();
+        }
+        showNotification('Reward approved and applied!', 'success');
+      } catch (err) {
+        console.error('approveReward error:', err);
+        showNotification('Failed: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification('Reward approved and applied!', 'success');
-      if (!useFirestore) { loadRewards(); updateStats(); }
     }
 
     async function rejectReward(rewardId) {
-      if (useFirestore && db) {
-        await db.collection('rewardQueue').doc(rewardId).update({
-          status: 'rejected',
-          rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          rejectedBy: currentAuthUser ? currentAuthUser.uid : 'admin'
-        });
-      } else {
-        const rewards = getRewards();
-        const rewardIndex = rewards.findIndex(r => r.id === rewardId);
-        if (rewardIndex === -1) { showNotification('Reward not found', 'error'); return; }
-        rewards[rewardIndex].status = 'rejected';
-        rewards[rewardIndex].rejectedAt = now();
-        rewards[rewardIndex].rejectedBy = 'admin';
-        setRewards(rewards);
+      try {
+        if (useFirestore && db) {
+          await db.collection('rewardQueue').doc(rewardId).update({
+            status: 'rejected',
+            rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            rejectedBy: currentAuthUser ? currentAuthUser.uid : 'admin'
+          });
+        } else {
+          const rewards = getRewards();
+          const rewardIndex = rewards.findIndex(r => r.id === rewardId);
+          if (rewardIndex === -1) { showNotification('Reward not found', 'error'); return; }
+          rewards[rewardIndex].status = 'rejected';
+          rewards[rewardIndex].rejectedAt = now();
+          rewards[rewardIndex].rejectedBy = 'admin';
+          setRewards(rewards);
+          loadRewards();
+          updateStats();
+        }
+        showNotification('Reward rejected', 'success');
+      } catch (err) {
+        console.error('rejectReward error:', err);
+        showNotification('Failed: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification('Reward rejected', 'success');
-      if (!useFirestore) { loadRewards(); updateStats(); }
     }
 
     // ===== TRANSACTIONS =====
@@ -1409,6 +1544,10 @@
               </div>
             </td>
           </tr>`;
+        document.getElementById('pendingTxCount').textContent = '0';
+        document.getElementById('depositTxCount').textContent = '0';
+        document.getElementById('withdrawTxCount').textContent = '0';
+        return;
       }
 
       txs.slice().reverse().forEach(tx => {
@@ -1423,6 +1562,16 @@
         if (tx.type === 'withdraw') withdrawCount++;
 
         const tr = document.createElement('tr');
+        let actionsHtml = '';
+        if (tx.status === 'pending') {
+          actionsHtml = `
+            <button class="user-action-btn btn-approve" data-action="approveTx" data-id="${escapeAttr(tx.id)}" data-type="${escapeAttr(tx.type)}" data-uid="${escapeAttr(tx.userId || '')}" data-amount="${tx.coinAmount || 0}">Approve</button>
+            <button class="user-action-btn btn-reject" data-action="rejectTx" data-id="${escapeAttr(tx.id)}" data-type="${escapeAttr(tx.type)}" data-uid="${escapeAttr(tx.userId || '')}" data-amount="${tx.coinAmount || 0}">Reject</button>`;
+        } else {
+          actionsHtml = '<span style="color:#666;font-size:10px;">Processed</span>';
+        }
+        actionsHtml += `<button class="user-action-btn btn-edit" data-action="viewTx" data-id="${escapeAttr(tx.id)}">View</button>`;
+
         tr.innerHTML = `
           <td>${escapeHtml(date)}</td>
           <td class="tx-detail" title="${escapeHtml(userEmail)}">${escapeHtml(userEmail)}</td>
@@ -1431,17 +1580,24 @@
           <td>R${tx.cost || 0}</td>
           <td><span class="status-badge status-${tx.status || 'pending'}">${(tx.status || 'pending').toUpperCase()}</span></td>
           <td class="tx-detail" title="${escapeHtml(details)}">${escapeHtml(details)}</td>
-          <td>
-            <div class="user-actions">
-              ${tx.status === 'pending' ? `
-                <button class="user-action-btn btn-approve" onclick="approveTransaction('${tx.id}', '${tx.type}', '${tx.userId}', ${tx.coinAmount || 0})">Approve</button>
-                <button class="user-action-btn btn-reject" onclick="rejectTransaction('${tx.id}', '${tx.type}', '${tx.userId}', ${tx.coinAmount || 0})">Reject</button>
-              ` : '<span style="color:#666;font-size:10px;">Processed</span>'}
-              <button class="user-action-btn btn-edit" onclick="viewTxDetails('${tx.id}')">View</button>
-            </div>
-          </td>
+          <td><div class="user-actions">${actionsHtml}</div></td>
         `;
         tbody.appendChild(tr);
+      });
+
+      // Attach event listeners
+      tbody.querySelectorAll('.user-action-btn[data-action]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const action = this.dataset.action;
+          if (action === 'approveTx') {
+            approveTransaction(this.dataset.id, this.dataset.type, this.dataset.uid, parseInt(this.dataset.amount) || 0);
+          } else if (action === 'rejectTx') {
+            rejectTransaction(this.dataset.id, this.dataset.type, this.dataset.uid, parseInt(this.dataset.amount) || 0);
+          } else if (action === 'viewTx') {
+            viewTxDetails(this.dataset.id);
+          }
+        });
       });
 
       document.getElementById('pendingTxCount').textContent = pendingCount;
@@ -1477,82 +1633,96 @@
     }
 
     async function approveTransaction(txId, type, userId, amount) {
-      if (useFirestore && db) {
-        const updates = {
-          status: 'approved',
-          approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          approvedBy: currentAuthUser ? currentAuthUser.uid : 'admin',
-          notes: 'Approved by admin'
-        };
-        if (type === 'deposit') {
-          await db.runTransaction(async (t) => {
-            t.update(db.collection('transactions').doc(txId), updates);
-            t.update(db.collection('users').doc(userId), {
-              eggs: firebase.firestore.FieldValue.increment(amount),
-              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      try {
+        if (useFirestore && db) {
+          const updates = {
+            status: 'approved',
+            approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            approvedBy: currentAuthUser ? currentAuthUser.uid : 'admin',
+            notes: 'Approved by admin'
+          };
+          if (type === 'deposit' && userId) {
+            await db.runTransaction(async (t) => {
+              t.update(db.collection('transactions').doc(txId), updates);
+              t.update(db.collection('users').doc(userId), {
+                eggs: firebase.firestore.FieldValue.increment(amount),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
             });
-          });
+          } else {
+            await db.collection('transactions').doc(txId).update(updates);
+          }
         } else {
-          await db.collection('transactions').doc(txId).update(updates);
+          const txs = getTransactions();
+          const users = getUsers();
+          const txIndex = txs.findIndex(t => t.id === txId);
+          if (txIndex === -1) { showNotification('Transaction not found', 'error'); return; }
+          if (type === 'deposit' && (!userId || !users[userId])) { showNotification('Error: User not found', 'error'); return; }
+          txs[txIndex].status = 'approved';
+          txs[txIndex].approvedAt = now();
+          txs[txIndex].approvedBy = 'admin';
+          txs[txIndex].notes = 'Approved by admin';
+          if (type === 'deposit' && userId) {
+            users[userId].eggs = (users[userId].eggs || 0) + amount;
+            users[userId].updatedAt = now();
+            setUsers(users);
+          }
+          setTransactions(txs);
+          loadTransactions();
+          loadUsers();
+          updateStats();
         }
-      } else {
-        const txs = getTransactions();
-        const users = getUsers();
-        const txIndex = txs.findIndex(t => t.id === txId);
-        if (txIndex === -1) { showNotification('Transaction not found', 'error'); return; }
-        if (!userId || !users[userId]) { showNotification('Error: User not found', 'error'); return; }
-        txs[txIndex].status = 'approved';
-        txs[txIndex].approvedAt = now();
-        txs[txIndex].approvedBy = 'admin';
-        txs[txIndex].notes = 'Approved by admin';
-        if (type === 'deposit') {
-          users[userId].eggs = (users[userId].eggs || 0) + amount;
-          users[userId].updatedAt = now();
-          setUsers(users);
-        }
-        setTransactions(txs);
+        showNotification('Transaction approved!', 'success');
+      } catch (err) {
+        console.error('approveTransaction error:', err);
+        showNotification('Failed: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification('Transaction approved!', 'success');
-      if (!useFirestore) { loadTransactions(); updateStats(); }
     }
 
     async function rejectTransaction(txId, type, userId, amount) {
-      if (useFirestore && db) {
-        const updates = {
-          status: 'rejected',
-          rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          rejectedBy: currentAuthUser ? currentAuthUser.uid : 'admin',
-          notes: 'Rejected by admin'
-        };
-        if (type === 'withdraw' && userId) {
-          await db.runTransaction(async (t) => {
-            t.update(db.collection('transactions').doc(txId), updates);
-            t.update(db.collection('users').doc(userId), {
-              eggs: firebase.firestore.FieldValue.increment(amount),
-              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      try {
+        if (useFirestore && db) {
+          const updates = {
+            status: 'rejected',
+            rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            rejectedBy: currentAuthUser ? currentAuthUser.uid : 'admin',
+            notes: 'Rejected by admin'
+          };
+          if (type === 'withdraw' && userId) {
+            await db.runTransaction(async (t) => {
+              t.update(db.collection('transactions').doc(txId), updates);
+              t.update(db.collection('users').doc(userId), {
+                eggs: firebase.firestore.FieldValue.increment(amount),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
             });
-          });
+          } else {
+            await db.collection('transactions').doc(txId).update(updates);
+          }
         } else {
-          await db.collection('transactions').doc(txId).update(updates);
+          const txs = getTransactions();
+          const users = getUsers();
+          const txIndex = txs.findIndex(t => t.id === txId);
+          if (txIndex === -1) { showNotification('Transaction not found', 'error'); return; }
+          txs[txIndex].status = 'rejected';
+          txs[txIndex].rejectedAt = now();
+          txs[txIndex].rejectedBy = 'admin';
+          txs[txIndex].notes = 'Rejected by admin';
+          if (type === 'withdraw' && userId && users[userId]) {
+            users[userId].eggs = (users[userId].eggs || 0) + amount;
+            users[userId].updatedAt = now();
+            setUsers(users);
+          }
+          setTransactions(txs);
+          loadTransactions();
+          loadUsers();
+          updateStats();
         }
-      } else {
-        const txs = getTransactions();
-        const users = getUsers();
-        const txIndex = txs.findIndex(t => t.id === txId);
-        if (txIndex === -1) { showNotification('Transaction not found', 'error'); return; }
-        txs[txIndex].status = 'rejected';
-        txs[txIndex].rejectedAt = now();
-        txs[txIndex].rejectedBy = 'admin';
-        txs[txIndex].notes = 'Rejected by admin';
-        if (type === 'withdraw' && userId && users[userId]) {
-          users[userId].eggs = (users[userId].eggs || 0) + amount;
-          users[userId].updatedAt = now();
-          setUsers(users);
-        }
-        setTransactions(txs);
+        showNotification('Transaction rejected. Coins refunded if applicable.', 'success');
+      } catch (err) {
+        console.error('rejectTransaction error:', err);
+        showNotification('Failed: ' + (err.message || 'Unknown error'), 'error');
       }
-      showNotification('Transaction rejected. Coins refunded if applicable.', 'success');
-      if (!useFirestore) { loadTransactions(); updateStats(); }
     }
 
     // ===== EXPORT DATA =====
@@ -1587,7 +1757,10 @@
         localStorage.removeItem(DB_KEYS.REWARDS);
       }
       showNotification('All data cleared!', 'success');
-      if (!useFirestore) { loadUsers(); updateStats(); }
+      loadUsers();
+      loadRewards();
+      loadTransactions();
+      updateStats();
     }
 
     // ===== MODAL CLOSE ON BACKDROP CLICK =====
@@ -1601,4 +1774,4 @@
     init();
   </script>
 </body>
-        </html>admin.html
+  </html>
