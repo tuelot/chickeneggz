@@ -31,18 +31,11 @@
     .bottom-nav-btn:hover { color: #fff; }
     .bottom-nav-icon { font-size: 16px; }
     .bottom-nav-label { font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 1000; letter-spacing: 0.5px; text-transform: uppercase; color: #fff; }
-    .auth-bar { position: fixed; top: 8px; right: 12px; z-index: 10000; display: flex; align-items: center; gap: 8px; }
-    .auth-bar span { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #a0b0d0; }
-    .auth-btn { background: rgba(255,0,125,0.8); border: none; color: #fff; padding: 4px 10px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 9px; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="bg-layer"><img src="Green.png" alt="Green Background"></div>
   <div class="bg-overlay"></div>
-  <div class="auth-bar" id="authBar">
-    <span id="userName">Guest</span>
-    <button class="auth-btn" id="authBtn" onclick="toggleAuth()">Login</button>
-  </div>
   <div class="page-wrapper">
     <header><div class="logo">Chicken Eggz</div></header>
     <div class="main-game-area" id="gameArea"><canvas id="gameCanvas"></canvas></div>
@@ -58,7 +51,7 @@
     </div>
     <div class="footer-stat">
       <span class="footer-stat-label">Next Lvl</span>
-      <span class="footer-stat-value" id="next-level">20</span>
+      <span class="footer-stat-value" id="next-level">1000</span>
     </div>
   </div>
   <nav class="bottom-nav">
@@ -72,29 +65,7 @@
     <p id="levelUpText">Level 2 Unlocked!</p>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    const firebaseConfig = {
-  apiKey: "AIzaSyBleBA1kmdnkQxGlOOCEhP7gPMUJ-q3Hkg",
-  authDomain: "chickeneggz.firebaseapp.com",
-  projectId: "chickeneggz",
-  storageBucket: "chickeneggz.firebasestorage.app",
-  messagingSenderId: "378281633320",
-  appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
-};
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let currentUser = null;
-    let userDocRef = null;
-    let isGuest = false;
-    let syncTimeout = null;
-
+  <script>
     // ===== STATE =====
     let coins = 0;
     let level = 1;
@@ -106,7 +77,7 @@
     const MAX_COMBO = 10;
     const BASE_BIRD_COUNT = 10;
 
-    function getLevelThreshold(lvl) { return Math.floor(20 * Math.pow(1.5, lvl - 1)); }
+    function getLevelThreshold(lvl) { return lvl * 1000; }
     function getBirdCountForLevel(lvl) { return BASE_BIRD_COUNT + Math.floor((lvl - 1) * 1.5); }
     function getBirdSpeedMultiplier(lvl) { return 1 + (lvl - 1) * 0.15; }
 
@@ -127,73 +98,18 @@
       setTimeout(function() { n.classList.remove('show'); }, 2500);
     }
 
-    // ===== AUTH =====
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        isGuest = false;
-        document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
-        document.getElementById('authBtn').textContent = 'Logout';
-        userDocRef = doc(db, 'users', user.uid);
-        await loadUserData();
-        listenForDeposits();
-      } else {
-        currentUser = null;
-        isGuest = localStorage.getItem('chickenEmpire_v1.guest') === 'true';
-        if (!isGuest) {
-          window.location.href = 'login.html';
-          return;
-        }
-        document.getElementById('userName').textContent = 'Guest';
-        document.getElementById('authBtn').textContent = 'Login';
-        coins = parseInt(localStorage.getItem('chickenEmpire_v1.eggs')) || 0;
-        level = parseInt(localStorage.getItem('chickenEmpire_v1.level')) || 1;
-        totalEarned = parseInt(localStorage.getItem('chickenEmpire_v1.totalEarned')) || 0;
-        updateHUD();
-      }
-    });
-
-    window.toggleAuth = function() {
-      if (currentUser) {
-        signOut(auth).then(() => { localStorage.removeItem('chickenEmpire_v1.guest'); window.location.href = 'login.html'; });
-      } else {
-        window.location.href = 'login.html';
-      }
-    };
-
-    async function loadUserData() {
-      if (!userDocRef) return;
-      const snap = await getDoc(userDocRef);
-      if (snap.exists()) {
-        const data = snap.data();
-        coins = data.eggs || 0;
-        level = data.level || 1;
-        totalEarned = data.totalEarned || 0;
-      } else {
-        // Create doc if missing
-        await setDoc(userDocRef, {
-          uid: currentUser.uid, email: currentUser.email, name: currentUser.displayName || currentUser.email.split('@')[0],
-          eggs: 0, level: 1, totalEarned: 0, isAdmin: currentUser.email === 'admin@chicken.com',
-          isBlocked: false, createdAt: serverTimestamp()
-        });
-      }
+    // ===== LOAD & SAVE =====
+    function loadLocalData() {
+      coins = parseInt(localStorage.getItem('chickenEmpire_v1.eggs')) || 0;
+      level = parseInt(localStorage.getItem('chickenEmpire_v1.level')) || 1;
+      totalEarned = parseInt(localStorage.getItem('chickenEmpire_v1.totalEarned')) || 0;
       updateHUD();
     }
 
-    function syncToFirestore() {
-      if (!userDocRef || isGuest) return;
-      if (syncTimeout) clearTimeout(syncTimeout);
-      syncTimeout = setTimeout(async () => {
-        try {
-          await updateDoc(userDocRef, { eggs: coins, level: level, totalEarned: totalEarned, updatedAt: serverTimestamp() });
-        } catch (e) { console.error('Sync error:', e); }
-      }, 2000);
-    }
-
-    function listenForDeposits() {
-      if (!currentUser) return;
-      // Listen for approved deposits on this user
-      // This is a simplified approach - in production you'd use a subcollection or query
+    function saveLocalData() {
+      localStorage.setItem('chickenEmpire_v1.eggs', coins);
+      localStorage.setItem('chickenEmpire_v1.level', level);
+      localStorage.setItem('chickenEmpire_v1.totalEarned', totalEarned);
     }
 
     // ===== HUD =====
@@ -203,17 +119,8 @@
       var next = document.getElementById('next-level');
       if (bal) bal.textContent = coins + ' Eggz (R' + (coins * 0.10).toFixed(2) + ')';
       if (lvl) lvl.textContent = level;
-      var threshold = getLevelThreshold(level);
-      var progress = totalEarned - getLevelThreshold(level - 1);
-      var needed = threshold - getLevelThreshold(level - 1);
-      if (next) next.textContent = Math.max(0, needed - progress);
-      if (isGuest) {
-        localStorage.setItem('chickenEmpire_v1.eggs', coins);
-        localStorage.setItem('chickenEmpire_v1.level', level);
-        localStorage.setItem('chickenEmpire_v1.totalEarned', totalEarned);
-      } else {
-        syncToFirestore();
-      }
+      if (next) next.textContent = Math.max(0, getLevelThreshold(level) - totalEarned);
+      saveLocalData();
     }
 
     function checkLevelUp() {
@@ -411,6 +318,7 @@
 
     function init() {
       resizeCanvas();
+      loadLocalData();
       birds.push(new Bird(true));
       var targetCount = getBirdCountForLevel(level);
       for (var i = 0; i < targetCount; i++) { birds.push(new Bird(false)); }
