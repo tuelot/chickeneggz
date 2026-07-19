@@ -795,55 +795,36 @@
       });
     }
 
-    // ===== TWO-WAY BALANCE SYNC =====
+    // ===== LOAD BALANCE (localStorage = primary source of truth) =====
     async function loadBalance() {
-      const localEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
+      let localEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
 
-      if (!firebaseUid) {
-        currentEggs = localEggs;
-        updateBalanceDisplay();
-        return;
-      }
-
-      try {
-        const userRef = doc(db, 'users', firebaseUid);
-        const userDoc = await getDoc(userRef);
-        let firestoreEggs = 0;
-
-        if (userDoc.exists()) {
-          firestoreEggs = userDoc.data().eggs || 0;
-        }
-
-        currentEggs = Math.max(localEggs, firestoreEggs);
-
-        if (firestoreEggs > localEggs) {
-          localStorage.setItem(DB_KEYS.GAME_EGGS, String(currentEggs));
-          console.log('[Cashout] Firestore ahead. Updated localStorage to', currentEggs);
-        }
-
-        if (localEggs > firestoreEggs) {
-          if (userDoc.exists()) {
-            await updateDoc(userRef, { eggs: currentEggs, updatedAt: now() });
-          } else {
-            await setDoc(userRef, {
-              uid: firebaseUid,
-              email: currentUser.email,
-              name: currentUser.name,
-              eggs: currentEggs,
-              isAdmin: false,
-              isBlocked: false,
-              createdAt: now()
-            });
+      // If localStorage is empty (0) but user is logged in, try restoring from Firestore
+      if (!localEggs && firebaseUid) {
+        try {
+          const userRef = doc(db, 'users', firebaseUid);
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists() && userDoc.data().eggs) {
+            localEggs = userDoc.data().eggs;
+            localStorage.setItem(DB_KEYS.GAME_EGGS, String(localEggs));
+            console.log('[Cashout] localStorage empty, restored from Firestore:', localEggs);
           }
-          console.log('[Cashout] localStorage ahead. Synced', currentEggs, 'to Firestore');
+        } catch (e) {
+          console.error('[Cashout] Firestore restore error:', e);
         }
-
-      } catch (e) {
-        console.error('[Cashout] Firestore sync error:', e);
-        currentEggs = localEggs;
       }
 
+      currentEggs = localEggs;
       updateBalanceDisplay();
+
+      // One-way sync: game (localStorage) → Firestore
+      if (firebaseUid) {
+        try {
+          await syncEggsToFirestore();
+        } catch (e) {
+          console.error('[Cashout] Firestore sync error:', e);
+        }
+      }
     }
 
     function updateBalanceDisplay() {
@@ -862,7 +843,7 @@
       if (zarVal) zarVal.textContent = '≈ R' + zarTotal.toFixed(2);
     }
 
-    // ===== REAL-TIME FIRESTORE LISTENER =====
+    // ===== REAL-TIME FIRESTORE LISTENER (deposit approvals only) =====
     function startBalanceListener() {
       if (!firebaseUid) return;
       const userRef = doc(db, 'users', firebaseUid);
@@ -872,19 +853,21 @@
         const fsEggs = snap.data().eggs || 0;
         const localEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
 
-        if (fsEggs !== currentEggs && fsEggs >= localEggs) {
+        // Only accept Firestore updates when it has MORE eggs than localStorage
+        // (e.g., admin approved a deposit). Never overwrite game progress.
+        if (fsEggs > localEggs) {
           currentEggs = fsEggs;
           localStorage.setItem(DB_KEYS.GAME_EGGS, String(currentEggs));
           updateBalanceDisplay();
           updateRateDisplays();
-          console.log('[Cashout] Real-time update from Firestore:', currentEggs);
+          console.log('[Cashout] Deposit approved! Updated from Firestore:', currentEggs);
         }
       }, (err) => {
         console.error('[Cashout] Balance listener error:', err);
       });
     }
 
-    // ===== SYNC EGGS TO FIRESTORE =====
+    // ===== SYNC EGGS TO FIRESTORE (one-way: game → Firestore) =====
     async function syncEggsToFirestore() {
       if (!firebaseUid) return;
       try {
@@ -1425,4 +1408,4 @@
     })();
   </script>
 </body>
-</html>
+  </html>
