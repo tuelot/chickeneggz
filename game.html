@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Chicken Eggz</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght=500;700;900&family=Poppins:wght=300;400;500;600;700&family=Fredoka+One&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&family=Fredoka+One&display=swap');
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; width: 100%; overflow: hidden; font-family: 'Poppins', sans-serif; background: #0a0f1e; color: #fff; touch-action: none; user-select: none; }
     .bg-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
     .bg-layer img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     .bg-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10,15,30,0.1); z-index: 1; }
     .page-wrapper { position: relative; z-index: 10; display: flex; flex-direction: column; height: 100vh; width: 100vw; padding: 10px; padding-bottom: 80px; }
-    header { display: flex; justify-content: center; align-items: center; background: rgba(135,206,235,0.85); padding: 5px 15px; margin-top: 40px; margin-right: 50px; margin-left: 50px; border-radius: 12px; backdrop-filter: blur(10px); border: 8px solid #fff; box-shadow: 0 0 12px #fff, inset 0 0 12px #00aaff; }
-    .logo { font-family: 'Fredoka One', cursive; color: #fff; text-shadow: 0 0 20px #00aaff; font-size: 30px; }
+    header { display: flex; justify-content: center; align-items: center; padding: 5px 15px; margin-top: 40px; margin-right: 50px; margin-left: 50px; }
     .main-game-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding-top: 5px; position: relative; overflow: hidden; border-radius: 12px; margin-top: 5px; }
     #gameCanvas { display: block; width: 100%; height: 100%; background: transparent; cursor: crosshair; touch-action: none; }
     .notification { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(239,68,68,0.9); padding: 12px 24px; border-radius: 8px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 10000; font-size: 14px; }
@@ -31,23 +30,65 @@
     .bottom-nav-btn:hover { color: #fff; }
     .bottom-nav-icon { font-size: 16px; }
     .bottom-nav-label { font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 1000; letter-spacing: 0.5px; text-transform: uppercase; color: #fff; }
+
+    /* ===== PUMP.FUN STYLE COIN INFO (ORIGINAL FOOTER LOOK) ===== */
+    .coin-info {
+      background: rgba(10, 15, 30, 0.85);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255, 255, 0, 1);
+      border-radius: 10px;
+      padding: 6px 14px;
+      text-align: center;
+      pointer-events: none;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+    }
+    .coin-info .coin-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 1000;
+      color: #00f2fe;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .coin-info .coin-price {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 1000;
+      color: rgba(255, 255, 0, 1);
+      text-shadow: 0 0 6px rgba(0, 255, 136, 0.4);
+    }
+    .coin-info .coin-cap {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      font-weight: 1000;
+      color: #00ff88;
+      margin-top: 1px;
+    }
+    .coin-info .coin-divider {
+      color: #4a5568;
+      margin: 0 4px;
+    }
   </style>
 </head>
 <body>
   <div class="bg-layer"><img src="Green.png" alt="Green Background"></div>
   <div class="bg-overlay"></div>
   <div class="page-wrapper">
-    <header><div class="logo">Chicken Eggz</div></header>
+    <header>
+      <div class="coin-info" id="coinInfo">
+        <div class="coin-name">EGGZ / USD · ZAR</div>
+        <div class="coin-price" id="coinPrice">$0.0055 <span class="coin-divider">|</span> R0.10</div>
+        <div class="coin-cap" id="coinCap">MCap: $55.0M <span class="coin-divider">|</span> R1.0B</div>
+      </div>
+    </header>
     <div class="main-game-area" id="gameArea"><canvas id="gameCanvas"></canvas></div>
   </div>
+
   <div class="footer-stats">
     <div class="footer-stat">
       <span class="footer-stat-label">Level</span>
       <span class="footer-stat-value" id="level-display">1</span>
-    </div>
-    <div class="footer-stat">
-      <span class="footer-stat-label">Eggz</span>
-      <span class="footer-stat-value" id="coin-balance">0</span>
     </div>
     <div class="footer-stat">
       <span class="footer-stat-label">Next Lvl</span>
@@ -77,6 +118,13 @@
     const MAX_COMBO = 10;
     const BASE_BIRD_COUNT = 10;
 
+    // Coin economics (pump.fun style)
+    const TOTAL_SUPPLY = 10000000000; // 10 billion max supply
+    const EGGZ_MINT = "8Bdkub6HZ8fYUW9D3CjjzVsYR3M2Uv5Yad12V5LSpump";
+    let currentPriceUSD = 0.0055;
+    let currentMarketCapUSD = 55000000;
+    let currentZARRate = 18.20;
+
     function getLevelThreshold(lvl) { return lvl * 1000; }
     function getBirdCountForLevel(lvl) { return BASE_BIRD_COUNT + Math.floor((lvl - 1) * 1.5); }
     function getBirdSpeedMultiplier(lvl) { return 1 + (lvl - 1) * 0.15; }
@@ -104,6 +152,7 @@
       level = parseInt(localStorage.getItem('chickenEmpire_v1.level')) || 1;
       totalEarned = parseInt(localStorage.getItem('chickenEmpire_v1.totalEarned')) || 0;
       updateHUD();
+      updateCoinInfo();
     }
 
     function saveLocalData() {
@@ -114,13 +163,67 @@
 
     // ===== HUD =====
     function updateHUD() {
-      var bal = document.getElementById('coin-balance');
       var lvl = document.getElementById('level-display');
       var next = document.getElementById('next-level');
-      if (bal) bal.textContent = coins + ' Eggz (R' + (coins * 0.10).toFixed(2) + ')';
       if (lvl) lvl.textContent = level;
       if (next) next.textContent = Math.max(0, getLevelThreshold(level) - totalEarned);
       saveLocalData();
+    }
+
+    // ===== PUMP.FUN STYLE COIN INFO UPDATE =====
+    function formatCompact(num) {
+      if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+      if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+      if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+      return num.toFixed(2);
+    }
+
+    function updateCoinInfo() {
+      var priceEl = document.getElementById('coinPrice');
+      var capEl = document.getElementById('coinCap');
+      if (!priceEl || !capEl) return;
+      var priceZAR = currentPriceUSD * currentZARRate;
+      var mcapZAR = currentMarketCapUSD * currentZARRate;
+      priceEl.innerHTML = '$' + currentPriceUSD.toFixed(4) + ' <span class="coin-divider">|</span> R' + priceZAR.toFixed(2);
+      capEl.innerHTML = 'MCap: $' + formatCompact(currentMarketCapUSD) + ' <span class="coin-divider">|</span> R' + formatCompact(mcapZAR);
+    }
+
+    async function fetchZARRate() {
+      try {
+        var res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        var data = await res.json();
+        currentZARRate = data.rates.ZAR || 18.20;
+        return currentZARRate;
+      } catch (e) {
+        return currentZARRate;
+      }
+    }
+
+    async function fetchLiveCoinData() {
+      try {
+        var pfRes = await fetch('https://frontend-api.pump.fun/coins/' + EGGZ_MINT);
+        if (!pfRes.ok) throw new Error('Pump.fun API failed');
+        var pfData = await pfRes.json();
+        currentMarketCapUSD = pfData.usd_market_cap || 0;
+        currentPriceUSD = currentMarketCapUSD > 0 ? (currentMarketCapUSD / TOTAL_SUPPLY) : 0;
+        await fetchZARRate();
+        updateCoinInfo();
+      } catch (err) {
+        console.error('Live data fetch failed:', err);
+        try {
+          var dexRes = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + EGGZ_MINT);
+          var dexData = await dexRes.json();
+          var pair = dexData.pairs ? dexData.pairs[0] : null;
+          if (pair) {
+            currentPriceUSD = parseFloat(pair.priceUsd) || 0;
+            currentMarketCapUSD = pair.marketCap ? parseFloat(pair.marketCap) : (currentPriceUSD * TOTAL_SUPPLY);
+            await fetchZARRate();
+            updateCoinInfo();
+          }
+        } catch (dexErr) {
+          console.error('DexScreener fallback also failed:', dexErr);
+        }
+      }
     }
 
     // ===== CANVAS =====
@@ -301,15 +404,15 @@
         for (var i = particles.length - 1; i >= 0; i--) { particles[i].update(); if (particles[i].alpha <= 0) particles.splice(i, 1); }
         for (var i = floatingTexts.length - 1; i >= 0; i--) { floatingTexts[i].update(); if (floatingTexts[i].alpha <= 0) floatingTexts.splice(i, 1); }
       }
-      
+
       // ===== 3D FUTURISTIC SLINGSHOT GRAPHICS (PERMANENT RENDER FIX) =====
       ctx.save();
-      
+
       const sx = slingshot.x;
       const sy = slingshot.y;
       const baseTopWidth = 60;
       const baseBottomWidth = 24;
-      
+
       // 1. Draw the 3D Ground Base Pedestal
       let baseGrad = ctx.createLinearGradient(sx - baseTopWidth, sy, sx + baseTopWidth, canvas.height);
       baseGrad.addColorStop(0, '#111827');
@@ -317,7 +420,7 @@
       baseGrad.addColorStop(0.5, '#4b5563');
       baseGrad.addColorStop(0.7, '#1f2937');
       baseGrad.addColorStop(1, '#030712');
-      
+
       ctx.fillStyle = baseGrad;
       ctx.beginPath();
       ctx.moveTo(sx - baseTopWidth / 2, sy + 25);
@@ -326,7 +429,7 @@
       ctx.lineTo(sx - baseBottomWidth, canvas.height);
       ctx.closePath();
       ctx.fill();
-      
+
       // Tech Accent Lines (Glow paths on the main body shaft)
       ctx.strokeStyle = 'rgba(0, 242, 254, 0.6)';
       ctx.lineWidth = 2;
@@ -411,7 +514,7 @@
       // 4. Draw the Launch Pouch / Projectile Orb
       ctx.shadowColor = '#00f2fe';
       ctx.shadowBlur = slingshot.isDragging ? 25 : 12;
-      
+
       let projectileShade = ctx.createRadialGradient(
         slingshot.elasticX - 3, slingshot.elasticY - 3, 2,
         slingshot.elasticX, slingshot.elasticY, 14
@@ -448,6 +551,8 @@
       var targetCount = getBirdCountForLevel(level);
       for (var i = 0; i < targetCount; i++) { birds.push(new Bird(false)); }
       updateHUD();
+      fetchLiveCoinData();
+      setInterval(fetchLiveCoinData, 30000);
       requestAnimationFrame(gameLoop);
     }
     init();
