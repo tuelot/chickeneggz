@@ -66,6 +66,7 @@
       justify-content: space-between;
       align-items: center;
     }
+    .balance-left { display: flex; flex-direction: column; gap: 2px; }
     .balance-label {
       font-family: 'Orbitron', sans-serif;
       font-size: 11px; color: #a0b0d0;
@@ -76,10 +77,18 @@
       font-size: 22px; color: #FFD700;
       font-weight: 900; text-shadow: 0 0 10px rgba(255,215,0,0.3);
     }
+    .balance-fiat {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      margin-top: 2px;
+    }
+    .balance-fiat .usd { color: #00d4ff; }
+    .balance-fiat .zar { color: #22c55e; }
+    .balance-fiat .sep { color: #5a6a8a; margin: 0 4px; }
 
     .container {
       position: relative; z-index: 10;
-      height: calc(100vh - 200px);
+      height: calc(100vh - 210px);
       padding: 10px 15px;
       overflow-y: auto;
       margin-top: 8px;
@@ -99,6 +108,68 @@
       margin-bottom: 12px; text-align: center;
       text-transform: uppercase; letter-spacing: 1px;
     }
+
+    /* PUMP.FUN MARKET CARD */
+    .market-card {
+      background: linear-gradient(135deg, rgba(20, 30, 60, 0.95), rgba(10, 20, 50, 0.95));
+      border: 2px solid #00d4ff;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+    }
+    .market-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .market-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px; color: #00d4ff;
+      text-transform: uppercase; letter-spacing: 1px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .market-live {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 10px; color: #22c55e;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .live-dot {
+      width: 6px; height: 6px; background: #22c55e;
+      border-radius: 50%; animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+    .market-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px; padding: 10px;
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 9px; color: #a0b0d0;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px; font-weight: 700; color: #fff;
+    }
+    .stat-value.price { color: #00d4ff; }
+    .stat-value.mc { color: #FFD700; }
+    .stat-value.vol { color: #c084fc; }
+    .stat-value.holders { color: #22c55e; }
+    .pump-link {
+      display: block; text-align: center;
+      margin-top: 10px; font-size: 11px;
+      color: #00d4ff; text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .pump-link:hover { text-decoration: underline; }
 
     .tab-nav {
       display: flex; gap: 8px; margin-bottom: 16px;
@@ -149,6 +220,85 @@
       line-height: 1.5; margin-bottom: 12px;
       padding: 8px; background: rgba(255, 215, 0, 0.05);
       border-radius: 8px; border-left: 3px solid #FFD700;
+    }
+
+    /* METHOD INFO PANELS */
+    .method-info {
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .method-info.phantom {
+      background: rgba(171, 100, 255, 0.08);
+      border-color: rgba(171, 100, 255, 0.3);
+    }
+    .method-info.cash {
+      background: rgba(34, 197, 94, 0.08);
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+    .method-info-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .method-info.pump .method-info-title { color: #00d4ff; }
+    .method-info.phantom .method-info-title { color: #ab64ff; }
+    .method-info.cash .method-info-title { color: #22c55e; }
+    .method-info-text {
+      font-size: 12px; color: #fff;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+    .method-info-text .label {
+      color: #a0b0d0; font-size: 10px;
+      text-transform: uppercase;
+      display: block; margin-bottom: 2px;
+    }
+    .method-btn {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px; font-weight: 700;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .method-btn.pump {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+    .method-btn.pump:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+    }
+    .method-btn.phantom {
+      background: linear-gradient(135deg, #ab64ff, #7c3aed);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(171, 100, 255, 0.3);
+    }
+    .method-btn.phantom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(171, 100, 255, 0.5);
+    }
+    .method-btn.cash {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    }
+    .method-btn.cash:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(34, 197, 94, 0.5);
     }
 
     .action-btn {
@@ -211,6 +361,7 @@
     }
     .tx-details { color: #a0b0d0; font-size: 11px; }
     .tx-amount { color: #FFD700; font-weight: 700; }
+    .tx-fiat { color: #00d4ff; font-size: 10px; }
 
     .notification {
       position: fixed; bottom: 80px; left: 50%;
@@ -282,15 +433,51 @@
 
   <!-- Balance Bar -->
   <div class="balance-bar">
-    <div>
+    <div class="balance-left">
       <div class="balance-label">Your Eggz Balance</div>
+      <div class="balance-fiat">
+        <span class="usd" id="balanceValueUSD">≈ $0.00</span>
+        <span class="sep">|</span>
+        <span class="zar" id="balanceValueZAR">≈ R0.00</span>
+      </div>
     </div>
     <div class="balance-value" id="balanceDisplay">0</div>
   </div>
 
   <div class="container">
 
-    <!-- Deposit / Withdraw Tabs -->
+    <!-- PUMP.FUN MARKET STATS -->
+    <div class="market-card">
+      <div class="market-header">
+        <div class="market-title">🚀 Pump.fun Live</div>
+        <div class="market-live">
+          <span class="live-dot"></span> LIVE
+        </div>
+      </div>
+      <div class="market-stats">
+        <div class="stat-box">
+          <div class="stat-label">Price (USD)</div>
+          <div class="stat-value price" id="statPriceUSD">$0.0000</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Price (ZAR)</div>
+          <div class="stat-value price" id="statPriceZAR">R0.00</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Market Cap</div>
+          <div class="stat-value mc" id="statMarketCap">$0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">24h Volume</div>
+          <div class="stat-value vol" id="statVolume">$0</div>
+        </div>
+      </div>
+      <a class="pump-link" id="pumpFunLink" href="#" target="_blank" rel="noopener">
+        View on Pump.fun →
+      </a>
+    </div>
+
+    <!-- Tabs -->
     <div class="tab-nav">
       <button class="tab-btn active" id="depositTab" onclick="showTab('deposit')">💰 Deposit</button>
       <button class="tab-btn" id="withdrawTab" onclick="showTab('withdraw')">🏦 Withdraw</button>
@@ -301,9 +488,8 @@
     <div id="depositPanel" class="panel active">
       <div class="card">
         <div class="card-title">💰 Buy Eggz</div>
-        <div class="info-text">
-          💡 Rate: 1 Eggz = R0.10 (10 cents)<br>
-          R10 = 100 Eggz | R100 = 1,000 Eggz<br>
+        <div class="info-text" id="depositInfoText">
+          💡 Live Rate loading...<br>
           Deposit money to get Eggz. Admin must approve before eggs are added.
         </div>
         <div class="form-group">
@@ -314,25 +500,68 @@
           <label class="form-label">Transfer Method</label>
           <select class="form-select" id="depositMethod">
             <option value="bank">Bank Transfer</option>
-            <option value="ewallet">E-Wallet</option>
+            <option value="pumpfun">Pump.fun</option>
+            <option value="phantom">Phantom Wallet</option>
             <option value="cash">Cash Deposit</option>
+            <option value="ewallet">E-Wallet</option>
           </select>
         </div>
+
+        <!-- Pump.fun Info -->
+        <div class="method-info pump" id="pumpfunInfo" style="display:none;">
+          <div class="method-info-title">🚀 Pump.fun Transfer</div>
+          <div class="method-info-text">
+            <span class="label">Send your payment via Pump.fun</span>
+            Click below to open your Pump.fun profile
+          </div>
+          <a href="https://pump.fun/profile/F4sugDEAKdqGVHLn2akgyad2xWrvLNBwzXxTMDbzBTE1" target="_blank" rel="noopener" class="method-btn pump">
+            Open Pump.fun Profile
+          </a>
+        </div>
+
+        <!-- Phantom Wallet Info -->
+        <div class="method-info phantom" id="phantomInfo" style="display:none;">
+          <div class="method-info-title">👻 Phantom Wallet</div>
+          <div class="method-info-text">
+            <span class="label">Send SOL to this address</span>
+            FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq
+          </div>
+          <button class="method-btn phantom" onclick="copyToClipboard('FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq', 'Solana address copied!')">
+            Copy Address
+          </button>
+        </div>
+
+        <!-- Cash Deposit Info -->
+        <div class="method-info cash" id="cashInfo" style="display:none;">
+          <div class="method-info-title">💵 Cash Deposit</div>
+          <div class="method-info-text">
+            <span class="label">Send cash to this number</span>
+            0695000932
+          </div>
+          <button class="method-btn cash" onclick="copyToClipboard('0695000932', 'Number copied!')">
+            Copy Number
+          </button>
+        </div>
+
+        <!-- Bank fields -->
         <div class="form-group" id="bankField">
           <label class="form-label">Bank Account Number</label>
           <input type="text" class="form-input" id="depositBankAccount" placeholder="Enter account number used for transfer">
         </div>
+
+        <!-- E-Wallet field -->
         <div class="form-group" id="cellField" style="display:none;">
           <label class="form-label">Cellphone Number</label>
           <input type="tel" class="form-input" id="depositCellphone" placeholder="0712345678">
         </div>
+
         <div class="form-group">
           <label class="form-label">Reference / Note</label>
           <input type="text" class="form-input" id="depositReference" placeholder="Optional reference">
         </div>
         <div class="info-text" id="depositSummary">
-          You will receive: <span class="tx-amount" id="depositEggs">1000</span> Eggz for R<span id="depositCost">100</span>
-          <br><small style="color:#888">(Rate: R1 = 10 Eggz)</small>
+          You will receive: <span class="tx-amount" id="depositEggs">0</span> Eggz for R<span id="depositCost">100</span>
+          <br><small style="color:#888" id="depositRateLine">(Rate loading...)</small>
         </div>
         <button class="action-btn btn-deposit" id="depositBtn" onclick="submitDeposit()">
           SUBMIT DEPOSIT REQUEST
@@ -344,9 +573,9 @@
     <div id="withdrawPanel" class="panel">
       <div class="card">
         <div class="card-title">🏦 Cash Out</div>
-        <div class="info-text">
-          💡 Rate: 1 Eggz = R0.10 (10 cents)<br>
-          Minimum: 1,000 Eggz (R100) | Maximum: your balance<br>
+        <div class="info-text" id="withdrawInfoText">
+          💡 Live Rate loading...<br>
+          Minimum: loading... | Maximum: your balance<br>
           Admin must approve. Eggz deducted immediately.
         </div>
         <div class="form-group">
@@ -373,9 +602,9 @@
           <input type="text" class="form-input" id="withdrawHolder" placeholder="Name on the account">
         </div>
         <div class="info-text" id="withdrawSummary">
-          You will receive: R<span class="tx-amount" id="withdrawRands">0</span> 
-          | Available: <span class="tx-amount" id="withdrawAvailable">0</span> Eggz
-          <br><small style="color:#888">(Rate: 1 Eggz = R0.10)</small>
+          You will receive: <span style="color:#00d4ff">$0.00</span> / <span style="color:#22c55e">R0.00</span>
+          <br>Available: <span class="tx-amount" id="withdrawAvailable">0</span> Eggz
+          <br><small style="color:#888" id="withdrawRateLine">(Rate loading...)</small>
         </div>
         <button class="action-btn btn-withdraw" id="withdrawBtn" onclick="submitWithdraw()">
           SUBMIT WITHDRAW REQUEST
@@ -416,7 +645,7 @@
     // ===== FIREBASE IMPORTS =====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // ===== FIREBASE CONFIG =====
     const firebaseConfig = {
@@ -441,6 +670,20 @@
     let currentUser = null;
     let currentEggs = 0;
     let firebaseUid = null;
+    let balanceUnsub = null;
+
+    // ===== PUMP.FUN CONFIG =====
+    const EGGZ_MINT = "8Bdkub6HZ8fYUW9D3CjjzVsYR3M2Uv5Yad12V5LSpump";
+    const PUMP_FUN_URL = `https://pump.fun/coin/${EGGZ_MINT}`;
+    const TOTAL_SUPPLY = 10000000000;
+
+    let livePriceUSD = 0;
+    let livePriceZAR = 0;
+    let liveZARRate = 18.20;
+    let liveMarketCap = 0;
+    let liveVolume24h = 0;
+    let liveHolders = 0;
+    const MIN_WITHDRAW_RANDS = 100;
 
     function showNotification(msg, type = 'error') {
       const notif = document.getElementById('notification');
@@ -455,7 +698,50 @@
       return new Date().toISOString();
     }
 
-    // ===== AUTH CHECK (FIREBASE) =====
+    function formatCurrency(num) {
+      if (num >= 1e9) return '$' + (num / 1e9).toFixed(2) + 'B';
+      if (num >= 1e6) return '$' + (num / 1e6).toFixed(2) + 'M';
+      if (num >= 1e3) return '$' + (num / 1e3).toFixed(2) + 'K';
+      return '$' + num.toFixed(2);
+    }
+
+    function formatNumber(num) {
+      if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+      if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+      if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+      return num.toLocaleString();
+    }
+
+    // ===== COPY TO CLIPBOARD =====
+    window.copyToClipboard = function(text, successMsg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showNotification(successMsg, 'success');
+        }).catch(() => {
+          fallbackCopy(text, successMsg);
+        });
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    };
+
+    function fallbackCopy(text, successMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showNotification(successMsg, 'success');
+      } catch (e) {
+        showNotification('Failed to copy. Please copy manually: ' + text);
+      }
+      document.body.removeChild(ta);
+    }
+
+    // ===== AUTH CHECK =====
     async function checkAuth() {
       return new Promise((resolve) => {
         onAuthStateChanged(auth, async (user) => {
@@ -476,38 +762,229 @@
       });
     }
 
-    // ===== LOAD BALANCE FROM FIRESTORE =====
+    // ===== TWO-WAY BALANCE SYNC =====
     async function loadBalance() {
-      if (!firebaseUid) return;
-      try {
-        const userDoc = await getDoc(doc(db, 'users', firebaseUid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          currentEggs = data.eggs || 0;
-          // Sync to localStorage for game compatibility
-          localStorage.setItem(DB_KEYS.GAME_EGGS, String(currentEggs));
-        } else {
-          currentEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
-        }
-      } catch (e) {
-        console.error('Error loading balance:', e);
-        currentEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
+      const localEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
+
+      if (!firebaseUid) {
+        currentEggs = localEggs;
+        updateBalanceDisplay();
+        return;
       }
-      document.getElementById('balanceDisplay').textContent = currentEggs.toLocaleString();
-      document.getElementById('withdrawAvailable').textContent = currentEggs;
+
+      try {
+        const userRef = doc(db, 'users', firebaseUid);
+        const userDoc = await getDoc(userRef);
+        let firestoreEggs = 0;
+
+        if (userDoc.exists()) {
+          firestoreEggs = userDoc.data().eggs || 0;
+        }
+
+        currentEggs = Math.max(localEggs, firestoreEggs);
+
+        if (firestoreEggs > localEggs) {
+          localStorage.setItem(DB_KEYS.GAME_EGGS, String(currentEggs));
+          console.log('[Cashout] Firestore ahead. Updated localStorage to', currentEggs);
+        }
+
+        if (localEggs > firestoreEggs) {
+          if (userDoc.exists()) {
+            await updateDoc(userRef, { eggs: currentEggs, updatedAt: now() });
+          } else {
+            await setDoc(userRef, {
+              uid: firebaseUid,
+              email: currentUser.email,
+              name: currentUser.name,
+              eggs: currentEggs,
+              isAdmin: false,
+              isBlocked: false,
+              createdAt: now()
+            });
+          }
+          console.log('[Cashout] localStorage ahead. Synced', currentEggs, 'to Firestore');
+        }
+
+      } catch (e) {
+        console.error('[Cashout] Firestore sync error:', e);
+        currentEggs = localEggs;
+      }
+
+      updateBalanceDisplay();
+    }
+
+    function updateBalanceDisplay() {
+      const bal = document.getElementById('balanceDisplay');
+      const avail = document.getElementById('withdrawAvailable');
+      const usdVal = document.getElementById('balanceValueUSD');
+      const zarVal = document.getElementById('balanceValueZAR');
+
+      if (bal) bal.textContent = currentEggs.toLocaleString();
+      if (avail) avail.textContent = currentEggs;
+
+      const usdTotal = currentEggs * livePriceUSD;
+      const zarTotal = currentEggs * livePriceZAR;
+
+      if (usdVal) usdVal.textContent = '≈ $' + usdTotal.toFixed(4);
+      if (zarVal) zarVal.textContent = '≈ R' + zarTotal.toFixed(2);
+    }
+
+    // ===== REAL-TIME FIRESTORE LISTENER =====
+    function startBalanceListener() {
+      if (!firebaseUid) return;
+      const userRef = doc(db, 'users', firebaseUid);
+
+      balanceUnsub = onSnapshot(userRef, (snap) => {
+        if (!snap.exists()) return;
+        const fsEggs = snap.data().eggs || 0;
+        const localEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
+
+        if (fsEggs !== currentEggs && fsEggs >= localEggs) {
+          currentEggs = fsEggs;
+          localStorage.setItem(DB_KEYS.GAME_EGGS, String(currentEggs));
+          updateBalanceDisplay();
+          updateRateDisplays();
+          console.log('[Cashout] Real-time update from Firestore:', currentEggs);
+        }
+      }, (err) => {
+        console.error('[Cashout] Balance listener error:', err);
+      });
     }
 
     // ===== SYNC EGGS TO FIRESTORE =====
     async function syncEggsToFirestore() {
       if (!firebaseUid) return;
       try {
-        await updateDoc(doc(db, 'users', firebaseUid), {
-          eggs: currentEggs,
-          updatedAt: now()
-        });
+        const userRef = doc(db, 'users', firebaseUid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          await updateDoc(userRef, { eggs: currentEggs, updatedAt: now() });
+        } else {
+          await setDoc(userRef, {
+            uid: firebaseUid,
+            email: currentUser.email,
+            name: currentUser.name,
+            eggs: currentEggs,
+            isAdmin: false,
+            isBlocked: false,
+            createdAt: now()
+          });
+        }
+        console.log('[Cashout] Synced', currentEggs, 'eggs to Firestore');
       } catch (e) {
-        console.error('Error syncing eggs:', e);
+        console.error('[Cashout] Error syncing eggs:', e);
       }
+    }
+
+    // ===== CROSS-TAB localStorage WATCHER =====
+    window.addEventListener('storage', (e) => {
+      if (e.key === DB_KEYS.GAME_EGGS) {
+        const newEggs = parseInt(e.newValue) || 0;
+        if (newEggs !== currentEggs) {
+          currentEggs = newEggs;
+          updateBalanceDisplay();
+          updateRateDisplays();
+          syncEggsToFirestore();
+          console.log('[Cashout] localStorage changed from another tab:', currentEggs);
+        }
+      }
+    });
+
+    // ===== POLLING FALLBACK =====
+    setInterval(() => {
+      const localEggs = parseInt(localStorage.getItem(DB_KEYS.GAME_EGGS)) || 0;
+      if (localEggs !== currentEggs) {
+        currentEggs = localEggs;
+        updateBalanceDisplay();
+        updateRateDisplays();
+        syncEggsToFirestore();
+      }
+    }, 3000);
+
+    // ===== PUMP.FUN INTEGRATION =====
+    async function fetchZARRate() {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await res.json();
+        liveZARRate = data.rates.ZAR || 18.20;
+        return liveZARRate;
+      } catch (e) {
+        console.error('[Pump.fun] ZAR rate fetch failed:', e);
+        return liveZARRate;
+      }
+    }
+
+    async function fetchPumpFunData() {
+      try {
+        const pfRes = await fetch(`https://frontend-api.pump.fun/coins/${EGGZ_MINT}`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!pfRes.ok) throw new Error(`Pump.fun HTTP ${pfRes.status}`);
+
+        const pfData = await pfRes.json();
+
+        liveMarketCap = pfData.usd_market_cap || 0;
+        liveVolume24h = pfData.volume_24h_usd || pfData.usd_market_cap * 0.1 || 0;
+        liveHolders = pfData.holder_count || 0;
+
+        const mc = liveMarketCap;
+        livePriceUSD = mc > 0 ? (mc / TOTAL_SUPPLY) : 0;
+
+        await fetchZARRate();
+        livePriceZAR = livePriceUSD * liveZARRate;
+
+        console.log('[Pump.fun] Price:', livePriceUSD, 'USD |', livePriceZAR, 'ZAR | MC:', liveMarketCap);
+        return true;
+
+      } catch (pfErr) {
+        console.warn('[Pump.fun] Primary fetch failed:', pfErr.message);
+
+        try {
+          const dexRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${EGGZ_MINT}`);
+          const dexData = await dexRes.json();
+          const pair = dexData.pairs ? dexData.pairs[0] : null;
+
+          if (pair) {
+            livePriceUSD = parseFloat(pair.priceUsd) || 0;
+            liveMarketCap = pair.marketCap || (livePriceUSD * TOTAL_SUPPLY) || 0;
+            liveVolume24h = pair.volume?.h24 || 0;
+            liveHolders = pair.holders || 0;
+
+            await fetchZARRate();
+            livePriceZAR = livePriceUSD * liveZARRate;
+
+            console.log('[DexScreener] Price:', livePriceUSD, 'USD |', livePriceZAR, 'ZAR');
+            return true;
+          }
+        } catch (dexErr) {
+          console.error('[DexScreener] Fallback failed:', dexErr);
+        }
+
+        // Ultimate fallback
+        livePriceUSD = 0.0055;
+        livePriceZAR = 0.10;
+        liveMarketCap = livePriceUSD * TOTAL_SUPPLY;
+        liveVolume24h = 0;
+        return false;
+      }
+    }
+
+    function updateMarketStats() {
+      const priceUSD = document.getElementById('statPriceUSD');
+      const priceZAR = document.getElementById('statPriceZAR');
+      const marketCap = document.getElementById('statMarketCap');
+      const volume = document.getElementById('statVolume');
+      const pumpLink = document.getElementById('pumpFunLink');
+
+      if (priceUSD) priceUSD.textContent = '$' + livePriceUSD.toFixed(6);
+      if (priceZAR) priceZAR.textContent = 'R' + livePriceZAR.toFixed(4);
+      if (marketCap) marketCap.textContent = formatCurrency(liveMarketCap);
+      if (volume) volume.textContent = formatCurrency(liveVolume24h);
+      if (pumpLink) pumpLink.href = PUMP_FUN_URL;
+
+      updateBalanceDisplay();
     }
 
     // ===== TAB NAVIGATION =====
@@ -531,8 +1008,26 @@
     // ===== DEPOSIT METHOD TOGGLE =====
     document.getElementById('depositMethod').addEventListener('change', function() {
       const method = this.value;
-      document.getElementById('bankField').style.display = method === 'bank' || method === 'cash' ? 'block' : 'none';
-      document.getElementById('cellField').style.display = method === 'ewallet' ? 'block' : 'none';
+
+      // Hide all method info panels first
+      document.getElementById('pumpfunInfo').style.display = 'none';
+      document.getElementById('phantomInfo').style.display = 'none';
+      document.getElementById('cashInfo').style.display = 'none';
+      document.getElementById('bankField').style.display = 'none';
+      document.getElementById('cellField').style.display = 'none';
+
+      // Show relevant panel and fields
+      if (method === 'pumpfun') {
+        document.getElementById('pumpfunInfo').style.display = 'block';
+      } else if (method === 'phantom') {
+        document.getElementById('phantomInfo').style.display = 'block';
+      } else if (method === 'cash') {
+        document.getElementById('cashInfo').style.display = 'block';
+      } else if (method === 'bank') {
+        document.getElementById('bankField').style.display = 'block';
+      } else if (method === 'ewallet') {
+        document.getElementById('cellField').style.display = 'block';
+      }
     });
 
     // ===== WITHDRAW METHOD TOGGLE =====
@@ -545,19 +1040,65 @@
     // ===== DEPOSIT SUMMARY UPDATE =====
     document.getElementById('depositAmount').addEventListener('input', function() {
       const rands = parseInt(this.value) || 0;
-      const eggz = rands * 10;
+      const eggz = livePriceZAR > 0 ? Math.floor(rands / livePriceZAR) : 0;
       document.getElementById('depositEggs').textContent = eggz;
       document.getElementById('depositCost').textContent = rands;
     });
 
     // ===== WITHDRAW SUMMARY UPDATE =====
     document.getElementById('withdrawAmount').addEventListener('input', function() {
-      const eggz = parseInt(this.value) || 0;
-      const rands = (eggz * 0.10).toFixed(2);
-      document.getElementById('withdrawRands').textContent = rands;
+      updateRateDisplays();
     });
 
-    // ===== SUBMIT DEPOSIT (FIRESTORE) =====
+    function updateRateDisplays() {
+      const minEggz = livePriceZAR > 0 ? Math.ceil(MIN_WITHDRAW_RANDS / livePriceZAR) : 1000;
+
+      // Deposit info
+      const depositInfo = document.getElementById('depositInfoText');
+      if (depositInfo) {
+        const r10eggz = livePriceZAR > 0 ? Math.floor(10 / livePriceZAR) : 0;
+        const r100eggz = livePriceZAR > 0 ? Math.floor(100 / livePriceZAR) : 0;
+        depositInfo.innerHTML =
+          '💡 Live Rate: 1 Eggz = <span style="color:#00d4ff">$' + livePriceUSD.toFixed(6) + '</span> / <span style="color:#22c55e">R' + livePriceZAR.toFixed(4) + '</span><br>' +
+          'R10 = ' + r10eggz + ' Eggz | R100 = ' + r100eggz + ' Eggz<br>' +
+          'Deposit money to get Eggz. Admin must approve before eggs are added.';
+      }
+
+      // Deposit summary
+      const depositSummary = document.getElementById('depositSummary');
+      const depositRateLine = document.getElementById('depositRateLine');
+      if (depositSummary && depositRateLine) {
+        const rands = parseInt(document.getElementById('depositAmount').value) || 0;
+        const eggz = livePriceZAR > 0 ? Math.floor(rands / livePriceZAR) : 0;
+        const usdCost = rands / liveZARRate;
+        depositSummary.innerHTML = 'You will receive: <span class="tx-amount" id="depositEggs">' + eggz + '</span> Eggz for R<span id="depositCost">' + rands + '</span>';
+        depositRateLine.innerHTML = '(≈ $' + usdCost.toFixed(2) + ' USD @ R' + liveZARRate.toFixed(2) + '/$1)';
+      }
+
+      // Withdraw info
+      const withdrawInfo = document.getElementById('withdrawInfoText');
+      if (withdrawInfo) {
+        withdrawInfo.innerHTML =
+          '💡 Live Rate: 1 Eggz = <span style="color:#00d4ff">$' + livePriceUSD.toFixed(6) + '</span> / <span style="color:#22c55e">R' + livePriceZAR.toFixed(4) + '</span><br>' +
+          'Minimum: ' + minEggz + ' Eggz (R100) | Maximum: your balance<br>' +
+          'Admin must approve. Eggz deducted immediately.';
+      }
+
+      // Withdraw summary
+      const withdrawSummary = document.getElementById('withdrawSummary');
+      const withdrawRateLine = document.getElementById('withdrawRateLine');
+      if (withdrawSummary && withdrawRateLine) {
+        const eggz = parseInt(document.getElementById('withdrawAmount').value) || 0;
+        const rands = livePriceZAR > 0 ? (eggz * livePriceZAR) : 0;
+        const usd = livePriceUSD > 0 ? (eggz * livePriceUSD) : 0;
+        withdrawSummary.innerHTML =
+          'You will receive: <span style="color:#00d4ff">$' + usd.toFixed(4) + '</span> / <span style="color:#22c55e">R' + rands.toFixed(2) + '</span><br>' +
+          'Available: <span class="tx-amount" id="withdrawAvailable">' + currentEggs + '</span> Eggz';
+        withdrawRateLine.innerHTML = '(1 Eggz = $' + livePriceUSD.toFixed(6) + ' / R' + livePriceZAR.toFixed(4) + ')';
+      }
+    }
+
+    // ===== SUBMIT DEPOSIT =====
     window.submitDeposit = async function() {
       if (!firebaseUid) {
         showNotification('Please login first');
@@ -574,6 +1115,8 @@
         showNotification('Please enter a valid deposit amount');
         return;
       }
+
+      // Validation per method
       if (method === 'bank' && !bankAccount) {
         showNotification('Please enter your bank account number');
         return;
@@ -588,7 +1131,27 @@
       btn.innerHTML = 'SUBMITTING... <span class="loading-spinner"></span>';
 
       try {
-        const eggzAmount = amount * 10;
+        const eggzAmount = livePriceZAR > 0 ? Math.floor(amount / livePriceZAR) : 0;
+        const usdAmount = (amount / liveZARRate).toFixed(2);
+
+        // Build payment details based on method
+        let paymentDetails = {
+          transferMethod: method,
+          reference: reference || null
+        };
+
+        if (method === 'bank') {
+          paymentDetails.bankAccount = bankAccount || null;
+        } else if (method === 'ewallet') {
+          paymentDetails.cellphone = cellphone || null;
+        } else if (method === 'pumpfun') {
+          paymentDetails.pumpFunProfile = 'https://pump.fun/profile/F4sugDEAKdqGVHLn2akgyad2xWrvLNBwzXxTMDbzBTE1';
+        } else if (method === 'phantom') {
+          paymentDetails.solanaAddress = 'FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq';
+        } else if (method === 'cash') {
+          paymentDetails.cashNumber = '0695000932';
+        }
+
         await addDoc(collection(db, 'transactions'), {
           userId: firebaseUid,
           userEmail: currentUser.email,
@@ -596,13 +1159,9 @@
           type: 'deposit',
           coinAmount: eggzAmount,
           cost: amount,
+          costUSD: usdAmount,
           status: 'pending',
-          paymentDetails: {
-            transferMethod: method,
-            bankAccount: bankAccount || null,
-            cellphone: cellphone || null,
-            reference: reference || null
-          },
+          paymentDetails: paymentDetails,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
           notes: ''
@@ -623,7 +1182,7 @@
       }
     };
 
-    // ===== SUBMIT WITHDRAW (FIRESTORE) =====
+    // ===== SUBMIT WITHDRAW =====
     window.submitWithdraw = async function() {
       if (!firebaseUid) {
         showNotification('Please login first');
@@ -636,8 +1195,10 @@
       const cellphone = document.getElementById('withdrawCellphone').value.trim();
       const holder = document.getElementById('withdrawHolder').value.trim();
 
-      if (amount < 1000) {
-        showNotification('Minimum withdrawal is 1,000 Eggz (R100)');
+      const minEggz = livePriceZAR > 0 ? Math.ceil(MIN_WITHDRAW_RANDS / livePriceZAR) : 1000;
+
+      if (amount < minEggz) {
+        showNotification('Minimum withdrawal is ' + minEggz + ' Eggz (R100)');
         return;
       }
       if (amount > currentEggs) {
@@ -662,13 +1223,14 @@
       btn.innerHTML = 'SUBMITTING... <span class="loading-spinner"></span>';
 
       try {
-        // Deduct eggs immediately
         currentEggs = Math.max(0, currentEggs - amount);
         localStorage.setItem(DB_KEYS.GAME_EGGS, String(currentEggs));
+        updateBalanceDisplay();
+        updateRateDisplays();
         await syncEggsToFirestore();
-        loadBalance();
 
-        const randsAmount = (amount * 0.10).toFixed(2);
+        const randsAmount = livePriceZAR > 0 ? (amount * livePriceZAR).toFixed(2) : '0.00';
+        const usdAmount = livePriceUSD > 0 ? (amount * livePriceUSD).toFixed(4) : '0.0000';
         await addDoc(collection(db, 'transactions'), {
           userId: firebaseUid,
           userEmail: currentUser.email,
@@ -676,6 +1238,7 @@
           type: 'withdraw',
           coinAmount: amount,
           cost: randsAmount,
+          costUSD: usdAmount,
           status: 'pending',
           paymentDetails: {
             transferMethod: method,
@@ -688,7 +1251,7 @@
           notes: ''
         });
 
-        showNotification('Withdrawal request submitted! ' + amount + ' Eggz (R' + randsAmount + ') deducted. Awaiting admin approval.', 'success');
+        showNotification('Withdrawal request submitted! ' + amount + ' Eggz deducted. Awaiting admin approval.', 'success');
         btn.disabled = false;
         btn.innerHTML = 'SUBMIT WITHDRAW REQUEST';
 
@@ -696,7 +1259,7 @@
         document.getElementById('withdrawBankAccount').value = '';
         document.getElementById('withdrawCellphone').value = '';
         document.getElementById('withdrawHolder').value = '';
-        document.getElementById('withdrawRands').textContent = '0';
+        updateRateDisplays();
       } catch (error) {
         console.error('Withdraw error:', error);
         showNotification('Failed to submit withdrawal. Please try again.');
@@ -705,7 +1268,7 @@
       }
     };
 
-    // ===== LOAD TRANSACTION HISTORY (FIRESTORE) =====
+    // ===== LOAD TRANSACTION HISTORY =====
     async function loadHistory() {
       if (!firebaseUid) return;
       const list = document.getElementById('txList');
@@ -732,6 +1295,7 @@
           const typeLabel = tx.type === 'deposit' ? 'DEPOSIT' : 'WITHDRAW';
           const statusClass = 'status-' + (tx.status || 'pending');
           const statusLabel = (tx.status || 'pending').toUpperCase();
+          const usdDisplay = tx.costUSD ? ' | $' + tx.costUSD : '';
           return `
             <div class="tx-item">
               <div class="tx-header">
@@ -739,7 +1303,7 @@
                 <span class="tx-status ${statusClass}">${statusLabel}</span>
               </div>
               <div class="tx-details">
-                <span class="tx-amount">${tx.coinAmount || 0} Eggz</span> | R${tx.cost || 0} | ${date}
+                <span class="tx-amount">${tx.coinAmount || 0} Eggz</span> | R${tx.cost || 0}${usdDisplay} | ${date}
               </div>
             </div>
           `;
@@ -750,12 +1314,25 @@
       }
     }
 
-    // ===== INIT =====
+    // ===== INITIALIZATION =====
     (async function init() {
       const authed = await checkAuth();
-      if (authed) {
-        await loadBalance();
-      }
+      if (!authed) return;
+
+      await loadBalance();
+      startBalanceListener();
+
+      document.getElementById('pumpFunLink').href = PUMP_FUN_URL;
+
+      await fetchPumpFunData();
+      updateMarketStats();
+      updateRateDisplays();
+
+      setInterval(async () => {
+        await fetchPumpFunData();
+        updateMarketStats();
+        updateRateDisplays();
+      }, 30000);
     })();
   </script>
 </body>
