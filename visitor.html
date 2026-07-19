@@ -394,7 +394,7 @@
     .link-style:hover {
       text-decoration: underline;
     }
-  
+
     .hud-container {
       position: relative;
       z-index: 10;
@@ -428,6 +428,68 @@
     .level-table tr:nth-child(even) {
       background: rgba(0, 0, 0, 0.2);
     }
+
+    .pump-box {
+      background: rgba(0, 212, 255, 0.08);
+      border: 2px solid rgba(0, 212, 255, 0.4);
+      border-radius: 10px;
+      padding: 12px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .pump-box-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      color: #00d4ff;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .pump-link-btn {
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      margin: 4px;
+    }
+    .pump-link-btn.pf {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+    .pump-link-btn.pf:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+    }
+    .pump-link-btn.ph {
+      background: linear-gradient(135deg, #ab64ff, #7c3aed);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(171, 100, 255, 0.3);
+    }
+    .pump-link-btn.ph:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(171, 100, 255, 0.5);
+    }
+    .wallet-address {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      color: #a0b0d0;
+      word-break: break-all;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .wallet-label {
+      font-size: 10px;
+      color: #00d4ff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
@@ -458,21 +520,41 @@
         <div class="corner corner-br"></div>
         <div class="ice-textbox">
 
-      <h3 class="guide-title">🎮 Terms and conditions</h3>
-      <p class="guide-text">Welcome to Chicken Eggz (2026)!A game where you shoot flying birds and earn eggz coins,1 Eggz = R0.10, This will break down the core mechanics, timing windows, economic rules, level progression, and penalty structures so you can maximize your eggz collection and rule the leaderboard.</p>
+      <h3 class="guide-title">🎮 Terms and Conditions</h3>
+      <p class="guide-text">Welcome to Chicken Eggz (2026)! A game where you shoot flying birds and earn Eggz coins. Eggz are now integrated with <strong style="color:#00d4ff">Pump.fun</strong> — the live market price determines the real-time value of your Eggz in both <strong style="color:#00d4ff">USD</strong> and <strong style="color:#22c55e">ZAR</strong>. This guide breaks down the core mechanics, timing windows, economic rules, level progression, and penalty structures so you can maximize your Eggz collection and rule the leaderboard.</p>
 
       <div class="disclaimer-box">
         <h3 class="disclaimer-title">⚠️ IMPORTANT DISCLAIMER</h3>
-        <p class="disclaimer-text">We are not rendering financial advice. Prices and value of Eggz may fluctuate due to currency volatility. In this game you can buy or sell Eggz. It is for saving purposes — you can choose to play the game or just keep your Eggz growing, then sell them later for cash. Speak to the creators and other players before you play as you may lose your Eggz or your money by registering on this game you agree and bind yourself with terms and conditions of the game, We presume they are read on info page.<br><br><strong style="color:#FFD700">💰 Current Rate: 1 Eggz = R0.10 (10 cents)</strong></p>
+        <p class="disclaimer-text">We are not rendering financial advice. Prices and value of Eggz fluctuate in real time based on the Pump.fun market. In this game you can buy or sell Eggz. It is for saving purposes — you can choose to play the game or just keep your Eggz growing, then sell them later for cash. Speak to the creators and other players before you play as you may lose your Eggz or your money. By registering on this game you agree and bind yourself with these terms and conditions. We presume they are read on this info page.</p>
       </div>
 
+      <!-- Pump.fun Integration Box -->
+      <div class="pump-box">
+        <div class="pump-box-title">🚀 Pump.fun & Wallet Links</div>
+        <a href="https://pump.fun/coin/8Bdkub6HZ8fYUW9D3CjjzVsYR3M2Uv5Yad12V5LSpump" target="_blank" rel="noopener" class="pump-link-btn pf">View on Pump.fun</a>
+        <a href="https://pump.fun/profile/F4sugDEAKdqGVHLn2akgyad2xWrvLNBwzXxTMDbzBTE1" target="_blank" rel="noopener" class="pump-link-btn pf">Pump.fun Profile</a>
+        <a href="https://phantom.app/download" target="_blank" rel="noopener" class="pump-link-btn ph">Download Phantom Wallet</a>
+        <div class="wallet-address">
+          <span class="wallet-label">Solana Address:</span> FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq<br>
+          <span class="wallet-label">Cash / E-Wallet:</span> 0695000932
+        </div>
+      </div>
 
       <div class="section-block">
-        <p class="rule-item"><strong>1. Level Progression System (1 — 10)</strong><br>
+        <p class="rule-item"><strong>1. Eggz Value & Pump.fun Integration</strong><br>
+        Eggz are now tracked live against the <strong style="color:#00d4ff">Pump.fun</strong> market. The price updates automatically every 30 seconds.<br>
+        • <strong>Live Price:</strong> Fetched directly from Pump.fun API (with DexScreener fallback).<br>
+        • <strong>USD Value:</strong> Your Eggz balance displays its real-time dollar worth.<br>
+        • <strong>ZAR Value:</strong> Converted live using the current USD/ZAR exchange rate.<br>
+        • <strong>Market Cap & Volume:</strong> Visible on the Cashout page market stats card.<br>
+        <strong style="color:#FFD700">💰 Eggz Value is live — it moves with the market!</strong></p>
+      </div>
+
+      <div class="section-block">
+        <p class="rule-item"><strong>2. Level Progression System (1 — 10)</strong><br>
         Your rank is determined by total lifetime Eggz collected. Every <strong>1,000 Eggz</strong> advances you to the next level.<br>
         There are <strong>10 levels total</strong>. Higher levels unlock bragging rights and leaderboard prestige.<br>
-        <strong style="color:#FFD700">💰 Eggz Value: 1 Eggz = R0.10 (10 cents) | R1 = 10 Eggz | R100 = 1,000 Eggz</strong><br>
-        The level cap is <strong>Level 10 (10,000+ Eggz = R1,000+)</strong>. Once you hit the cap, you continue earning Eggz but remain at max level.</p>
+        The level cap is <strong>Level 10 (10,000+ Eggz)</strong>. Once you hit the cap, you continue earning Eggz but remain at max level.</p>
 
         <table class="level-table">
           <tr><th>Level</th><th>Eggz Required</th><th>Title</th></tr>
@@ -490,34 +572,37 @@
       </div>
 
       <div class="section-block">
-        <p class="rule-item"><strong>2. Scoring & Penalties (The Economy)</strong><br>
-        <strong style="color:#FFD700">💰 Rate: 1 Eggz = R0.10 (10 cents)</strong><br><br>
-        • <strong>Hit a Baby Chick (🎯 +1 Eggz = R0.10):</strong> Successfully hitting a small flying purple cyber-chick awards you +1 Eggz.<br>
-        • <strong>Miss a Shot (❌ -1 Eggz = -R0.10):</strong> Firing a stone that completely misses all targets and exits the screen penalizes your balance by -1 Eggz.<br>
-        • <strong>Golden Bird (🌟 +5 Eggz = R0.50):</strong> Rare golden birds drop +5 Eggz per hit, multiplied by your current combo.<br>
-        • <strong>Rainbow Bird (🌈 +3 Eggz = R0.30):</strong> Rainbow birds grant +3 Eggz per hit, multiplied by your current combo.<br>
-        • <strong>Bomb Bird (💣 -10 Eggz = -R1.00):</strong> Hitting a bomb bird instantly wipes 10 Eggz from your balance and resets your combo to zero.<br>
-        • <strong>The Mother Shield (🛡️ -10 Eggz = -R1.00):</strong> The large green patrolling Mother Bird acts as a shield for her chicks. Hitting her cracks the shield and costs you 10 Eggz. The on-screen tracking pop-up will show your progress (e.g., MOTHER HIT: 3/10).</p>
+        <p class="rule-item"><strong>3. Scoring & Penalties (The Economy)</strong><br>
+        • <strong>Hit a Baby Chick (🎯 +1 Eggz):</strong> Successfully hitting a small flying purple cyber-chick awards you +1 Eggz.<br>
+        • <strong>Miss a Shot (❌ -1 Eggz):</strong> Firing a stone that completely misses all targets and exits the screen penalizes your balance by -1 Eggz.<br>
+        • <strong>Golden Bird (🌟 +5 Eggz):</strong> Rare golden birds drop +5 Eggz per hit, multiplied by your current combo.<br>
+        • <strong>Rainbow Bird (🌈 +3 Eggz):</strong> Rainbow birds grant +3 Eggz per hit, multiplied by your current combo.<br>
+        • <strong>Bomb Bird (💣 -10 Eggz):</strong> Hitting a bomb bird instantly wipes 10 Eggz from your balance and resets your combo to zero.<br>
+        • <strong>The Mother Shield (🛡️ -10 Eggz):</strong> The large green patrolling Mother Bird acts as a shield for her chicks. Hitting her cracks the shield and costs you 10 Eggz. The on-screen tracking pop-up will show your progress (e.g., MOTHER HIT: 3/10).</p>
       </div>
 
       <div class="section-block">
-        <p class="rule-item"><strong>3. Buying & Selling Eggz (Cashout)</strong><br>
-        • <strong>Deposit (Buy Eggz):</strong> Send money via Bank Transfer, E-Wallet, or Cash Deposit. Rate is <strong>R1 = 10 Eggz</strong>. Admin must approve before Eggz are added to your balance.<br>
-        • <strong>Withdraw (Sell Eggz):</strong> Cash out your Eggz to your bank account or E-Wallet. Rate is <strong>1 Eggz = R0.10</strong>. Minimum withdrawal is <strong>1,000 Eggz (R100)</strong>. Eggz are deducted immediately; admin must approve the payout.<br>
+        <p class="rule-item"><strong>4. Buying & Selling Eggz (Cashout)</strong><br>
+        • <strong>Deposit (Buy Eggz):</strong> Send money via <strong>Bank Transfer</strong>, <strong>Pump.fun</strong>, <strong>Phantom Wallet (SOL)</strong>, <strong>E-Wallet</strong>, or <strong>Cash Deposit</strong>. The amount of Eggz you receive is calculated using the <strong>live Pump.fun rate</strong>. Admin must approve before Eggz are added to your balance.<br><br>
+        <strong>Transfer Details:</strong><br>
+        — <strong style="color:#00d4ff">Pump.fun:</strong> <a href="https://pump.fun/profile/F4sugDEAKdqGVHLn2akgyad2xWrvLNBwzXxTMDbzBTE1" target="_blank" rel="noopener" class="link-style">Open Profile</a><br>
+        — <strong style="color:#ab64ff">Phantom Wallet:</strong> Send SOL to <span style="color:#FFD700">FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq</span> | <a href="https://phantom.app/download" target="_blank" rel="noopener" class="link-style">Download Phantom</a><br>
+        — <strong style="color:#22c55e">Cash / E-Wallet:</strong> Send to <span style="color:#FFD700">0695000932</span><br><br>
+        • <strong>Withdraw (Sell Eggz):</strong> Cash out your Eggz to your bank account or E-Wallet. Minimum withdrawal is <strong>1,000 Eggz (R100)</strong>. Eggz are deducted immediately; admin must approve the payout. The Rand value is calculated using the live rate.<br>
         • <strong>Processing:</strong> All deposits and withdrawals require admin approval. Please allow up to 24 hours for processing.<br>
-        • <strong>Fees:</strong> N.B! Player must have 1000 eggz to play the game or We will deduct 1000eggz or R100 once off fee for joining fee.No fees for deposits. Withdrawals may incur a small processing fee deducted from the payout amount minimum of 10% if more that R1000.both once-0ff fee and withdrawal fee can be charged same time</p>
+        • <strong>Fees:</strong> N.B! Player must have 1,000 Eggz to play the game or we will deduct 1,000 Eggz (R100) once-off joining fee. No fees for deposits. Withdrawals may incur a small processing fee deducted from the payout amount — minimum of 10% if more than R1,000. Both once-off fee and withdrawal fee can be charged at the same time.</p>
       </div>
 
       <div class="section-block">
-        <p class="rule-item"><strong>4. Chatroom Rules</strong><br>
+        <p class="rule-item"><strong>5. Chatroom Rules</strong><br>
         • <strong>Group Chat:</strong> Public chat for all players. Be respectful — no spam, abuse, or inappropriate content.<br>
-        • <strong>🔒Inbox Admin:</strong> Private channel to message admin directly. Use this for support, disputes, or private inquiries.<br>
+        • <strong>🔒 Inbox Admin:</strong> Private channel to message admin directly. Use this for support, disputes, or private inquiries.<br>
         • <strong>Violations:</strong> Admin can delete posts, block users from posting, or permanently remove users from chat.<br>
-        • <strong>Admin Access:</strong> Only <strong>administrator</strong> has full chat moderation powers.</p>
+        • <strong>Admin Access:</strong> Only the <strong>administrator</strong> has full chat moderation powers.</p>
       </div>
 
       <div class="section-block">
-        <p class="rule-item"><strong>5. Account & Registration</strong><br>
+        <p class="rule-item"><strong>6. Account & Registration</strong><br>
         • <strong>Sign Up:</strong> Register with your name, email, cell number, and password.<br>
         • <strong>Approval:</strong> New accounts are <strong>pending</strong> until admin approves them. You cannot play until approved.<br>
         • <strong>Blocked Accounts:</strong> Admin can block accounts for rule violations. Blocked users cannot login.<br>
@@ -530,12 +615,13 @@
       <h2 class="guide-subtitle">🛠️ Credits & Official Links</h2>
       <p class="guide-text">
         <strong>Game Creator:</strong> Tuelo Tsheko (Web Developer)<br>
-        <strong>Official Website:</strong> <a href="https://www.chickeneggz.com" target="_blank" class="link-style">www.chickeneggz.com</a><br>
-        <strong>Direct Email Support:</strong> <a href="mailto:chickeneggz2026@gmail.com" class="link-style">Chickeneggz2026@gmail.com</a>
+        <strong>Official Linktree:</strong> <a href="https://linktr.ee/chickeneggz" target="_blank" rel="noopener" class="link-style">linktr.ee/chickeneggz</a><br>
+        <strong>Pump.fun Coin:</strong> <a href="https://pump.fun/coin/8Bdkub6HZ8fYUW9D3CjjzVsYR3M2Uv5Yad12V5LSpump" target="_blank" rel="noopener" class="link-style">View on Pump.fun</a><br>
+        <strong>Direct Email Support:</strong> <a href="mailto:chickeneggz2026@gmail.com" class="link-style">chickeneggz2026@gmail.com</a>
       </p>
 
       <p class="guide-text" style="color: #FFD700; font-weight: 600; margin-top: 1.5rem; text-align: center;">Good luck out there, and protect your eggs!</p>
-    
+
         </div>
     </div>
   </div>
