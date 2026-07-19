@@ -16,8 +16,8 @@
       width: 100%; 
       overflow: hidden; 
       font-family: 'Poppins', sans-serif; 
-      background: rgba(255, 255, 0, 1); 
-      color:  rgba(255, 255, 0, 1); 
+      background: #00aaff; 
+      color:  #00aaff; 
       user-select: none;
       touch-action: none;
     }
@@ -175,7 +175,7 @@
     .btn-label {
       font-family: 'Orbitron', sans-serif;
       font-size: 6px;
-      font-weight: 700;
+      font-weight: 1000;
       letter-spacing: 1.5px;
       color:  #00f2fe;
       text-transform: uppercase;
@@ -214,7 +214,7 @@
       background: #000000;
       backdrop-filter: blur(-10px);
       border: 2px solid rgba(255, 255, 0, 1);
-      border-radius: -10px;
+      border-radius: 10px;
       padding: 5px 15px;
       text-align: center;
       pointer-events: none;
@@ -234,7 +234,7 @@
       font-family: 'Orbitron', monospace;
       font-size: 11px;
       font-weight: 900;
-      color: #0f0fee;
+      color: rgba(255, 255, 0, 1);
       text-shadow: 0 0 6px rgba(0, 255, 136, 0.4);
     }
     .coin-info .coin-cap {
@@ -303,9 +303,106 @@
       messagingSenderId: "378281633320",
       appId: "1:378281633320:web:2b6d668d3631e031a5f71d"
     };
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      console.log("🚀 Firebase Core Matrix Connected.");
+    } catch (error) {
+      console.error("❌ Core Portal Connection Interrupted:", error);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const statusText = document.getElementById('system-status');
+      const bootSequences = [
+        "Welcome to Chicken Eggz",
+        "Shoot your birds",
+        "Earn Buy Sell // Cash Eggz Coins",
+        "Eggz Coin Listed on Pump.fun"
+      ];
+      let index = 0;
+      const sequenceInterval = setInterval(() => {
+        if(index < bootSequences.length - 1) {
+          statusText.textContent = bootSequences[index];
+          index++;
+        } else {
+          statusText.textContent = bootSequences[bootSequences.length - 1];
+          clearInterval(sequenceInterval);
         }
       }, 450);
     });
+
+    // ==================== LIVE PUMP.FUN DATA ====================
+    const EGGZ_MINT = "8Bdkub6HZ8fYUW9D3CjjzVsYR3M2Uv5Yad12V5LSpump";
+    const TOTAL_SUPPLY = 10000000000;
+
+    function formatCompact(num) {
+      if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+      if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+      if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+      return num.toFixed(2);
+    }
+
+    async function fetchZARRate() {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await res.json();
+        return data.rates.ZAR || 18.20;
+      } catch (e) {
+        return 18.20;
+      }
+    }
+
+    async function fetchLiveCoinData() {
+      try {
+        const pfRes = await fetch(`https://frontend-api.pump.fun/coins/${EGGZ_MINT}`);
+        if (!pfRes.ok) throw new Error('Pump.fun API failed');
+        const pfData = await pfRes.json();
+
+        const usdMarketCap = pfData.usd_market_cap || 0;
+        const priceUSD = usdMarketCap > 0 ? (usdMarketCap / TOTAL_SUPPLY) : 0;
+
+        const zarRate = await fetchZARRate();
+        const priceZAR = priceUSD * zarRate;
+        const mcapZAR = usdMarketCap * zarRate;
+
+        const priceEl = document.getElementById('coinPrice');
+        const capEl = document.getElementById('coinCap');
+        if (priceEl) {
+          priceEl.innerHTML = '$' + priceUSD.toFixed(4) + ' <span class="coin-divider">|</span> R' + priceZAR.toFixed(2);
+        }
+        if (capEl) {
+          capEl.innerHTML = 'MCap: $' + formatCompact(usdMarketCap) + ' <span class="coin-divider">|</span> R' + formatCompact(mcapZAR);
+        }
+      } catch (err) {
+        console.error('Live data fetch failed:', err);
+        try {
+          const dexRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${EGGZ_MINT}`);
+          const dexData = await dexRes.json();
+          const pair = dexData.pairs?.[0];
+          if (pair) {
+            const priceUSD = parseFloat(pair.priceUsd) || 0;
+            const usdMarketCap = pair.marketCap ? parseFloat(pair.marketCap) : (priceUSD * TOTAL_SUPPLY);
+            const zarRate = await fetchZARRate();
+            const priceZAR = priceUSD * zarRate;
+            const mcapZAR = usdMarketCap * zarRate;
+
+            const priceEl = document.getElementById('coinPrice');
+            const capEl = document.getElementById('coinCap');
+            if (priceEl) {
+              priceEl.innerHTML = '$' + priceUSD.toFixed(4) + ' <span class="coin-divider">|</span> R' + priceZAR.toFixed(2);
+            }
+            if (capEl) {
+              capEl.innerHTML = 'MCap: $' + formatCompact(usdMarketCap) + ' <span class="coin-divider">|</span> R' + formatCompact(mcapZAR);
+            }
+          }
+        } catch (dexErr) {
+          console.error('DexScreener fallback also failed:', dexErr);
+        }
+      }
+    }
+
+    fetchLiveCoinData();
+    setInterval(fetchLiveCoinData, 30000);
   </script>
 </body>
 </html>
