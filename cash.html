@@ -691,9 +691,15 @@
     let firebaseUid = null;
     let balanceUnsub = null;
 
-    // ===== TOKEN CONFIG =====
-    // ⚠️ UPDATE THIS TO YOUR REAL SOLANA TOKEN MINT ADDRESS
-    const EGGZ_MINT = "8Bdkub6HZ8fYUW9D3CjjzVsYR3M2Uv5Yad12V5Lspump";
+    // =========================================================================
+    // ⚠️⚠️⚠️  UPDATE THIS TO YOUR REAL SOLANA TOKEN MINT ADDRESS  ⚠️⚠️⚠️
+    // =========================================================================
+    // Go to pump.fun → find your token → copy the mint from the URL after /coin/
+    // Example: https://pump.fun/coin/AbCdEfG...  →  mint = "AbCdEfG..."
+    // =========================================================================
+    const EGGZ_MINT = "8Bdkub6HZ8fYUW9D3CjjzVsYR3M2Uv5Yad12V5LSpump";
+    // =========================================================================
+
     const PUMP_FUN_URL = `https://pump.fun/coin/${EGGZ_MINT}`;
     const DEXSCREENER_URL = `https://api.dexscreener.com/token-pairs/v1/solana/${EGGZ_MINT}`;
 
@@ -974,8 +980,6 @@
         liveFDV = mainPair.fdv || 0;
         liveLiquidity = mainPair.liquidity?.usd || 0;
         liveVolume24h = mainPair.volume?.h24 || 0;
-
-        // Get holder count if available (DexScreener doesn't always provide this)
         liveHolders = mainPair.holders || 0;
 
         await fetchZARRate();
@@ -993,8 +997,6 @@
     // ===== PUMP.FUN API (Secondary - requires auth, likely to fail in browser) =====
     async function fetchPumpFunData() {
       try {
-        // Pump.fun API v3 requires JWT auth and proper Origin header
-        // This will likely fail in browser due to CORS + auth requirements
         const pfRes = await fetch(`https://frontend-api-v3.pump.fun/coins/${EGGZ_MINT}`, {
           method: 'GET',
           headers: {
@@ -1007,7 +1009,6 @@
 
         const pfData = await pfRes.json();
 
-        // Pump.fun v3 returns price directly
         livePriceUSD = parseFloat(pfData.price) || parseFloat(pfData.usd_price) || 0;
         liveMarketCap = pfData.usd_market_cap || pfData.market_cap || 0;
         liveVolume24h = pfData.volume_24h_usd || pfData.volume24h || 0;
@@ -1025,14 +1026,18 @@
       }
     }
 
-    // ===== MAIN PRICE FETCH (tries DexScreener first, then Pump.fun, then fallback) =====
+    // ===== MAIN PRICE FETCH (DexScreener → Pump.fun → Fallback) =====
     async function fetchLivePrice() {
       let success = false;
 
       // 1. Try DexScreener first (CORS-friendly, no auth)
-      success = await fetchDexScreenerData();
+      if (EGGZ_MINT !== "PASTE_YOUR_REAL_TOKEN_MINT_HERE") {
+        success = await fetchDexScreenerData();
+      } else {
+        console.warn('[Price] Mint address is still the placeholder!');
+      }
 
-      // 2. If DexScreener fails, try Pump.fun (will likely fail in browser without proxy)
+      // 2. If DexScreener fails, try Pump.fun
       if (!success) {
         success = await fetchPumpFunData();
       }
@@ -1047,11 +1052,9 @@
         liveVolume24h = 0;
         liveHolders = 0;
 
-        // Show error notice
         const errEl = document.getElementById('apiError');
         if (errEl) errEl.classList.add('show');
       } else {
-        // Hide error notice on success
         const errEl = document.getElementById('apiError');
         if (errEl) errEl.classList.remove('show');
       }
@@ -1103,14 +1106,12 @@
     document.getElementById('depositMethod').addEventListener('change', function() {
       const method = this.value;
 
-      // Hide all method info panels first
       document.getElementById('pumpfunInfo').style.display = 'none';
       document.getElementById('phantomInfo').style.display = 'none';
       document.getElementById('cashInfo').style.display = 'none';
       document.getElementById('bankField').style.display = 'none';
       document.getElementById('cellField').style.display = 'none';
 
-      // Show relevant panel and fields
       if (method === 'pumpfun') {
         document.getElementById('pumpfunInfo').style.display = 'block';
       } else if (method === 'phantom') {
@@ -1147,7 +1148,6 @@
     function updateRateDisplays() {
       const minEggz = livePriceZAR > 0 ? Math.ceil(MIN_WITHDRAW_RANDS / livePriceZAR) : 1000;
 
-      // Deposit info
       const depositInfo = document.getElementById('depositInfoText');
       if (depositInfo) {
         const r10eggz = livePriceZAR > 0 ? Math.floor(10 / livePriceZAR) : 0;
@@ -1158,7 +1158,6 @@
           'Deposit money to get Eggz. Admin must approve before eggs are added.';
       }
 
-      // Deposit summary
       const depositSummary = document.getElementById('depositSummary');
       const depositRateLine = document.getElementById('depositRateLine');
       if (depositSummary && depositRateLine) {
@@ -1169,7 +1168,6 @@
         depositRateLine.innerHTML = '(≈ $' + usdCost.toFixed(2) + ' USD @ R' + liveZARRate.toFixed(2) + '/$1)';
       }
 
-      // Withdraw info
       const withdrawInfo = document.getElementById('withdrawInfoText');
       if (withdrawInfo) {
         withdrawInfo.innerHTML =
@@ -1178,7 +1176,6 @@
           'Admin must approve. Eggz deducted immediately.';
       }
 
-      // Withdraw summary
       const withdrawSummary = document.getElementById('withdrawSummary');
       const withdrawRateLine = document.getElementById('withdrawRateLine');
       if (withdrawSummary && withdrawRateLine) {
@@ -1210,7 +1207,6 @@
         return;
       }
 
-      // Validation per method
       if (method === 'bank' && !bankAccount) {
         showNotification('Please enter your bank account number');
         return;
@@ -1228,7 +1224,6 @@
         const eggzAmount = livePriceZAR > 0 ? Math.floor(amount / livePriceZAR) : 0;
         const usdAmount = (amount / liveZARRate).toFixed(2);
 
-        // Build payment details based on method
         let paymentDetails = {
           transferMethod: method,
           reference: reference || null
@@ -1418,12 +1413,10 @@
 
       document.getElementById('pumpFunLink').href = PUMP_FUN_URL;
 
-      // Fetch live price (DexScreener primary, Pump.fun secondary, fallback last)
       await fetchLivePrice();
       updateMarketStats();
       updateRateDisplays();
 
-      // Refresh every 30 seconds
       setInterval(async () => {
         await fetchLivePrice();
         updateMarketStats();
@@ -1432,4 +1425,4 @@
     })();
   </script>
 </body>
-            </html>
+</html>
