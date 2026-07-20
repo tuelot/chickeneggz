@@ -490,6 +490,37 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+    .copy-address {
+      cursor: pointer;
+      position: relative;
+      border-bottom: 1px dashed rgba(255, 215, 0, 0.6);
+      transition: all 0.2s ease;
+    }
+    .copy-address:hover {
+      border-bottom: 1px solid rgba(255, 215, 0, 1);
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+    }
+    .copy-tooltip {
+      position: absolute;
+      background: rgba(0, 212, 255, 0.95);
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: all 0.25s ease;
+      z-index: 1000;
+      white-space: nowrap;
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+    }
+    .copy-tooltip.show {
+      opacity: 1;
+      transform: translateY(-24px);
+    }
   </style>
 </head>
 <body>
@@ -535,7 +566,7 @@
         <a href="https://pump.fun/profile/F4sugDEAKdqGVHLn2akgyad2xWrvLNBwzXxTMDbzBTE1" target="_blank" rel="noopener" class="pump-link-btn pf">Pump.fun Profile</a>
         <a href="https://phantom.app/download" target="_blank" rel="noopener" class="pump-link-btn ph">Download Phantom Wallet</a>
         <div class="wallet-address">
-          <span class="wallet-label">Solana Address:</span> FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq<br>
+          <span class="wallet-label">Solana Address:</span> <span class="copy-address" onclick="copyAddress(this, 'FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq')">FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq</span><span class="copy-tooltip">Copied!</span><br>
           <span class="wallet-label">Cash / E-Wallet:</span> 0695000932
         </div>
       </div>
@@ -586,7 +617,7 @@
         • <strong>Deposit (Buy Eggz):</strong> Send money via <strong>Bank Transfer</strong>, <strong>Pump.fun</strong>, <strong>Phantom Wallet (SOL)</strong>, <strong>E-Wallet</strong>, or <strong>Cash Deposit</strong>. The amount of Eggz you receive is calculated using the <strong>live Pump.fun rate</strong>. Admin must approve before Eggz are added to your balance.<br><br>
         <strong>Transfer Details:</strong><br>
         — <strong style="color:#00d4ff">Pump.fun:</strong> <a href="https://pump.fun/profile/F4sugDEAKdqGVHLn2akgyad2xWrvLNBwzXxTMDbzBTE1" target="_blank" rel="noopener" class="link-style">Open Profile</a><br>
-        — <strong style="color:#ab64ff">Phantom Wallet:</strong> Send SOL to <span style="color:#FFD700">FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq</span> | <a href="https://phantom.app/download" target="_blank" rel="noopener" class="link-style">Download Phantom</a><br>
+        — <strong style="color:#ab64ff">Phantom Wallet:</strong> Send SOL to <span style="color:#FFD700" class="copy-address" onclick="copyAddress(this, 'FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq')">FG4Hb7c4DS3Y8QGwiAwwDxhq1PjoHYdao1efv1UDdDfq</span><span class="copy-tooltip">Copied!</span> | <a href="https://phantom.app/download" target="_blank" rel="noopener" class="link-style">Download Phantom</a><br>
         — <strong style="color:#22c55e">Cash / E-Wallet:</strong> Send to <span style="color:#FFD700">0695000932</span><br><br>
         • <strong>Withdraw (Sell Eggz):</strong> Cash out your Eggz to your bank account or E-Wallet. Minimum withdrawal is <strong>1,000 Eggz (R100)</strong>. Eggz are deducted immediately; admin must approve the payout. The Rand value is calculated using the live rate.<br>
         • <strong>Processing:</strong> All deposits and withdrawals require admin approval. Please allow up to 24 hours for processing.<br>
@@ -690,6 +721,42 @@
 
     // Storage utilities available for game pages that need them
     // This is a static guide page - no active game state needed here
+    function copyAddress(el, text) {
+      navigator.clipboard.writeText(text).then(function() {
+        // Show tooltip
+        let tooltip = el.nextElementSibling;
+        if (tooltip && tooltip.classList.contains('copy-tooltip')) {
+          tooltip.classList.add('show');
+          setTimeout(function() {
+            tooltip.classList.remove('show');
+          }, 1800);
+        }
+        // Also show notification
+        showNotification('Solana address copied to clipboard!');
+      }).catch(function(err) {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          let tooltip = el.nextElementSibling;
+          if (tooltip && tooltip.classList.contains('copy-tooltip')) {
+            tooltip.classList.add('show');
+            setTimeout(function() {
+              tooltip.classList.remove('show');
+            }, 1800);
+          }
+          showNotification('Solana address copied to clipboard!');
+        } catch (e) {
+          showNotification('Failed to copy address. Please select and copy manually.');
+        }
+        document.body.removeChild(textarea);
+      });
+    }
   </script>
 </body>
 </html>
